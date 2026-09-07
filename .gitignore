@@ -6,3 +6,8 @@ build/
 __pycache__/
 *.pyc
 .DS_Store
+
+# Ready-to-upload copy of the Flutter web output (BLUSHY_MAINAPP/build/web plus
+# a root-level vercel.json). Regenerate it with `flutter build web --release`;
+# it is 82 MB of build artefacts and must never be committed.
+blushy-web-upload/
