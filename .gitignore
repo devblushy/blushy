@@ -1,0 +1,8 @@
+*.zip
+node_modules/
+**/node_modules/
+build/
+.dart_tool/
+__pycache__/
+*.pyc
+.DS_Store
