@@ -2,6 +2,7 @@ import { aiHistoryRepository } from '../repositories/aiHistoryRepository.js';
 import { journalRepository } from '../repositories/journalRepository.js';
 import { dailyMoodRepository } from '../repositories/dailyMoodRepository.js';
 import { env } from '../utils/env.js';
+import { aiFetch } from '../utils/aiRequest.js';
 
 function isWithinHours(dateInput, hours = 48) {
   if (!dateInput) return false;
@@ -254,7 +255,7 @@ Respond ONLY with valid JSON in this exact schema (no markdown outside the JSON,
   ]
 }`;
 
-    const response = await fetch(aiChatApiUrl, {
+    const response = await aiFetch(aiChatApiUrl, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${aiChatApiKey}`,
@@ -270,7 +271,7 @@ Respond ONLY with valid JSON in this exact schema (no markdown outside the JSON,
         temperature: 0.65,
         max_tokens: 500,
       }),
-    });
+    }, { feature: 'partner_needs', userId: cleanUserId });
 
     if (response.ok) {
       const payload = await response.json();

@@ -24,12 +24,14 @@ import { partnerRepository } from '../repositories/partnerRepository.js';
 import { normalizePermissions, hasGrant } from '../domain/partnerPermissions.js';
 import { getPeriodEntries } from '../repositories/periodRepository.js';
 import { db } from '../utils/db.js';
+import { getCachedDiscover, saveCachedDiscover } from '../repositories/discoverCacheRepository.js';
 import { parseAndSaveMedicalReport } from '../services/medicalReportService.js';
 import { evaluateUserSafety, buildSafetyFlow, gateAiOutput } from '../services/safetyService.js';
 import fs from 'node:fs';
 import { env } from '../utils/env.js';
 import { aiChatSummaryRepository } from '../repositories/aiChatSummaryRepository.js';
 import { generateCheckinFollowUps } from '../services/checkinFollowupService.js';
+import { aiFetch } from '../utils/aiRequest.js';
 
 function getUserKey(req, _role = 'woman') {
   const userId = req.user?.userId;
@@ -895,7 +897,7 @@ export async function getPartnerSuggestions(req, res, next) {
       const chatMessages = await partnerRepository.listMessagesForConnection(connectionId, req.user.userId);
       if (chatMessages && chatMessages.length > 0) {
         const mode = String(req.query?.mode ?? 'default').trim();
-        aiChatSuggestions = await aiChatService.generatePartnerChatSuggestions(chatMessages, viewerRole, connectionId, mode);
+        aiChatSuggestions = await aiChatService.generatePartnerChatSuggestions(chatMessages, viewerRole, connectionId, mode, req.user.userId);
       }
     }
 
@@ -1062,10 +1064,13 @@ export async function getRelationshipAdvice(req, res, next) {
     let answer = '';
     try {
       answer = await aiChatService.createReply({
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: question },
-        ],
+        // The task prompt travels as `systemPrompt`, not as a message. Sent as
+        // a message it was normalised down to a user turn, so "you are not a
+        // therapist and must not diagnose" and "never speculate about
+        // information you were not given" arrived with no more standing than
+        // the question itself.
+        messages: [{ role: 'user', content: question }],
+        systemPrompt,
         role: viewerRole,
         user: viewerProfile,
       });
@@ -1161,12 +1166,21 @@ export async function getHealthInsights(req, res, next) {
         user: userProfile,
         languageCode,
       });
-      global.dailyAiInsightCache.set(cacheKey, { timestamp: now, data: aiDaily });
+      // Only a real generation is worth keeping. Caching the fallback would
+      // hold a "could not be generated" message in front of her for ten
+      // minutes after the provider had already recovered.
+      if (aiDaily?.source !== 'unavailable_fallback') {
+        global.dailyAiInsightCache.set(cacheKey, { timestamp: now, data: aiDaily });
+      }
     }
 
     res.status(200).json({
       ok: true,
-      hasData: true,
+      // The analyser's own verdict, not a literal. This was hardcoded `true`,
+      // so the app was told data existed for someone who had logged nothing and
+      // could never render its empty state (spec §4, §31).
+      hasData: Boolean(healthAnalysis.hasData),
+      dataPoints: healthAnalysis.dataPoints ?? 0,
       headline: aiDaily.headline,
       thought: aiDaily.thought,
       narrative: aiDaily.thought,
@@ -1325,7 +1339,21 @@ export async function decodePartnerMessage(req, res, next) {
     }
 
     const permissions = normalizePermissions(connection.permissions);
-    if (!permissions.allowDecoderMan) {
+
+    // Read the decoder switch from the stored permissions, not from the
+    // normalised object above.
+    //
+    // `normalizePermissions` returns the v1 data-sharing vocabulary -- energy,
+    // symptoms, mood, sleep, appointments, journal and so on. `allowDecoderMan`
+    // is not one of those; it is a feature toggle, and the normaliser has never
+    // emitted it. So `permissions.allowDecoderMan` was always `undefined`, and
+    // this endpoint answered "Decoder is disabled in settings" to every request
+    // no matter what the user had actually set.
+    //
+    // The flag itself is fine: the partner settings screen writes it, the
+    // repository stores it, and `partnerRepository` reads it from exactly here
+    // when deciding whether to show the decoder at all. This now matches.
+    if (connection.permissions?.allowDecoderMan !== true) {
       return res.status(200).json({ canDecode: false, message: 'Decoder is disabled in settings.' });
     }
 
@@ -1400,7 +1428,7 @@ export async function decodePartnerMessage(req, res, next) {
 
     if (aiChatApiKey) {
       try {
-        const response = await fetch(aiChatApiUrl, {
+        const response = await aiFetch(aiChatApiUrl, {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${aiChatApiKey}`,
@@ -1428,7 +1456,7 @@ Latest Partner Message to Decode: "${latestMessage.message}"`,
             ],
             max_tokens: 80,
           }),
-        });
+        }, { feature: 'partner_decoder_inline', userId: req.user?.userId ?? null });
 
         if (response.ok) {
           const payload = await response.json();
@@ -1529,103 +1557,38 @@ export async function getMyDailySummaries(req, res, next) {
   }
 }
 
-export async function createVoiceSession(req, res, next) {
-  try {
-    const { mode, languageCode } = req.body ?? {};
-    const user = req.user ?? null;
-    const userId = user?.userId;
-    const safeRole = normalizeRoleValue(user?.role, 'woman');
-    const userKey = userId ? `user:${userId}` : (req.ip ?? 'anonymous');
+// The realtime voice-call session endpoint was removed here.
+//
+// `POST /ai/voice/session` had called `aiChatService.createSiaVoiceSession`,
+// which no longer exists -- every request returned 500. Nothing in the app
+// called it: the voice feature records audio and posts it to /ai/transcribe,
+// which is a different path and works.
+//
+// It was not restored from the August implementation, because that returned
+// the provider API key to the client (`apiKey: env.grokApiKey`). Handing a
+// billable credential to every authenticated device is a worse defect than
+// the 500 it would have fixed. Realtime voice needs the socket proxied
+// through this server so the key never leaves it.
 
-    let onboardingSummary = '';
-    let predictionSummary = '';
-    let healthInsightsSummary = '';
-    let medicalReportSummary = '';
-    let journalSummary = '';
-
-    if (userId) {
-      const userProfile = await userRepository.getUserById(userId);
-      onboardingSummary = buildOnboardingSummary(userProfile?.onboardingAnswers);
-
-      const predictionContext = await userPredictionContextService.buildUserPredictionContext({
-        userId,
-        userKey,
-        role: safeRole,
-      });
-
-      predictionSummary = predictionContext
-        ? userPredictionContextService.summarizeForPrompt(predictionContext)
-        : '';
-
-      if (predictionContext) {
-        const ownPeriodEntries = await getPeriodEntries(userId, 20).catch(() => []);
-        const healthAnalysis = healthInsightsService.analyzeUserHealth({
-          userId,
-          role: safeRole,
-          dailyMoods: predictionContext.moodHistory || [],
-          sleepLogs: predictionContext.sleepHistory || [],
-          onboardingAnswers: userProfile?.onboardingAnswers || {},
-          cycleStartDate: userProfile?.cycleStartDate,
-          periodEntries: ownPeriodEntries,
-        });
-
-        const alertMessages = healthAnalysis.alerts
-          .map((item) => `ALERT: ${item.title} - ${item.message}`)
-          .join(' | ');
-        const suggestionMessages = healthAnalysis.suggestions
-          .map((item) => `SUGGESTION: ${item.suggestion}`)
-          .join(' | ');
-        const insightMessages = healthAnalysis.insights
-          .map((item) => `INSIGHT: ${item.message}`)
-          .join(' | ');
-
-        healthInsightsSummary = [alertMessages, suggestionMessages, insightMessages]
-          .filter(Boolean)
-          .join(' | ');
-      }
-
-      // Fetch latest medical report
-      try {
-        const latestReport = await db.collection('medical_reports')
-          .findOne({ user_id: userId }, { sort: { created_at: -1 } });
-        if (latestReport) {
-          const meds = latestReport.extracted_medication || 'No medications extracted';
-          medicalReportSummary = `Medical Report (${latestReport.file_name}): Extracted Medications: ${meds} | Details: ${latestReport.details || 'None'}`;
-        }
-      } catch (_) {}
-
-      // Fetch user journals
-      try {
-        const recentJournals = await journalRepository.getJournalsByUserId(userId, 5);
-        if (recentJournals && recentJournals.length > 0) {
-          journalSummary = recentJournals.map(j => {
-            const entryTexts = (j.entries || []).map(e => `${e.title || e.type || 'Note'}: ${e.content || ''}`).join('; ');
-            return `[${j.date || 'Journal Entry'}]: ${j.summary || entryTexts}`;
-          }).join(' | ');
-        }
-      } catch (_) {}
-    }
-
-    const session = await aiChatService.createSiaVoiceSession({
-      user,
-      mode: mode || 'default',
-      languageCode: languageCode || 'en',
-      aiContext: {
-        onboardingSummary,
-        predictionSummary,
-        healthInsightsSummary,
-        medicalReportSummary,
-        journalSummary,
-      },
-    });
-    res.status(200).json(session);
-  } catch (error) {
-    next(error);
+/**
+ * The collection holding a user's record, and the record itself.
+ *
+ * Discover's personalisation read the user with
+ * `db.collection('users').findOne({ _id: new ObjectId(userId) })`, which was
+ * wrong three times over: `getDb` was never defined, `ObjectId` was never
+ * imported, and there is no `users` collection -- records live in `users_man`
+ * and `users_woman`, keyed on a string `user_id`. All of it sat inside
+ * `try/catch`, so every request fell through to the generic feed and no error
+ * ever surfaced. Personalised Discover has therefore never worked.
+ */
+async function findDiscoverUserRecord(userId) {
+  for (const collection of ['users_woman', 'users_man']) {
+    const doc = await db.collection(collection).findOne({ user_id: userId });
+    if (doc) return { collection, doc };
   }
+  return null;
 }
 
-// In-memory cache for discover recommendations
-const discoverCache = new Map();
 
 /**
  * Get daily AI-powered Discover topics and educational cards.
@@ -1653,8 +1616,11 @@ export async function getDailyDiscoverTopicsAndCards(req, res, next) {
 
     const cacheKey = userId ? `${userId}_${dateStr}` : `generic_discover_${dateStr}`;
 
-    if (discoverCache.has(cacheKey)) {
-      return res.status(200).json(discoverCache.get(cacheKey));
+    // Served from the shared store, so a restart or a second instance does not
+    // re-run the 16,000-token generation for a day already produced.
+    const cachedPayload = await getCachedDiscover(cacheKey);
+    if (cachedPayload) {
+      return res.status(200).json(cachedPayload);
     }
 
     const defaultTopics = [
@@ -1678,17 +1644,24 @@ export async function getDailyDiscoverTopicsAndCards(req, res, next) {
 
     if (userId) {
       try {
-        const db = await getDb();
-        const user = await db.collection('users').findOne({ _id: new ObjectId(userId) });
-        const chats = await db.collection('chats').find({ user_id: userId }).sort({ created_at: -1 }).limit(10).toArray();
+        const record = await findDiscoverUserRecord(userId);
+        // Chat history is role-suffixed and keyed on `user:<id>`, which is what
+        // the repository knows how to reach; `db.collection('chats')` was a
+        // collection that does not exist.
+        const history = await aiHistoryRepository.listHistory(`user:${userId}`);
         const journals = await journalRepository.getJournalsByUserId(userId, 3);
 
-        const chatInterests = chats.map(c => c.message).join('; ');
+        const chatInterests = history
+          .slice(-10)
+          .map((entry) => entry.userMessage)
+          .filter(Boolean)
+          .join('; ');
         const journalInterests = (journals || []).map(j => j.summary || '').join('; ');
-        
-        if (chatInterests || journalInterests || (user && user.stage)) {
+        const stage = record?.doc?.stage || record?.doc?.life_stage || '';
+
+        if (chatInterests || journalInterests || stage) {
           isPersonalized = true;
-          userContext = `User Stage: ${user?.stage || 'Living with Cycle'}. Recent user questions & research: ${chatInterests}. Recent journals: ${journalInterests}.`;
+          userContext = `User Stage: ${stage || 'Living with Cycle'}. Recent user questions & research: ${chatInterests}. Recent journals: ${journalInterests}.`;
         }
       } catch (err) {
         console.warn('Could not fetch user research history for discover personalization:', err.message);
@@ -1698,10 +1671,9 @@ export async function getDailyDiscoverTopicsAndCards(req, res, next) {
     let dbSeenTitles = [];
     if (userId) {
       try {
-        const db = await getDb();
-        const user = await db.collection('users').findOne({ _id: new ObjectId(userId) });
-        if (user && Array.isArray(user.seenDiscoverCardTitles)) {
-          dbSeenTitles = user.seenDiscoverCardTitles.slice(-30);
+        const record = await findDiscoverUserRecord(userId);
+        if (Array.isArray(record?.doc?.seenDiscoverCardTitles)) {
+          dbSeenTitles = record.doc.seenDiscoverCardTitles.slice(-30);
         }
       } catch (_) {}
     }
@@ -2091,7 +2063,7 @@ Before returning the JSON, silently verify:
         // static fallback below still covers a timeout.
         const timeoutId = setTimeout(() => controller.abort(), 45000);
 
-        const aiRes = await fetch(aiChatApiUrl, {
+        const aiRes = await aiFetch(aiChatApiUrl, {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${aiChatApiKey}`,
@@ -2105,7 +2077,7 @@ Before returning the JSON, silently verify:
             max_tokens: 16000,
           }),
           signal: controller.signal,
-        });
+        }, { feature: 'discover_feed', userId, timeoutMs: 120000 });
 
         clearTimeout(timeoutId);
 
@@ -2168,11 +2140,13 @@ Before returning the JSON, silently verify:
 
     if (userId && newTitles.length > 0) {
       try {
-        const db = await getDb();
-        await db.collection('users').updateOne(
-          { _id: new ObjectId(userId) },
-          { $addToSet: { seenDiscoverCardTitles: { $each: newTitles } } }
-        );
+        const record = await findDiscoverUserRecord(userId);
+        if (record) {
+          await db.collection(record.collection).updateOne(
+            { user_id: userId },
+            { $addToSet: { seenDiscoverCardTitles: { $each: newTitles } } }
+          );
+        }
       } catch (_) {}
     }
 
@@ -2187,7 +2161,7 @@ Before returning the JSON, silently verify:
       lastUpdated: new Date().toISOString(),
     };
 
-    discoverCache.set(cacheKey, payload);
+    await saveCachedDiscover({ cacheKey, userId, dateStr, payload });
 
     return res.status(200).json(payload);
   } catch (error) {

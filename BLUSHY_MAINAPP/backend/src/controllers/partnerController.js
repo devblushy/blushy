@@ -370,6 +370,27 @@ export async function listPartnerConnections(req, res, next) {
   }
 }
 
+/**
+ * Why a permission change was refused, in the words of the rule that refused it.
+ *
+ * Three separate rules guard these settings and each needs its own sentence.
+ * A single "only the permission owner can update access controls" was wrong
+ * for two of the three: the permission owner is the woman, and she is still
+ * refused the decoder switch because that one belongs to him.
+ */
+function permissionRefusalMessage(error) {
+  switch (error?.permissionRule) {
+    case 'requires_woman':
+      return 'Only she can change this setting. It controls the suggestions shown to her.';
+    case 'requires_man':
+      return 'Only he can change this setting. It controls a feature on his side of the connection.';
+    case 'requires_owner':
+      return 'Only the person whose data is being shared can change what is shared.';
+    default:
+      return 'You do not have permission to change this setting.';
+  }
+}
+
 export async function updatePartnerPermissions(req, res, next) {
   try {
     const user = await requireAuthUser(req);
@@ -404,7 +425,10 @@ export async function updatePartnerPermissions(req, res, next) {
     });
   } catch (error) {
     if (error?.message === 'FORBIDDEN_PERMISSION_UPDATE') {
-      next(createHttpError(403, 'Only the permission owner can update access controls.'));
+      next(createHttpError(403, permissionRefusalMessage(error), {
+        permissionKey: error.permissionKey ?? null,
+        rule: error.permissionRule ?? null,
+      }));
       return;
     }
 

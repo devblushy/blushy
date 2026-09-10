@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../l10n/app_localizations.dart';
+import '../../services/api_consent_service.dart' show kLegalDocumentVersions;
 
-enum LegalTab { privacyPolicy, termsAndConditions }
+enum LegalTab { privacyPolicy, termsAndConditions, medicalDisclaimer }
 
 class LegalDocumentsScreen extends StatefulWidget {
   final LegalTab initialTab;
@@ -47,6 +48,47 @@ class _LegalDocumentsScreenState extends State<LegalDocumentsScreen> {
     _currentTab = widget.initialTab;
   }
 
+  /// Full name, for the title bar.
+  String _tabTitle(LegalTab tab) {
+    final l10n = AppLocalizations.of(context);
+    switch (tab) {
+      case LegalTab.privacyPolicy:
+        return l10n.ldPrivacyPolicy;
+      case LegalTab.termsAndConditions:
+        return l10n.ldTermsConditions;
+      case LegalTab.medicalDisclaimer:
+        return l10n.ldMedicalDisclaimer;
+    }
+  }
+
+  /// Short name, for the pills.
+  ///
+  /// Three segments across a phone leaves each about a third of the width, and
+  /// "Terms & Conditions" does not fit there at a legible size. The full name
+  /// stays in the title bar above, so nothing is lost.
+  String _tabLabel(LegalTab tab) {
+    final l10n = AppLocalizations.of(context);
+    switch (tab) {
+      case LegalTab.privacyPolicy:
+        return l10n.ldTabPrivacy;
+      case LegalTab.termsAndConditions:
+        return l10n.ldTabTerms;
+      case LegalTab.medicalDisclaimer:
+        return l10n.ldTabDisclaimer;
+    }
+  }
+
+  Widget _buildTabContent(LegalTab tab) {
+    switch (tab) {
+      case LegalTab.privacyPolicy:
+        return _buildPrivacyPolicyContent();
+      case LegalTab.termsAndConditions:
+        return _buildTermsContent();
+      case LegalTab.medicalDisclaimer:
+        return _buildMedicalDisclaimerContent();
+    }
+  }
+
   Future<void> _launchUrl(String urlString) async {
     final Uri uri = Uri.parse(urlString);
     try {
@@ -81,7 +123,7 @@ class _LegalDocumentsScreenState extends State<LegalDocumentsScreen> {
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
-          _currentTab == LegalTab.privacyPolicy ? AppLocalizations.of(context).ldPrivacyPolicy : AppLocalizations.of(context).ldTermsConditions,
+          _tabTitle(_currentTab),
           style: GoogleFonts.manrope(fontSize: 16, fontWeight: FontWeight.bold, color: textDark),
         ),
         centerTitle: true,
@@ -101,48 +143,30 @@ class _LegalDocumentsScreenState extends State<LegalDocumentsScreen> {
               ),
               child: Row(
                 children: [
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () => setState(() => _currentTab = LegalTab.privacyPolicy),
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 200),
-                        decoration: BoxDecoration(
-                          color: _currentTab == LegalTab.privacyPolicy ? primaryColor : Colors.transparent,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        alignment: Alignment.center,
-                        child: Text(
-                          AppLocalizations.of(context).ldPrivacyPolicy,
-                          style: GoogleFonts.manrope(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            color: _currentTab == LegalTab.privacyPolicy ? Colors.white : textMuted,
+                  for (final tab in LegalTab.values)
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () => setState(() => _currentTab = tab),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          decoration: BoxDecoration(
+                            color: _currentTab == tab ? primaryColor : Colors.transparent,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          alignment: Alignment.center,
+                          child: Text(
+                            _tabLabel(tab),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: GoogleFonts.manrope(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: _currentTab == tab ? Colors.white : textMuted,
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () => setState(() => _currentTab = LegalTab.termsAndConditions),
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 200),
-                        decoration: BoxDecoration(
-                          color: _currentTab == LegalTab.termsAndConditions ? primaryColor : Colors.transparent,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        alignment: Alignment.center,
-                        child: Text(
-                          AppLocalizations.of(context).ldTermsConditions,
-                          style: GoogleFonts.manrope(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            color: _currentTab == LegalTab.termsAndConditions ? Colors.white : textMuted,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
                 ],
               ),
             ),
@@ -155,9 +179,7 @@ class _LegalDocumentsScreenState extends State<LegalDocumentsScreen> {
               child: Center(
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 760),
-                  child: _currentTab == LegalTab.privacyPolicy
-                      ? _buildPrivacyPolicyContent()
-                      : _buildTermsContent(),
+                  child: _buildTabContent(_currentTab),
                 ),
               ),
             ),
@@ -173,9 +195,10 @@ class _LegalDocumentsScreenState extends State<LegalDocumentsScreen> {
       children: [
         _buildDocumentHeader(
           title: AppLocalizations.of(context).ldPrivacyPolicy2,
-          effectiveDate: 'July 28, 2026',
-          lastUpdated: 'July 28, 2026',
+          effectiveDate: 'September 9, 2026',
+          lastUpdated: 'September 9, 2026',
           appUrl: 'https://blushy.life',
+          version: kLegalDocumentVersions['privacy_policy'],
         ),
         const SizedBox(height: 20),
 
@@ -221,6 +244,16 @@ class _LegalDocumentsScreenState extends State<LegalDocumentsScreen> {
         _buildBulletPoint('Device & Technical Data', 'Browser type, OS version, application version, device locale, and anonymized interaction metrics for error debugging.'),
         _buildBulletPoint('Session Tokens', 'Secure authentication tokens stored locally to keep you signed in safely.'),
 
+        // Stated as a closed list, because "what a health app does not collect"
+        // is the part users and reviewers actually want answered, and silence
+        // reads as concealment.
+        _buildSubsectionTitle('C. What We Do Not Collect'),
+        _buildBulletPoint('No Location', 'Blushy never asks for location permission and holds no GPS or geolocation data.'),
+        _buildBulletPoint('No Advertising', 'No ads, no ad networks, and no advertising identifiers.'),
+        _buildBulletPoint('No Third-Party Analytics', 'No Google Analytics, Firebase Analytics or similar SDK. Usage counts are recorded in our own database against a pseudonymous id, and never carry your health entries.'),
+        _buildBulletPoint('No Payments', 'Blushy does not process payments and collects no card, bank or UPI details.'),
+        _buildBulletPoint('No Device or Wearable Data', 'Everything Blushy knows about your health is something you typed. We do not connect to Google Fit, Apple Health, or any tracker.'),
+
         _buildSectionTitle('3. How We Use Your Information'),
         _buildParagraph('We use your data strictly to deliver, personalize, and improve the Blushy experience:'),
         _buildBulletPoint('Cycle Predictions & Insights', 'Calculating period predictions, fertile window estimates, cycle phase analysis, and tailored health insights.'),
@@ -230,7 +263,12 @@ class _LegalDocumentsScreenState extends State<LegalDocumentsScreen> {
         _buildBulletPoint('Security & Account Access', 'Authenticating logins, preventing unauthorized account access, and maintaining system integrity.'),
 
         _buildSectionTitle('4. Data Protection, Storage & Encryption'),
-        _buildBulletPoint('Encryption in Transit & at Rest', 'All communication between your device and our servers uses industry-standard TLS 1.3/HTTPS encryption. Database records are encrypted at rest using AES-256 standards.'),
+        _buildBulletPoint('Encryption in Transit & at Rest', 'All communication between your device and our servers uses HTTPS/TLS. Our database provider encrypts stored data at rest.'),
+        // Said plainly, because the opposite was implied elsewhere. A tracker
+        // that computes your cycle and answers you through Docsy has to be able
+        // to read what you log, so it cannot be end-to-end encrypted -- and a
+        // privacy claim the product cannot keep is worse than none.
+        _buildBulletPoint('Not End-to-End Encrypted', 'Our servers can read the health data you log. They have to: calculating your cycle, finding patterns and answering you through Docsy all happen on the server. We do not sell it, and nothing reaches your partner unless you switch that sharing on.'),
         _buildBulletPoint('Voice Audio Security', 'Voice call audio streams are processed ephemerally for Speech-to-Text (STT) transcription and are not permanently archived as raw audio recordings.'),
         _buildBulletPoint('Access Control', 'Strict database access controls restrict backend operations to authorized automated services only.'),
 
@@ -241,8 +279,14 @@ class _LegalDocumentsScreenState extends State<LegalDocumentsScreen> {
 
         _buildSectionTitle('6. Data Sharing & Third-Party Processors'),
         _buildParagraph('We never sell your data to advertisers, data brokers, or third parties. We share limited data only with trusted infrastructure providers essential to operating the app:'),
-        _buildBulletPoint('Cloud Infrastructure & Database Services', 'Secure database and hosting providers (MongoDB Atlas, Node.js cloud servers).'),
-        _buildBulletPoint('AI Processing Providers', 'Trusted API endpoints (OpenRouter / Grok / OpenAI Whisper) used strictly for real-time natural language processing and voice transcription. Third-party AI providers are contractually bound not to use your personal data to train public AI models.'),
+        _buildBulletPoint('Cloud Infrastructure & Database Services', 'Application hosting (Render, Singapore) and database hosting (MongoDB Atlas).'),
+        _buildBulletPoint('Email Delivery', 'Brevo, for verification codes, password resets and service notices.'),
+        // The provider names were wrong here: transcription runs on Groq, not
+        // OpenAI. And the line claiming they are "contractually bound not to
+        // train on your data" asserted a contract term nobody had confirmed --
+        // exactly the kind of promise that must not be made on a user's behalf.
+        _buildBulletPoint('AI Processing Providers', 'OpenRouter (running the Grok model) for Docsy and generated notes, and Groq (Whisper) for voice transcription. Only what is needed to answer you is sent. Whether those providers retain or train on what they receive is governed by their own terms, not ours — we do not use your data to train any model of our own.'),
+        _buildBulletPoint('Processing Outside India', 'Our servers are in Singapore, email delivery is in the EU, and AI requests go to providers outside India. Using Blushy means your data crosses borders.'),
         _buildBulletPoint('Legal Compliance', 'We will disclose data only if explicitly required by valid law enforcement orders or court subpoenas.'),
 
         _buildSectionTitle('7. Data Retention & Your Rights'),
@@ -251,19 +295,27 @@ class _LegalDocumentsScreenState extends State<LegalDocumentsScreen> {
         _buildBulletPoint('Right to Rectify', 'You can edit or update your period logs, mood history, and profile settings at any time.'),
         _buildClickableBulletPoint(
           label: AppLocalizations.of(context).ldRightToErasureDelete,
-          prefixText: 'You may delete your account and clear all associated data directly from the Profile Settings screen or by contacting ',
+          prefixText: 'Open My Health and choose "Delete Account Permanently". You will be asked to confirm twice, the second time by typing DELETE, so it cannot happen by accident. You can also write to ',
           linkText: 'info@blushy.life',
           targetUrl: 'mailto:info@blushy.life',
-          suffixText: '. Account deletion permanently wipes your profile, period history, Docsy chat history, and partner connection logs from our primary databases.',
+          suffixText: '. Deletion permanently removes your profile, period and symptom history, journal entries, Docsy chat history, uploaded files, community posts and partner connections. It cannot be undone.',
         ),
 
-        _buildSectionTitle('8. Children’s Privacy'),
+        _buildSectionTitle('8. Your Consent'),
+        _buildParagraph(
+          'We process your health data because you agreed to it, and we keep a record of that agreement — which documents you accepted, which version of each, and when. You can see this at any time under My Health.',
+        ),
+        _buildBulletPoint('Asked Before, Not After', 'We ask you to agree before you enter any health information, not once it is already collected.'),
+        _buildBulletPoint('Asked Again When Things Change', 'If we change this policy materially, we will ask you again rather than assume your earlier agreement covers the new version.'),
+        _buildBulletPoint('Withdrawing', 'You can withdraw your agreement from My Health. Withdrawing stops us relying on it, and the health features stop working, because they depend on processing the data you withdrew agreement for. Withdrawing is not the same as deleting — if you want your data gone as well, delete your account.'),
+
+        _buildSectionTitle('9. Children’s Privacy'),
         _buildParagraph('Blushy is designed for individuals aged 13 and older. We do not knowingly collect personal information from children under the age of 13. If we become aware that a child under 13 has provided personal data, we will take steps to delete such information immediately.'),
 
-        _buildSectionTitle('9. Changes to This Privacy Policy'),
+        _buildSectionTitle('10. Changes to This Privacy Policy'),
         _buildParagraph('We may update this Privacy Policy periodically to reflect new features or regulatory requirements. We will notify you of material changes by posting an update notice within the app or via email.'),
 
-        _buildSectionTitle('10. Contact Us'),
+        _buildSectionTitle('11. Contact Us'),
         _buildParagraph('For any privacy-related questions, data requests, or feedback, please contact us at:'),
         _buildClickableBulletPoint(
           label: AppLocalizations.of(context).ldEmail,
@@ -290,9 +342,10 @@ class _LegalDocumentsScreenState extends State<LegalDocumentsScreen> {
       children: [
         _buildDocumentHeader(
           title: AppLocalizations.of(context).ldTermsAndConditionsTerms,
-          effectiveDate: 'July 28, 2026',
-          lastUpdated: 'July 28, 2026',
+          effectiveDate: 'September 9, 2026',
+          lastUpdated: 'September 9, 2026',
           appUrl: 'https://blushy.life',
+          version: kLegalDocumentVersions['terms'],
         ),
         const SizedBox(height: 20),
 
@@ -327,7 +380,11 @@ class _LegalDocumentsScreenState extends State<LegalDocumentsScreen> {
         ),
 
         _buildSectionTitle('2. Medical Disclaimer'),
-        _buildParagraph('Please read the important medical disclaimer above carefully regarding informational usage and healthcare guidance.'),
+        _buildParagraph(
+          'Please read the notice above carefully. The full Medical Disclaimer — what Blushy is, '
+          'what each feature can and cannot tell you, and what to do in an emergency — is the third '
+          'tab at the top of this screen, and forms part of these Terms.',
+        ),
 
         _buildSectionTitle('3. User Accounts & Security'),
         _buildBulletPoint('Account Creation', 'You agree to provide accurate and truthful information during registration.'),
@@ -387,11 +444,136 @@ class _LegalDocumentsScreenState extends State<LegalDocumentsScreen> {
     );
   }
 
+  /// The medical disclaimer.
+  ///
+  /// Says what Blushy is not, feature by feature, and covers only features that
+  /// exist. An earlier draft disclaimed doctor discovery and doctor
+  /// consultations, neither of which the app has ever offered -- disclaiming a
+  /// feature you do not ship reads as evidence that you do.
+  Widget _buildMedicalDisclaimerContent() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildDocumentHeader(
+          title: '⚕️ Medical Disclaimer',
+          effectiveDate: 'September 9, 2026',
+          lastUpdated: 'September 9, 2026',
+          appUrl: 'https://blushy.life',
+          version: kLegalDocumentVersions['medical_disclaimer'],
+        ),
+        const SizedBox(height: 20),
+
+        // The one thing to take away if nothing else on this screen is read.
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: const Color(0xFFFFF0F3),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: const Color(0xFFF5D6DE)),
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('⚠️ ', style: TextStyle(fontSize: 20)),
+              Expanded(
+                child: Text(
+                  'Blushy is not a doctor.\nNothing here is medical advice, diagnosis or treatment. In an emergency call 112 or go to the nearest hospital — do not wait for anything in this app.',
+                  style: GoogleFonts.manrope(fontSize: 13, fontWeight: FontWeight.w600, color: const Color(0xFF2D2529), height: 1.4),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 24),
+
+        _buildSectionTitle('1. What Blushy Is'),
+        _buildParagraph(
+          'Blushy is a health and wellness app. It gives you tools to track your cycle, log how you feel, read general health information, and ask questions of an AI assistant.\nBlushy is not a hospital, clinic, laboratory, pharmacy or licensed healthcare provider, and does not practise medicine. It is not clinically validated or medically certified, and holds no regulatory approval or clearance as a medical device anywhere.',
+        ),
+        _buildParagraph(
+          'Everything Blushy knows about your health is something you entered yourself. It does not connect to any wearable, tracker, health platform, laboratory or clinic.',
+        ),
+
+        _buildSectionTitle('2. Not a Substitute for Care'),
+        _buildParagraph(
+          'Everything in the app is for general information, education and your own record-keeping. It does not replace advice, diagnosis or treatment from a qualified doctor.',
+        ),
+        _buildBulletPoint('Ask a Professional', 'Take any question about a condition, symptom, medication or treatment to a qualified healthcare professional.'),
+        _buildBulletPoint('Do Not Delay Care', 'Never disregard, delay or avoid professional advice because of something you read or tracked here.'),
+        _buildBulletPoint('At Your Own Risk', 'Relying on any prediction, insight or AI answer from Blushy is your own decision.'),
+
+        _buildSectionTitle('3. What We Do and Do Not Give You'),
+        _buildParagraph('Blushy provides general health information, and personalised observations drawn from what you have logged. It does not provide medical advice, a diagnosis, treatment, or emergency care.'),
+        _buildParagraph('Personalised observations are patterns and estimates from your own entries. They are not clinical judgment. Where there is too little of your data to say anything meaningful, the app tells you so instead of showing general guidance as though it were about you.'),
+
+        _buildSectionTitle('4. AI-Generated Content'),
+        _buildParagraph(
+          'Docsy and the notes and articles Blushy generates are produced by general-purpose AI models run by third parties — OpenRouter for text, Groq for voice transcription. They are not medical models and carry no medical accreditation.',
+        ),
+        _buildBulletPoint('It Can Be Wrong', 'AI can misread what you wrote, generalise badly, or state something false with complete confidence.'),
+        _buildBulletPoint('Nobody Checks It First', 'AI answers are not reviewed by a physician, or by any person, before you see them.'),
+        _buildBulletPoint('Not a Diagnosis', 'If Docsy mentions a condition, that is information to take to a doctor — never a finding about you.'),
+
+        _buildSectionTitle('5. Feature by Feature'),
+        _buildBulletPoint('Cycle Predictions', 'Statistical estimates from the dates you logged. Not guarantees, and often wrong where cycles are irregular or logging is patchy. Do not use them as contraception.'),
+        _buildBulletPoint('Period & Symptom Tracking', 'Only as accurate as what you entered. A symptom or an association listed here does not mean you have any condition, and cannot rule one out.'),
+        _buildBulletPoint('Patterns & Correlations', 'A relationship between two things you logged is statistical and drawn only from your entries. It does not mean one caused the other.'),
+        _buildBulletPoint('Sleep & Mood', 'Self-reported, and not a clinical or psychological assessment. Persistent sleep or mood difficulty deserves a professional, not an app.'),
+        _buildBulletPoint('Life-Stage Guidance', 'Blushy does not determine or confirm which life stage you are in — that follows what you selected and logged. Perimenopause, menopause, pregnancy and postpartum all need professional care.'),
+        _buildBulletPoint('Safety Alerts', 'A prompt to seek care, not an assessment. Just as importantly: the absence of an alert is not reassurance. Silence from Blushy never means nothing is wrong.'),
+        _buildBulletPoint('Uploaded Medical Reports', 'Text is extracted automatically and may be incomplete or wrong. The report from your laboratory or clinician is the real document; ours is a convenience.'),
+        _buildBulletPoint('Doctor-Visit Summaries', 'Compiled from your own entries for your convenience. Not a medical record, not a referral, and it may be incomplete.'),
+        _buildBulletPoint('Partner Mode', 'What you share stays general or personalised wellness information. It is not medical advice for you or your partner.'),
+        _buildBulletPoint('Community', 'Posts by other members are their own. Blushy does not write, review or endorse them, and other members are not doctors.'),
+
+        _buildSectionTitle('6. No Guarantees'),
+        _buildParagraph(
+          'Predictions and insights are estimates. Two people with similar symptoms may have entirely different conditions, and Blushy cannot account for your medical history, genetics or circumstances.',
+        ),
+        _buildParagraph(
+          'If Blushy shows no pattern and no alert, that reflects the limits of what you logged and what the app can detect. It is not an indication that you are well.',
+        ),
+
+        _buildSectionTitle('7. Emergencies'),
+        _buildParagraph(
+          'Blushy is not an emergency service and nobody monitors what you log.\nIf you are experiencing severe pain, heavy or uncontrolled bleeding, difficulty breathing, chest pain, thoughts of suicide or self-harm, or anything else that may be life-threatening, contact emergency services immediately, go to the nearest emergency department, or call 112. Do not wait for anything in this app.',
+        ),
+
+        _buildSectionTitle('8. Features Blushy Does Not Offer'),
+        _buildParagraph('For the avoidance of doubt, Blushy does not provide:'),
+        _buildBulletPoint('No Consultations', 'No appointments, messaging or consultations with doctors or other healthcare professionals, and no directory of providers.'),
+        _buildBulletPoint('No Prescriptions or Tests', 'No prescriptions, medication supply, pharmacy services, laboratory testing, or clinical interpretation of results.'),
+        _buildBulletPoint('No Contraceptive Guidance', 'Blushy is not a family-planning service and must not be used as one.'),
+        _buildBulletPoint('No Emergency Response', 'No crisis or emergency response of any kind.'),
+
+        _buildSectionTitle('9. Your Responsibility'),
+        _buildBulletPoint('Your Decisions', 'You remain responsible for your health decisions and for seeking timely professional care. Blushy is a tool, not a decision-maker.'),
+        _buildBulletPoint('Your Medication', 'Do not start, stop or change any medication or treatment based on anything in this app.'),
+        _buildBulletPoint('Your Data', 'Inaccurate or incomplete entries produce inaccurate output.'),
+
+        _buildSectionTitle('10. Contact'),
+        _buildParagraph('Questions about this disclaimer, or a concern about something the app showed you:'),
+        _buildClickableBulletPoint(
+          label: AppLocalizations.of(context).ldEmail,
+          prefixText: '',
+          linkText: 'info@blushy.life',
+          targetUrl: 'mailto:info@blushy.life',
+          suffixText: '',
+        ),
+        const SizedBox(height: 32),
+      ],
+    );
+  }
+
   Widget _buildDocumentHeader({
     required String title,
     required String effectiveDate,
     required String lastUpdated,
     required String appUrl,
+    // Shown because the consent record names it. A user asked to agree again
+    // after an update can then see which version they are looking at, rather
+    // than having to take the prompt's word for it.
+    String? version,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -405,7 +587,9 @@ class _LegalDocumentsScreenState extends State<LegalDocumentsScreen> {
           crossAxisAlignment: WrapCrossAlignment.center,
           children: [
             Text(
-              'Effective Date: $effectiveDate  |  Last Updated: $lastUpdated\nApplication: Blushy (Mobile App & Website) — ',
+              'Effective Date: $effectiveDate  |  Last Updated: $lastUpdated'
+              '${version == null ? '' : '  |  Version $version'}'
+              '\nApplication: Blushy (Mobile App & Website) — ',
               style: GoogleFonts.manrope(fontSize: 12, color: const Color(0xFF7A6B72), height: 1.4),
             ),
             MouseRegion(

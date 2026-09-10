@@ -7,6 +7,7 @@ import '../../../core/cycle_calculator.dart';
 import '../../../theme/colors.dart';
 import '../../../theme/scale.dart';
 import '../../../services/api_auth_service.dart';
+import '../../../services/api_consent_service.dart';
 import '../../legal/legal_documents_screen.dart';
 import '../../../services/api_blushy_service.dart';
 import '../../../l10n/app_localizations.dart';
@@ -120,6 +121,13 @@ class _OnboardingWizardState extends State<OnboardingWizard> with TickerProvider
   // Privacy Policy Acceptance Checkbox States
   bool _agreePrivacy = false;
   bool _agreeTerms = false;
+  bool _agreeDisclaimer = false;
+
+  /// True while the acceptance is being recorded, so the button cannot be
+  /// tapped twice into two consent rows for one decision.
+  bool _recordingConsent = false;
+
+  bool get _hasAgreedToEverything => _agreePrivacy && _agreeTerms && _agreeDisclaimer;
 
   // Expansion state for "Why we're asking this"
   bool _whyAskingExpanded = false;
@@ -838,6 +846,22 @@ class _OnboardingWizardState extends State<OnboardingWizard> with TickerProvider
                           });
                         },
                       ),
+                      const SizedBox(height: 8),
+
+                      // The disclaimer's own acknowledgement section says the
+                      // user confirms they have read it. That was only true if
+                      // they were ever asked, and until now they were not.
+                      _buildInteractiveCheckTile(
+                        titlePrefix: AppLocalizations.of(context).oIAgreeToThe,
+                        linkText: AppLocalizations.of(context).oMedicalDisclaimer,
+                        isChecked: _agreeDisclaimer,
+                        onTapLink: () => LegalDocumentsScreen.show(context, initialTab: LegalTab.medicalDisclaimer),
+                        onChanged: (val) {
+                          setState(() {
+                            _agreeDisclaimer = val;
+                          });
+                        },
+                      ),
                       const SizedBox(height: 16),
 
                       // Compact Luxury Button (46px Pill)
@@ -845,35 +869,39 @@ class _OnboardingWizardState extends State<OnboardingWizard> with TickerProvider
                         width: double.infinity,
                         height: 46,
                         child: ElevatedButton(
-                          onPressed: (_agreePrivacy && _agreeTerms)
-                              ? () {
-                                  setState(() {
-                                    _phase = OnboardingPhase.questions;
-                                  });
-                                  _saveProgress();
-                                }
+                          onPressed: (_hasAgreedToEverything && !_recordingConsent)
+                              ? _recordConsentAndContinue
                               : null,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: BlushyColors.primary,
                             disabledBackgroundColor: const Color(0xFFEFE9E4),
                             disabledForegroundColor: const Color(0xFFAFA59E),
-                            elevation: (_agreePrivacy && _agreeTerms) ? 3 : 0,
+                            elevation: _hasAgreedToEverything ? 3 : 0,
                             shadowColor: BlushyColors.primary.withValues(alpha: 0.3),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(23),
                             ),
                           ),
-                          child: Text(
-                            "Agree & Continue",
-                            style: TextStyle(
-                              fontFamily: 'Manrope',
-                              fontSize: 14.5,
-                              fontWeight: FontWeight.w700,
-                              fontStyle: FontStyle.normal,
-                              letterSpacing: 0.3,
-                              color: (_agreePrivacy && _agreeTerms) ? Colors.white : const Color(0xFFAFA59E),
-                            ),
-                          ),
+                          child: _recordingConsent
+                              ? const SizedBox(
+                                  width: 18,
+                                  height: 18,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                  ),
+                                )
+                              : Text(
+                                  "Agree & Continue",
+                                  style: TextStyle(
+                                    fontFamily: 'Manrope',
+                                    fontSize: 14.5,
+                                    fontWeight: FontWeight.w700,
+                                    fontStyle: FontStyle.normal,
+                                    letterSpacing: 0.3,
+                                    color: _hasAgreedToEverything ? Colors.white : const Color(0xFFAFA59E),
+                                  ),
+                                ),
                         ),
                       ),
                     ],
@@ -885,6 +913,60 @@ class _OnboardingWizardState extends State<OnboardingWizard> with TickerProvider
         ),
       ),
     );
+  }
+
+  /// Records the acceptance, then moves on.
+  ///
+  /// The tick boxes used to be the whole of it: they gated the button and were
+  /// then forgotten, so there was no evidence anyone had ever agreed to
+  /// anything. This sends the acceptance -- which documents, at which versions
+  /// -- to the server before the user is asked for a single health detail.
+  ///
+  /// Two failures, treated differently:
+  ///
+  /// * The documents on the server are newer than the ones this build can
+  ///   show. Continuing would record agreement to text the user never saw, so
+  ///   it stops and asks them to update.
+  /// * The server could not be reached. It continues anyway. The consent was
+  ///   genuinely given, the network merely failed to carry it, and the consent
+  ///   gate will ask again on the next launch -- whereas refusing to proceed
+  ///   would strand a new user at a wall they cannot get past.
+  Future<void> _recordConsentAndContinue() async {
+    if (!_hasAgreedToEverything || _recordingConsent) return;
+
+    setState(() => _recordingConsent = true);
+
+    final result = await ApiConsentService().accept(method: 'onboarding');
+
+    if (!mounted) return;
+    setState(() => _recordingConsent = false);
+
+    if (result.failure == ConsentFailure.appOutOfDate) {
+      await showDialog<void>(
+        context: context,
+        builder: (dialogContext) => AlertDialog(
+          title: const Text('Please update Blushy'),
+          content: Text(
+            result.message ??
+                'Our privacy policy and terms have been updated since this version of the app was '
+                    'released. Please update Blushy so you can read the current version before agreeing to it.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
+
+    if (!mounted) return;
+    setState(() {
+      _phase = OnboardingPhase.questions;
+    });
+    _saveProgress();
   }
 
   Widget _buildPrivacyPillar({

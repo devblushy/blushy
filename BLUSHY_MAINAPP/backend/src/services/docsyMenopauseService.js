@@ -131,13 +131,33 @@ PHILOSOPHY RULES:
       matters.push("Protect bone density: Include calcium-rich foods and natural sunshine for Vitamin D.");
     }
 
+    // Whether anything has actually been logged.
+    //
+    // `matters` above already falls back to generic guidance when nothing has,
+    // but `whyToday` claimed the brief was "tailored to recent check-in
+    // patterns" regardless -- so an account with no check-ins at all was told
+    // its advice came from data it had never entered. The life mode is a
+    // setting rather than an observation, so that half stays true either way.
+    const hasCheckinSignals = Boolean(
+      latest && (
+        latest.sleepQuality
+        || latest.jointDiscomfort
+        || latest.hotFlashes
+        || latest.moodState
+        || latest.energyLevel
+      ),
+    );
+    const lifeModeLabel = LIFE_MODES[lifeMode.toUpperCase()]?.label || lifeMode;
+
     return {
       openingHeadline: isExhausted
         ? "Permission to rest and recharge today."
         : "Understanding your body. Protecting your vitality.",
       doNothingAffirmation: doNothing,
       whatMattersToday: matters,
-      whyToday: `Tailored to your current '${LIFE_MODES[lifeMode.toUpperCase()]?.label || lifeMode}' life mode and recent check-in patterns.`,
+      whyToday: hasCheckinSignals
+        ? `Tailored to your current '${lifeModeLabel}' life mode and recent check-in patterns.`
+        : `Based on your '${lifeModeLabel}' life mode. Log a check-in and this starts reflecting your own patterns.`,
       promptPills: [
         "Is 3 AM waking common in menopause?",
         "How can I protect my bone density?",

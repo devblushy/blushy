@@ -143,7 +143,7 @@ export async function generateCheckinFollowUps({ userId, date, symptoms, stage =
         max_tokens: 900,
         temperature: 0.4,
       }),
-    });
+    }, { feature: 'checkin_followups', userId });
   } catch (error) {
     logger.warn('Check-in follow-ups: model unreachable', { message: error?.message });
     return { cards: [], source: 'none', reason: 'unreachable' };

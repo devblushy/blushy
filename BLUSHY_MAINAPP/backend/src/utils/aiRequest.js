@@ -21,7 +21,7 @@ import { logger } from './logger.js';
  * Kept behind AI_REASONING_ENABLED so it can be turned back on from the
  * environment without a deploy, per model or per incident.
  */
-export async function aiFetch(url, options = {}) {
+export async function aiFetch(url, options = {}, meta = {}) {
   let body = options.body;
 
   if (!env.aiReasoningEnabled && typeof body === 'string') {
@@ -36,17 +36,62 @@ export async function aiFetch(url, options = {}) {
     }
   }
 
+  // Most calls want the shared budget. Discover does not: it is capped at
+  // 16,000 output tokens and was measured taking 55 seconds, so the default
+  // 30s would abort a request that was working. Callers that legitimately run
+  // long pass their own budget rather than the helper having no limit at all.
+  const timeoutMs = Number(meta.timeoutMs) > 0 ? Number(meta.timeoutMs) : env.aiRequestTimeoutMs;
+
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), env.aiRequestTimeoutMs);
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
 
   try {
-    return await fetch(url, { ...options, body, signal: controller.signal });
+    const response = await fetch(url, { ...options, body, signal: controller.signal });
+    // Read the usage block off a clone. The caller still gets an unread body;
+    // a Response can only be consumed once, so measuring must not be the thing
+    // that consumes it. Deliberately not awaited -- recording a measurement
+    // must never delay or fail the request being measured.
+    recordUsageFrom(response.clone(), meta);
+    return response;
   } catch (error) {
     if (error?.name === 'AbortError') {
-      logger.warn(`AI request timed out after ${env.aiRequestTimeoutMs}ms`);
+      logger.warn(`AI request timed out after ${timeoutMs}ms`);
     }
     throw error;
   } finally {
     clearTimeout(timer);
+  }
+}
+
+/**
+ * Records what a completed call consumed, from a cloned response.
+ *
+ * Swallows everything. A provider that answers without a `usage` block, a body
+ * that will not parse, an unreachable database -- none of those are reasons to
+ * disturb a request that already succeeded.
+ */
+async function recordUsageFrom(clone, meta) {
+  try {
+    const payload = await clone.json();
+    const usage = payload?.usage;
+    if (!usage) return;
+
+    // Imported here rather than at the top of the file. The repository pulls in
+    // utils/db.js, which opens a MongoDB connection the moment it is loaded --
+    // so a static import made every consumer of aiFetch, including the unit
+    // tests that only stub fetch, connect to a database and then hang on an
+    // open handle. Loaded only when there is something to record.
+    const { recordAiUsage } = await import('../repositories/aiUsageRepository.js');
+
+    await recordAiUsage({
+      userId: meta.userId ?? null,
+      feature: meta.feature ?? 'unknown',
+      model: payload.model ?? meta.model ?? null,
+      promptTokens: usage.prompt_tokens,
+      completionTokens: usage.completion_tokens,
+      totalTokens: usage.total_tokens,
+    });
+  } catch {
+    // Measurement is best-effort by design.
   }
 }

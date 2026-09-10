@@ -10,6 +10,7 @@ import {
   PERMISSION_MATRIX_VERSION,
   PERMISSION_KEYS,
   PERMISSIONS,
+  legacyFlagsForPatch,
 } from '../domain/partnerPermissions.js';
 import { normalizeLifeStage, getBranchCapabilities } from '../domain/lifeStages.js';
 import { calculatePregnancyState, getMilestones } from '../domain/pregnancy.js';
@@ -86,6 +87,10 @@ export async function authorizeConnection(connectionId, viewerUserId) {
     connectionState,
     active: isConnectionActive(row.status),
     permissions,
+    // The row exactly as stored, legacy flags and all. `permissions` above is
+    // the normalised v1 view; writing that back wholesale would delete every
+    // key the v1 vocabulary does not name.
+    storedPermissions: row.permissions ?? {},
     subjectUserId,
     partnerUserId,
     viewerIsSubject: uid === subjectUserId,
@@ -388,7 +393,20 @@ export async function updatePermissions(connectionId, actorUserId, patch) {
   }
 
   const previous = auth.permissions;
-  const next = { ...previous, ...clean };
+
+  // Merge onto what is stored, not onto the normalised view.
+  //
+  // `previous` holds only the v1 keys, so `$set: { permissions: previous +
+  // patch }` replaced the stored object and dropped `shareMood`, `shareCycle`,
+  // `allowDecoderMan` and the rest -- flags the older read paths still use.
+  // Changing one v1 toggle therefore silently switched off the partner
+  // decoder and the legacy sharing reads.
+  const next = {
+    ...auth.storedPermissions,
+    ...previous,
+    ...clean,
+    ...legacyFlagsForPatch(clean),
+  };
 
   await db.collection(CONNECTIONS).updateOne(
     { connection_id: connectionId },

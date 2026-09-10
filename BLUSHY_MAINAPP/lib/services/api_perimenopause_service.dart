@@ -325,45 +325,61 @@ class ApiPerimenopauseService {
   static const String _briefKey = 'perimenopause_brief_cache.json';
 
   /// Fetches the complete dynamic Perimenopause Overview payload.
-  static Future<PerimenopauseOverviewData?> getOverview() async {
-    try {
-      final res = await ApiContractClient.get(
-        '/perimenopause/overview',
-        parse: (data) => PerimenopauseOverviewData.fromJson(Map<String, dynamic>.from(data as Map)),
-      );
-      if (res.data != null) {
-        return res.data;
-      }
-    } catch (_) {}
+  /// Preserves the server's state instead of collapsing it to a nullable, so
+  /// the caller can distinguish fresh data, a cached copy shown after a failure
+  /// (stale), genuinely no data, and an error or offline request.
+  static Future<ApiResult<PerimenopauseOverviewData>> getOverview() async {
+    final res = await ApiContractClient.get<PerimenopauseOverviewData>(
+      '/perimenopause/overview',
+      parse: (data) => PerimenopauseOverviewData.fromJson(Map<String, dynamic>.from(data as Map)),
+    );
+
+    if (res.data != null) {
+      return res;
+    }
 
     final cached = BlushyStorage.read(_overviewKey);
     if (cached.isNotEmpty) {
       try {
-        return PerimenopauseOverviewData.fromJson(cached);
+        return ApiResult<PerimenopauseOverviewData>(
+          data: PerimenopauseOverviewData.fromJson(cached),
+          state: ApiState.stale,
+          lastUpdated: res.lastUpdated,
+          source: res.source,
+        );
       } catch (_) {}
     }
-    return null;
+
+    return res;
   }
 
   /// Fetches the dynamic Today with Docsy briefing.
-  static Future<PerimenopauseTodayBriefData?> getTodayBrief() async {
-    try {
-      final res = await ApiContractClient.get(
-        '/perimenopause/today-brief',
-        parse: (data) => PerimenopauseTodayBriefData.fromJson(Map<String, dynamic>.from(data as Map)),
-      );
-      if (res.data != null) {
-        return res.data;
-      }
-    } catch (_) {}
+  /// Preserves the server's state instead of collapsing it to a nullable, so
+  /// the caller can distinguish fresh data, a cached copy shown after a failure
+  /// (stale), genuinely no data, and an error or offline request.
+  static Future<ApiResult<PerimenopauseTodayBriefData>> getTodayBrief() async {
+    final res = await ApiContractClient.get<PerimenopauseTodayBriefData>(
+      '/perimenopause/today-brief',
+      parse: (data) => PerimenopauseTodayBriefData.fromJson(Map<String, dynamic>.from(data as Map)),
+    );
+
+    if (res.data != null) {
+      return res;
+    }
 
     final cached = BlushyStorage.read(_briefKey);
     if (cached.isNotEmpty) {
       try {
-        return PerimenopauseTodayBriefData.fromJson(cached);
+        return ApiResult<PerimenopauseTodayBriefData>(
+          data: PerimenopauseTodayBriefData.fromJson(cached),
+          state: ApiState.stale,
+          lastUpdated: res.lastUpdated,
+          source: res.source,
+        );
       } catch (_) {}
     }
-    return null;
+
+    return res;
   }
 
   /// Records daily check-in with severity + impact.

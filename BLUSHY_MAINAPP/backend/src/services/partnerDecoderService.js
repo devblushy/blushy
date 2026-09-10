@@ -222,7 +222,7 @@ Return ONLY raw valid JSON. Do not include markdown formatting or extra text.`;
           temperature: 0.75,
           max_tokens: 500,
         }),
-      });
+      }, { feature: 'partner_decoder', userId: viewerUserId ?? null });
 
       if (response.ok) {
         const data = await response.json();

@@ -1182,6 +1182,12 @@ abstract class AppLocalizations {
   /// **'Terms of Service'**
   String get oTermsOfService;
 
+  /// No description provided for @oMedicalDisclaimer.
+  ///
+  /// In en, this message translates to:
+  /// **'Medical Disclaimer'**
+  String get oMedicalDisclaimer;
+
   /// No description provided for @oWhenIsYourBirthday.
   ///
   /// In en, this message translates to:
@@ -1769,6 +1775,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Terms & Conditions'**
   String get ldTermsConditions;
+
+  /// No description provided for @ldMedicalDisclaimer.
+  ///
+  /// In en, this message translates to:
+  /// **'Medical Disclaimer'**
+  String get ldMedicalDisclaimer;
+
+  /// No description provided for @ldTabPrivacy.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy'**
+  String get ldTabPrivacy;
+
+  /// No description provided for @ldTabTerms.
+  ///
+  /// In en, this message translates to:
+  /// **'Terms'**
+  String get ldTabTerms;
+
+  /// No description provided for @ldTabDisclaimer.
+  ///
+  /// In en, this message translates to:
+  /// **'Disclaimer'**
+  String get ldTabDisclaimer;
 
   /// No description provided for @ldPrivacyPolicy2.
   ///

@@ -13,7 +13,6 @@ import {
   transcribeAudio,
   getMyDailySummaries,
   generateMyDailySummary,
-  createVoiceSession,
   getDailyDiscoverTopicsAndCards,
   getTodayMemorySummary,
   getHealthInsights,
@@ -28,7 +27,6 @@ const router = Router();
 // Private authenticated AI & health endpoints
 router.post('/chat', requireAuth, uploadPartnerAttachment, createChatReply);
 router.post('/transcribe', requireAuth, uploadPartnerAttachment, transcribeAudio);
-router.post('/voice/session', requireAuth, createVoiceSession);
 router.post('/checkin-followups', requireAuth, getCheckinFollowUps);
 router.get('/medical-reports', requireAuth, getMedicalReports);
 router.get('/history', requireAuth, getChatHistory);

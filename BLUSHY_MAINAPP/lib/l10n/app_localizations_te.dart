@@ -595,6 +595,9 @@ class AppLocalizationsTe extends AppLocalizations {
   String get oTermsOfService => 'సేవా నిబంధనలు';
 
   @override
+  String get oMedicalDisclaimer => 'Medical Disclaimer';
+
+  @override
   String get oWhenIsYourBirthday => 'మీ పుట్టినరోజు ఎప్పుడు?';
 
   @override
@@ -913,6 +916,18 @@ class AppLocalizationsTe extends AppLocalizations {
 
   @override
   String get ldTermsConditions => 'నిబంధనలు & షరతులు';
+
+  @override
+  String get ldMedicalDisclaimer => 'Medical Disclaimer';
+
+  @override
+  String get ldTabPrivacy => 'Privacy';
+
+  @override
+  String get ldTabTerms => 'Terms';
+
+  @override
+  String get ldTabDisclaimer => 'Disclaimer';
 
   @override
   String get ldPrivacyPolicy2 => '📜 గోప్యతా విధానం';

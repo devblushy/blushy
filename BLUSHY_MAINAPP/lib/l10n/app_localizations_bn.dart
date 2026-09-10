@@ -597,6 +597,9 @@ class AppLocalizationsBn extends AppLocalizations {
   String get oTermsOfService => 'পরিষেবার শর্তাবলী';
 
   @override
+  String get oMedicalDisclaimer => 'Medical Disclaimer';
+
+  @override
   String get oWhenIsYourBirthday => 'আপনার জন্মদিন কবে?';
 
   @override
@@ -904,6 +907,18 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get ldTermsConditions => 'নিয়ম ও শর্তাবলী';
+
+  @override
+  String get ldMedicalDisclaimer => 'Medical Disclaimer';
+
+  @override
+  String get ldTabPrivacy => 'Privacy';
+
+  @override
+  String get ldTabTerms => 'Terms';
+
+  @override
+  String get ldTabDisclaimer => 'Disclaimer';
 
   @override
   String get ldPrivacyPolicy2 => '📜 গোপনীয়তা নীতি';

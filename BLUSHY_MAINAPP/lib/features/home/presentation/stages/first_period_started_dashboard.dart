@@ -18,6 +18,9 @@ import '../../home_screen.dart';
 import '../../widgets/cycle_card.dart';
 import '../../widgets/cycle_tracker_image.dart';
 import '../../widgets/home_hero.dart';
+import '../../../../shared/user_display_name.dart';
+import '../../../../services/api_contract_client.dart';
+import '../../../../shared/stage_empty_notice.dart';
 
 class FirstPeriodStartedDashboard extends StatefulWidget {
   final bool isNested;
@@ -34,6 +37,10 @@ class FirstPeriodStartedDashboard extends StatefulWidget {
 }
 
 class _FirstPeriodStartedDashboardState extends State<FirstPeriodStartedDashboard> {
+
+  /// How the last cycle-data load went, so a failed request is not drawn as an
+  /// account with nothing in it.
+  ApiState _cycleState = ApiState.loading;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   late final ScrollController _internalScrollController = ScrollController();
   ScrollController get _effectiveScrollController => widget.scrollController ?? _internalScrollController;
@@ -294,14 +301,18 @@ class _FirstPeriodStartedDashboardState extends State<FirstPeriodStartedDashboar
       }
 
       try {
-        final prediction = await ApiPeriodService().getPredictions();
+        final result = await ApiPeriodService().getPredictionsResult();
+        _cycleState = result.state;
+        final prediction = result.data;
         if (prediction != null && prediction.hasData && prediction.lastPeriodStartDate != null) {
           final pStart = DateTime.tryParse(prediction.lastPeriodStartDate!);
           if (pStart != null) start = pStart;
           if (prediction.cycleLengthDays > 0) _cycleLength = prediction.cycleLengthDays;
           if (prediction.periodLengthDays > 0) _periodLength = prediction.periodLengthDays;
         }
-      } catch (_) {}
+      } catch (_) {
+        _cycleState = ApiState.offline;
+      }
 
       if (start != null) {
         _lastPeriodStartDate = start;
@@ -461,11 +472,10 @@ class _FirstPeriodStartedDashboardState extends State<FirstPeriodStartedDashboar
   // 00 — EDITORIAL GREETING (UNBOXED, Cormorant & Manrope)
   // ════════════════════════════════════════════════════════════════
   Widget _buildEditorialGreeting(BuildContext context) {
-    String userName = 'nithya';
-    try {
-      final decoded = BlushyStorage.read('user_profile.json');
-      userName = decoded['name'] ?? decoded['profile']?['name'] ?? 'nithya';
-    } catch (_) {}
+    // Was: decoded['name'] ?? decoded['profile']?['name'] ?? 'nithya'.
+    // Onboarding writes profile.preferredName, so neither key existed and every
+    // user was greeted as "nithya".
+    final String userName = userDisplayName(context);
 
     final hour = DateTime.now().hour;
     final timeGreeting = hour < 12
@@ -488,7 +498,7 @@ class _FirstPeriodStartedDashboardState extends State<FirstPeriodStartedDashboar
             ),
           ),
           Text(
-            '${userName.toLowerCase()}.',
+            '$userName.',
             style: GoogleFonts.cormorantGaramond(
               fontSize: 28,
               fontWeight: FontWeight.w600,
@@ -2155,6 +2165,13 @@ class _FirstPeriodStartedDashboardState extends State<FirstPeriodStartedDashboar
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildEditorialGreeting(context),
+                  StageStateNotice(
+                    state: _cycleState,
+                    hasData: _hasLoggedPeriod,
+                    emptyMessage: 'Once you log your first period, this page '
+                        'works from your own cycle rather than general guidance.',
+                    onRetry: _loadPeriodData,
+                  ),
                   _buildPeriodTrackerCard(context),
                   const SizedBox(height: 18),
                   _buildNoteFromDocsy(context),

@@ -594,6 +594,9 @@ class AppLocalizationsKn extends AppLocalizations {
   String get oTermsOfService => 'ಸೇವಾ ನಿಯಮಗಳು';
 
   @override
+  String get oMedicalDisclaimer => 'Medical Disclaimer';
+
+  @override
   String get oWhenIsYourBirthday => 'ನಿಮ್ಮ ಹುಟ್ಟುಹಬ್ಬ ಯಾವಾಗ?';
 
   @override
@@ -908,6 +911,18 @@ class AppLocalizationsKn extends AppLocalizations {
 
   @override
   String get ldTermsConditions => 'ನಿಯಮಗಳು ಮತ್ತು ಷರತ್ತುಗಳು';
+
+  @override
+  String get ldMedicalDisclaimer => 'Medical Disclaimer';
+
+  @override
+  String get ldTabPrivacy => 'Privacy';
+
+  @override
+  String get ldTabTerms => 'Terms';
+
+  @override
+  String get ldTabDisclaimer => 'Disclaimer';
 
   @override
   String get ldPrivacyPolicy2 => '📜 ಗೌಪ್ಯತಾ ನೀತಿ';

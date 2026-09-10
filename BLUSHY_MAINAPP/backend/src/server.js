@@ -6,17 +6,15 @@ import { initDatabase } from './utils/initDatabase.js';
 import { logger } from './utils/logger.js';
 import { assertCaptchaNotFalselyEnabled } from './services/captchaService.js';
 import { startCapsuleDeliveryScheduler } from './services/timeCapsuleService.js';
-import { initRealtimeHub, stopRealtimeHeartbeat } from './utils/realtimeHub.js';
+import { connectRealtimeBus, disconnectRealtimeBus, initRealtimeHub, stopRealtimeHeartbeat } from './utils/realtimeHub.js';
 import { startCommunityCleanupScheduler } from './services/communityCleanupService.js';
 import { startDailyChatSummaryScheduler } from './services/dailyChatSummaryService.js';
 import { startPushDispatchScheduler } from './services/pushDispatchService.js';
+import { runSchedulersOnOneProcess } from './utils/schedulerLease.js';
 import { bootstrapMedicalContent } from './services/contentSeedService.js';
 
 const port = env.port;
-let stopCommunityCleanupScheduler = () => {};
-let stopDailyChatSummaryScheduler = () => {};
-let stopPushDispatchScheduler = () => {};
-let stopCapsuleDeliveryScheduler = () => {};
+let stopSchedulers = () => {};
 
 const server = createServer(app);
 
@@ -70,10 +68,17 @@ async function start() {
   await initDatabase();
   await bootstrapMedicalContent();
   initRealtimeHub(server);
-  stopCommunityCleanupScheduler = startCommunityCleanupScheduler();
-  stopDailyChatSummaryScheduler = startDailyChatSummaryScheduler();
-  stopPushDispatchScheduler = startPushDispatchScheduler();
-  stopCapsuleDeliveryScheduler = startCapsuleDeliveryScheduler();
+  // Joins the cross-instance bus. No-op without REDIS_URL, so a single
+  // instance behaves exactly as before.
+  await connectRealtimeBus();
+  // Behind a lease, so a second instance serves traffic without also sending
+  // every push notification and delivering every time capsule a second time.
+  stopSchedulers = await runSchedulersOnOneProcess(() => [
+    startCommunityCleanupScheduler(),
+    startDailyChatSummaryScheduler(),
+    startPushDispatchScheduler(),
+    startCapsuleDeliveryScheduler(),
+  ]);
 
   server.listen(port, () => {
     logger.info(`Blushy auth backend listening on port ${port}`);
@@ -87,10 +92,8 @@ start().catch((error) => {
 
 process.on('SIGINT', () => {
   logger.info('Shutting down gracefully');
-  stopCommunityCleanupScheduler();
-  stopDailyChatSummaryScheduler();
-  stopPushDispatchScheduler();
-  stopCapsuleDeliveryScheduler();
+  stopSchedulers();
   stopRealtimeHeartbeat();
+  disconnectRealtimeBus().catch(() => {});
   server.close(() => process.exit(0));
 });

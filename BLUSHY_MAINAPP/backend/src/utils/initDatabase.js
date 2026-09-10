@@ -117,6 +117,34 @@ export async function initDatabase() {
     await db.collection('analytics_events').createIndex({ pseudonymous_id: 1, created_at: -1 });
     await db.collection('doctor_summaries').createIndex({ user_id: 1, created_at: -1 });
 
+    // Scheduler leadership. The unique key is what makes the race safe: two
+    // instances starting together both try to insert, and exactly one wins.
+    await db.collection('scheduler_leases').createIndex({ lease_id: 1 }, { unique: true });
+
+    // AI spend. Queried as "what did feature X cost since date Y", and
+    // occasionally per user. No TTL: this is the cost record, and throwing it
+    // away is how the question became unanswerable in the first place.
+    await db.collection('ai_usage_events').createIndex({ created_at: -1 });
+    await db.collection('ai_usage_events').createIndex({ feature: 1, created_at: -1 });
+    await db.collection('ai_usage_events').createIndex({ user_id: 1, created_at: -1 });
+
+    // Discover's daily feed. The unique key is what makes two requests racing
+    // to generate the same day converge on one row instead of duplicating, and
+    // the TTL is what stops this growing forever -- the failing behaviour of
+    // the in-memory Map it replaced.
+    await db.collection('discover_daily_cache').createIndex({ cache_key: 1 }, { unique: true });
+    await db.collection('discover_daily_cache').createIndex(
+      { created_at: 1 },
+      { expireAfterSeconds: 48 * 60 * 60 },
+    );
+
+    // Consent ledger. Every read is "this user's latest row", so the sort key
+    // belongs in the index -- otherwise the check runs on every app launch and
+    // scans the user's whole consent history to find one document. No TTL:
+    // the record's purpose is to outlive the moment it describes.
+    await db.collection('user_consents').createIndex({ user_id: 1, granted_at: -1 });
+    await db.collection('user_consents').createIndex({ consent_id: 1 }, { unique: true });
+
     // Community moderation (spec §12, §22).
     await db.collection('posts').createIndex({ audience: 1, moderation_state: 1, created_at: -1 });
     await db.collection('posts').createIndex({ requires_human_review: 1, moderation_updated_at: 1 });

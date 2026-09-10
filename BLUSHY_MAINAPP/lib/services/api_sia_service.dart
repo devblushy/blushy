@@ -3,6 +3,7 @@ import 'package:http_parser/http_parser.dart' show MediaType;
 import 'package:flutter/foundation.dart';
 import '../models/blushy_models.dart';
 import 'api_base_url.dart';
+import 'api_contract_client.dart';
 import 'language_preference.dart';
 import 'auth_storage.dart';
 
@@ -385,21 +386,53 @@ class ApiSiaService {
     }
   }
 
-  /// Creates a voice call session: `POST /ai/voice/session`
-  Future<Map<String, dynamic>> createVoiceSession() async {
+  /// Health insights, with the reason attached when there are none.
+  ///
+  /// [getHealthInsights] answers `{}` for a failed request and for an account
+  /// with nothing to say alike, so a screen cannot tell an outage from an empty
+  /// account. Screens that show a state notice need that difference.
+  Future<ApiResult<Map<String, dynamic>>> getHealthInsightsResult({
+    String? stage,
+    int? cycleDay,
+    String? phase,
+  }) async {
     try {
-      final response = await _dio.post(
-        '/ai/voice/session',
-        data: {'languageCode': LanguagePreference.code},
-        options: _authOptions(),
+      final queryParams = <String, dynamic>{};
+      if (stage != null && stage.isNotEmpty) queryParams['stage'] = stage;
+      if (cycleDay != null) queryParams['cycleDay'] = cycleDay;
+      if (phase != null && phase.isNotEmpty) queryParams['phase'] = phase;
+
+      final response = await _dio.get(
+        '/ai/health-insights',
+        queryParameters: queryParams.isNotEmpty ? queryParams : null,
+        options: _aiOptions(),
       );
-      if (response.data is Map<String, dynamic>) {
-        return response.data as Map<String, dynamic>;
+
+      final data = response.data;
+      if (data is Map<String, dynamic> && data.isNotEmpty) {
+        return ApiResult(data: data, state: ApiState.ready);
       }
-      return {};
+      return const ApiResult(state: ApiState.empty);
+    } on DioException catch (e) {
+      final status = e.response?.statusCode;
+      if (status == 401 || status == 403) {
+        return const ApiResult(state: ApiState.restricted);
+      }
+      if (status != null) {
+        return ApiResult(
+          state: ApiState.error,
+          errorMessage: 'Health insights request failed ($status).',
+        );
+      }
+      // No response at all: the request never reached the server.
+      return ApiResult(
+        state: ApiState.offline,
+        errorCode: 'NETWORK_UNAVAILABLE',
+        errorMessage: e.message,
+      );
     } catch (e) {
-      debugPrint('BlushySia: Error creating voice session: $e');
-      return {};
+      debugPrint('BlushySia: Error fetching health insights: $e');
+      return ApiResult(state: ApiState.offline, errorMessage: e.toString());
     }
   }
 

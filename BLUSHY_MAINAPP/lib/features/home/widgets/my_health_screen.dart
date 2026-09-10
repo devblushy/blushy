@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../legal/consent_status_card.dart';
 import '../../../core/state.dart';
 import '../../../services/api_auth_service.dart';
 import '../../../services/api_blushy_service.dart';
@@ -963,6 +964,36 @@ class _MyHealthScreenState extends State<MyHealthScreen> with SingleTickerProvid
                       },
                     ),
                   ]),
+                  const SizedBox(height: 20),
+                  // Separated from the reset actions above: those change what
+                  // this device shows, this ends the account. Google Play
+                  // requires an in-app deletion route, and the legal screen has
+                  // always promised one.
+                  _buildCard([
+                    // The record of what was agreed sits with the action that
+                    // ends the agreement, so a user looking for one finds the
+                    // other. Withdrawing and deleting are different things and
+                    // the card says so.
+                    const ConsentStatusCard(),
+                    const Divider(color: BlushyColors.border),
+                    _buildDangerButton(
+                      label: 'Delete Account Permanently',
+                      onPressed: () => _deleteAccount(context, state),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: Text(
+                        'Removes your profile, period history, check-ins, journal, '
+                        'Docsy conversations and partner connections from our servers. '
+                        'This cannot be undone.',
+                        style: GoogleFonts.manrope(
+                          fontSize: 11.5,
+                          height: 1.45,
+                          color: BlushyColors.secondaryText,
+                        ),
+                      ),
+                    ),
+                  ]),
       ],
     );
   }
@@ -1226,6 +1257,88 @@ class _MyHealthScreenState extends State<MyHealthScreen> with SingleTickerProvid
         )
       ],
     );
+  }
+
+  /// Permanent account deletion.
+  ///
+  /// Two steps on purpose: the first says plainly what goes, the second asks
+  /// the word to be typed. Nothing is deleted until the server confirms, and
+  /// only then is the local session cleared -- a failed request must leave the
+  /// account reachable rather than signed out of something still there.
+  Future<void> _deleteAccount(BuildContext context, BlushyOSState state) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final navigator = Navigator.of(context);
+
+    final understood = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('Delete your account?',
+            style: GoogleFonts.manrope(fontWeight: FontWeight.bold, fontSize: 17)),
+        content: Text(
+          'This permanently removes your profile, period history, check-ins, '
+          'symptom logs, journal entries, Docsy conversations, community posts '
+          'and partner connections.\n\nIt cannot be undone, and it cannot be '
+          'recovered by signing in again.',
+          style: GoogleFonts.manrope(fontSize: 13, height: 1.5),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text('Keep my account', style: GoogleFonts.manrope(fontWeight: FontWeight.w600)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text('Continue',
+                style: GoogleFonts.manrope(
+                    fontWeight: FontWeight.bold, color: BlushyColors.danger)),
+          ),
+        ],
+      ),
+    );
+    if (understood != true || !context.mounted) return;
+
+    final controller = TextEditingController();
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('Type DELETE to confirm',
+            style: GoogleFonts.manrope(fontWeight: FontWeight.bold, fontSize: 17)),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          textCapitalization: TextCapitalization.characters,
+          decoration: const InputDecoration(hintText: 'DELETE'),
+          style: GoogleFonts.manrope(fontSize: 14),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text('Cancel', style: GoogleFonts.manrope(fontWeight: FontWeight.w600)),
+          ),
+          TextButton(
+            onPressed: () =>
+                Navigator.pop(ctx, controller.text.trim().toUpperCase() == 'DELETE'),
+            child: Text('Delete for ever',
+                style: GoogleFonts.manrope(
+                    fontWeight: FontWeight.bold, color: BlushyColors.danger)),
+          ),
+        ],
+      ),
+    );
+    controller.dispose();
+    if (confirmed != true) return;
+
+    final ok = await ApiAuthService().deleteAccount();
+    if (!ok) {
+      messenger.showSnackBar(const SnackBar(
+        content: Text('Could not delete the account. Check your connection and try again.'),
+      ));
+      return;
+    }
+
+    // The session is already gone server-side; this clears what the app holds.
+    await state.logout();
+    navigator.pushNamedAndRemoveUntil('/', (route) => false);
   }
 
   Widget _buildDangerButton({required String label, required VoidCallback onPressed}) {

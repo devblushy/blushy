@@ -4,8 +4,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../../core/state.dart';
+import '../../../../services/api_contract_client.dart';
 import '../../../../services/api_menopause_service.dart';
 import 'stage_shared_components.dart';
+import '../../../../shared/stage_empty_notice.dart';
+import '../../../../shared/user_display_name.dart';
 
 /// 🌸 THE MENOPAUSE OPERATING SYSTEM: UNDERSTANDING YOUR NEW CHAPTER
 /// Built strictly in adherence to STAGE1_DESIGN_RULES.md:
@@ -65,6 +68,9 @@ class _MenopauseDashboardState extends State<MenopauseDashboard> {
 
   // ─── State ─────────────────────────────────────────────────────────
   MenopauseOverviewData? _overview;
+  /// The server's own verdict on the last load, so a failure, an offline
+  /// device and an empty account are no longer indistinguishable.
+  ApiState _overviewState = ApiState.loading;
   bool _loading = true;
   String _activeLifeMode = 'normal';
   bool _privateMode = false;
@@ -94,10 +100,12 @@ class _MenopauseDashboardState extends State<MenopauseDashboard> {
   }
 
   Future<void> _loadOverview() async {
-    final data = await ApiMenopauseService.getOverview();
+    final res = await ApiMenopauseService.getOverview();
     if (!mounted) return;
+    final data = res.data;
     setState(() {
       _overview = data;
+      _overviewState = res.state;
       if (data != null) {
         _activeLifeMode = data.lifeMode;
         _privateMode = data.privateMode;
@@ -186,7 +194,7 @@ class _MenopauseDashboardState extends State<MenopauseDashboard> {
                   ),
                 ),
                 TextSpan(
-                  text: '${userName.toLowerCase()}.',
+                  text: '$userName.',
                   style: GoogleFonts.cormorantGaramond(
                     fontSize: 28,
                     fontWeight: FontWeight.w600,
@@ -2051,7 +2059,9 @@ class _MenopauseDashboardState extends State<MenopauseDashboard> {
   Widget build(BuildContext context) {
     final osState = BlushyOSProvider.of(context);
     final pc = osState.personalContext;
-    final userName = (pc.userName != null && pc.userName!.trim().isNotEmpty) ? pc.userName!.trim() : 'Ananya';
+    // Defaulted to 'Ananya' -- an invented name shown to anyone whose own
+    // was not known.
+    final userName = userDisplayName(context);
 
     if (_loading) {
       return Scaffold(
@@ -2063,12 +2073,16 @@ class _MenopauseDashboardState extends State<MenopauseDashboard> {
     }
 
     final data = _overview;
+    // The fallback shown when the server returned nothing. `whyToday` used to
+    // read "Tailored to your current baseline", which claimed a personalisation
+    // that had not happened and a baseline that may not exist. It now says what
+    // it is: general guidance for the stage.
     final brief = data?.todayWithDocsy ??
         MenopauseTodayBrief(
           openingHeadline: 'Understanding your body. Protecting your vitality.',
           doNothingAffirmation: '',
           whatMattersToday: ['Keep moving comfortably', 'Protect bone density'],
-          whyToday: 'Tailored to your current baseline',
+          whyToday: 'General guidance for this stage, not based on your logs.',
           promptPills: ['Is 3 AM waking common?', 'Protecting bone health'],
         );
 
@@ -2110,6 +2124,21 @@ class _MenopauseDashboardState extends State<MenopauseDashboard> {
     };
 
     final contentList = <Widget>[];
+    // Nothing came back from the server, so every section below is falling back
+    // to the stage's general content. Saying so is the difference between "we
+    // have nothing for you yet" and "here is your brief" (spec §4, §31).
+    contentList.add(StageStateNotice(
+      state: _overviewState,
+      hasData: data != null,
+      emptyMessage:
+          'There is nothing recorded for this stage yet, so what follows is general '
+          'guidance rather than anything worked out from your own entries. Complete a '
+          'check-in to start building your baseline.',
+      onRetry: () {
+        setState(() => _loading = true);
+        _loadOverview();
+      },
+    ));
     for (final secKey in sectionOrder) {
       if (moduleMap.containsKey(secKey)) {
         final w = moduleMap[secKey]!;

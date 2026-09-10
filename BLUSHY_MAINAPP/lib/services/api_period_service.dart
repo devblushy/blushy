@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'api_base_url.dart';
+import 'api_contract_client.dart';
 import 'auth_storage.dart';
 
 class PeriodEntry {
@@ -300,20 +301,55 @@ class ApiPeriodService {
     return false;
   }
 
-  Future<PeriodPrediction?> getPredictions() async {
+  /// Cycle predictions, with the reason attached when there are none.
+  ///
+  /// [getPredictions] returns `null` for a failed request, an empty account and
+  /// an unreadable response alike, so a caller cannot tell "you have not logged
+  /// a period yet" from "we could not reach the server". Screens that show a
+  /// state notice need that difference, because presenting an outage as an
+  /// empty account is a lie about the user's own data.
+  Future<ApiResult<PeriodPrediction>> getPredictionsResult() async {
     try {
       final url = Uri.parse('$_baseUrl/period/predictions');
       final res = await http.get(url, headers: await _headers());
 
+      if (res.statusCode == 401 || res.statusCode == 403) {
+        return const ApiResult(state: ApiState.restricted);
+      }
+
       if (res.statusCode >= 200 && res.statusCode < 300) {
         final decoded = jsonDecode(res.body);
         if (decoded['data'] != null) {
-          return PeriodPrediction.fromJson(decoded['data']);
+          return ApiResult(
+            data: PeriodPrediction.fromJson(decoded['data']),
+            state: ApiState.ready,
+          );
         }
+        // A well-formed answer carrying nothing: the account genuinely has no
+        // cycle history yet.
+        return const ApiResult(state: ApiState.empty);
       }
+
+      return ApiResult(
+        state: ApiState.error,
+        errorMessage: 'Predictions request failed (${res.statusCode}).',
+      );
     } catch (e) {
+      // A throw here is a transport failure, not a bad answer. Treated as
+      // offline to match api_contract_client, and because `dart:io`'s
+      // SocketException is unavailable on the web build.
       debugPrint('ApiPeriodService getPredictions error: $e');
+      return ApiResult(
+        state: ApiState.offline,
+        errorCode: 'NETWORK_UNAVAILABLE',
+        errorMessage: e.toString(),
+      );
     }
-    return null;
+  }
+
+  /// The prediction alone, or null. Kept for callers that do not show state.
+  Future<PeriodPrediction?> getPredictions() async {
+    final result = await getPredictionsResult();
+    return result.data;
   }
 }

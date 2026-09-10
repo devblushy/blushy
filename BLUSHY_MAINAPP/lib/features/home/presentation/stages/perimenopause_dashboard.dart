@@ -6,9 +6,12 @@ import 'package:share_plus/share_plus.dart';
 import '../../../../core/state.dart';
 import '../../../../core/storage.dart';
 import '../../../../services/api_period_service.dart';
+import '../../../../services/api_contract_client.dart';
 import '../../../../services/api_perimenopause_service.dart';
 import '../../widgets/blushy_period_tracker_card.dart';
 import 'stage_shared_components.dart';
+import '../../../../shared/stage_empty_notice.dart';
+import '../../../../shared/user_display_name.dart';
 
 /// 🌗 THE PERIMENOPAUSE COMMAND CENTER: MY TRANSITION
 /// Built strictly in adherence to STAGE1_DESIGN_RULES.md:
@@ -62,6 +65,8 @@ class _PerimenopauseDashboardState extends State<PerimenopauseDashboard> {
 
   // ─── Real Dynamic State ─────────────────────────────────────────────
   PerimenopauseOverviewData? _overview;
+  /// The server's own verdict on the last load (spec §4, §31).
+  ApiState _overviewState = ApiState.loading;
   PerimenopauseTodayBriefData? _todayBrief;
   bool _isLoading = true;
   bool _isRefreshingBrief = false;
@@ -171,11 +176,14 @@ class _PerimenopauseDashboardState extends State<PerimenopauseDashboard> {
       final briefFuture = ApiPerimenopauseService.getTodayBrief();
 
       final results = await Future.wait([overviewFuture, briefFuture]);
-      final overviewData = results[0] as PerimenopauseOverviewData?;
-      final briefData = results[1] as PerimenopauseTodayBriefData?;
+      final overviewRes = results[0] as ApiResult<PerimenopauseOverviewData>;
+      final briefRes = results[1] as ApiResult<PerimenopauseTodayBriefData>;
+      final overviewData = overviewRes.data;
+      final briefData = briefRes.data;
 
       if (mounted) {
         setState(() {
+          _overviewState = overviewRes.state;
           if (overviewData != null) {
             _overview = overviewData;
             _activeFocus = overviewData.profile['currentFocus']?.toString() ?? 'sleep';
@@ -274,11 +282,18 @@ class _PerimenopauseDashboardState extends State<PerimenopauseDashboard> {
     }
 
     // Thoroughly sanitized user name
-    String userName = (pc.userName != null && pc.userName!.trim().isNotEmpty)
-        ? pc.userName!.trim()
-        : (_overview?.profile['name']?.toString() ?? 'Ananya');
-    userName = userName.replaceAll(RegExp(r'^[,.\s]+'), '').trim();
-    if (userName.isEmpty) userName = 'Ananya';
+    // Falls back to a neutral address, not to a name. This defaulted to
+    // "Ananya" -- greeting the user by an invented name when hers was not known.
+    // App state, then stored profile, then the name the server sent with the
+    // overview, then a neutral address. The overview is kept as a source
+    // because this screen is the only one that receives it.
+    final fromOverview = (_overview?.profile['name']?.toString() ?? '')
+        .replaceAll(RegExp(r'^[,.\s]+'), '')
+        .trim();
+    final String userName = userDisplayName(
+      context,
+      fallback: fromOverview.isNotEmpty ? fromOverview : 'there',
+    );
 
     // Order of sections: PERIOD TRACKER IS RIGHT AFTER TODAY WITH DOCSY!
     final List<String> rawOrder = _overview?.sectionOrder ?? [
@@ -333,6 +348,17 @@ class _PerimenopauseDashboardState extends State<PerimenopauseDashboard> {
           physics: const AlwaysScrollableScrollPhysics(),
           padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
           children: [
+            // No server data, so every section below is the stage's general
+            // content rather than anything derived from her entries.
+            StageStateNotice(
+              state: _overviewState,
+              hasData: _overview != null || _todayBrief != null,
+              emptyMessage:
+                  'There is nothing recorded for your transition yet, so what follows is '
+                  'general guidance rather than anything worked out from your own entries. '
+                  'Log a check-in to start building your baseline.',
+              onRetry: () => _loadAllData(),
+            ),
             for (final section in sectionOrder) ...[
               _buildSectionByName(section, userName),
               const SizedBox(height: 20),
@@ -413,7 +439,7 @@ class _PerimenopauseDashboardState extends State<PerimenopauseDashboard> {
             ),
           ),
           Text(
-            '${cleanName.toLowerCase()}.',
+            '$cleanName.',
             style: GoogleFonts.cormorantGaramond(
               fontSize: 28,
               fontWeight: FontWeight.w600,
@@ -447,7 +473,11 @@ class _PerimenopauseDashboardState extends State<PerimenopauseDashboard> {
 
     final String openingText = brief?.openingGreeting ??
         'Your body is moving through its midlife transition rhythm. Give yourself credit for how you are navigating it.';
-    final String whyToday = brief?.whyToday ?? 'Surfaced today based on recent sleep and cycle rhythm logs.';
+    // Only the server's brief can explain why something was surfaced, because
+    // only the server read anything. The fallback used to claim it was
+    // "Surfaced today based on recent sleep and cycle rhythm logs" while
+    // reading no logs at all, to users who may have logged none.
+    final String whyToday = brief?.whyToday ?? 'General guidance for this stage, not based on your logs.';
     final List<String> pills = brief?.promptPills ?? [
       'What should I expect next in my transition?',
       'How can I protect my bone density in midlife?',
@@ -526,7 +556,7 @@ class _PerimenopauseDashboardState extends State<PerimenopauseDashboard> {
                     final updated = await ApiPerimenopauseService.getTodayBrief();
                     if (mounted) {
                       setState(() {
-                        if (updated != null) _todayBrief = updated;
+                        if (updated.data != null) _todayBrief = updated.data;
                         _isRefreshingBrief = false;
                       });
                     }
@@ -2863,12 +2893,19 @@ class _PerimenopauseDashboardState extends State<PerimenopauseDashboard> {
     final brief = await ApiPerimenopauseService.getClinicianBrief();
     if (!mounted) return;
 
-    final String text = brief?['markdownSummary']?.toString() ??
-        'Patient Name: ${pc.userName ?? "Ananya"}\n'
-        'Stage: Perimenopause (My Transition)\n'
-        'Cycle Variability: 27 to 56 days interval\n'
-        'Frequent Observations: Night sweats (3x/wk), Sleep disruption\n'
-        'Active Treatments: Magnesium, Cooling habits';
+    // A clinician brief is only worth showing when the server built one from
+    // her records. The fallback used to invent an entire clinical picture --
+    // the patient's name ("Ananya"), a 27 to 56 day cycle interval, night
+    // sweats three times a week, magnesium and cooling habits as active
+    // treatments -- none of it measured, all of it shown to anyone whose
+    // request had failed, in a document meant for a doctor.
+    final String? summary = brief?['markdownSummary']?.toString();
+    final String text = (summary != null && summary.trim().isNotEmpty)
+        ? summary
+        : 'No clinician brief could be produced yet.\n\n'
+            'This is built from the periods, symptoms and treatments you have '
+            'logged. Once there is enough recorded, it will appear here and can '
+            'be shared with your doctor.';
 
     showDialog(
       context: context,

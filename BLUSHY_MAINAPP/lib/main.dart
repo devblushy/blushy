@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'theme/colors.dart';
 import 'features/home/blushy_shell.dart';
 import 'features/home/presentation/partner_shell.dart';
@@ -10,6 +11,7 @@ import 'features/admin/content_review_screen.dart';
 import 'l10n/app_localizations.dart';
 import 'features/auth/presentation/auth_screen.dart';
 import 'features/auth/presentation/onboarding_wizard.dart';
+import 'features/legal/consent_gate.dart';
 import 'features/auth/presentation/partner_onboarding_wizard.dart';
 import 'features/auth/presentation/choose_experience_screen.dart';
 import 'features/dev/developer_playground.dart';
@@ -151,7 +153,10 @@ class BlushyApp extends StatelessWidget {
         home: const SplashGate(child: LanguageGate(child: AppRouter())),
         routes: {
           '/login': (context) => const AppRouter(),
-          '/dev': (context) => const DeveloperPlaygroundScreen(),
+          // Debug builds only. The playground exposes internal state and stage
+          // simulation, has no entry point in the UI, and has no business in a
+          // published build; the route itself is what made it reachable.
+          if (kDebugMode) '/dev': (context) => const DeveloperPlaygroundScreen(),
           // Clinical reviewers approve health content here. The backend has
           // had the whole review API from the start with nothing calling it.
           '/admin/content-review': (context) => const ContentReviewScreen(),
@@ -204,11 +209,15 @@ class AppRouter extends StatelessWidget {
       }
     }
 
+    // Wrapped from here down rather than around the whole router: onboarding
+    // asks for consent as its own first step, so gating it as well would ask
+    // the same question twice, and the unauthenticated flow has no user to
+    // record consent against.
     if (resolvedRole == 'partner' || resolvedRole == 'man') {
-      return const PartnerShell();
+      return const ConsentGate(child: PartnerShell());
     }
 
-    return const BlushyOSShell();
+    return const ConsentGate(child: BlushyOSShell());
   }
 }
 

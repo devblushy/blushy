@@ -649,7 +649,7 @@ export async function saveMyOnboarding(req, res, next) {
     // comes through this same endpoint, and re-analysing on each one would
     // spend a model call per tap.
     if (answers.life_stage) {
-      analyseOnboarding(updated?.onboardingAnswers ?? answers)
+      analyseOnboarding(updated?.onboardingAnswers ?? answers, { userId })
         .then((analysis) =>
           userRepository.updateOnboardingAnswers(userId, {
             analysis_summary: analysis.summary,
@@ -736,7 +736,7 @@ async function notifyPartnerIfShared({ userId, dataType, dataValue }) {
       );
 
       if (dataType === 'mood' && (dataValue === 'low' || dataValue === 'bad' || dataValue === 'anxious' || dataValue === 'irritated')) {
-        aiChatService.generatePartnerMoodSuggestion(dataValue).then((suggestion) => {
+        aiChatService.generatePartnerMoodSuggestion(dataValue, userId).then((suggestion) => {
           if (suggestion) {
             publishToUsers(
               [recipientUserId],
@@ -1195,6 +1195,43 @@ export async function logout(req, res, next) {
       logger.info(`User session revoked via logout for user ${userId}`);
     }
     res.status(200).json({ success: true, message: 'Logged out successfully.' });
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
+ * Permanently deletes the signed-in account and everything belonging to it.
+ *
+ * The legal screen has always promised this and nothing implemented it. Google
+ * Play also requires an in-app deletion path for any app that has accounts.
+ *
+ * A typed confirmation is required in the body rather than a password, because
+ * accounts created through Google have no password to re-enter and would
+ * otherwise have no way to delete themselves. Authentication is mandatory, so
+ * the confirmation guards against an accidental call, not an unauthorised one.
+ */
+export async function deleteMyAccount(req, res, next) {
+  try {
+    const userId = req.user?.userId;
+    if (!userId) {
+      throw createHttpError(401, 'Authentication required.');
+    }
+
+    const confirm = typeof req.body?.confirm === 'string' ? req.body.confirm.trim() : '';
+    if (confirm !== 'DELETE') {
+      throw createHttpError(400, 'Send { "confirm": "DELETE" } to permanently delete this account.');
+    }
+
+    const { deleteAccount } = await import('../services/accountDeletionService.js');
+    const result = await deleteAccount(userId);
+
+    res.status(200).json({
+      success: true,
+      message: 'Account and associated data permanently deleted.',
+      recordsDeleted: result.total,
+      collections: Object.keys(result.deleted).length,
+    });
   } catch (error) {
     next(error);
   }

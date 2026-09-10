@@ -175,17 +175,30 @@ Return ONLY a JSON object with this EXACT structure (no markdown, no other keys)
       promptPills.push('Postpartum hair loss');
     }
 
-    // AI Transparency Telemetry: "Why am I seeing this?"
+    // "Why am I seeing this?" -- only things she actually gave us.
+    //
+    // The postpartum-day line was pushed unconditionally, and `daysSinceBirth`
+    // falls back to 0 when no delivery date is set. So an account with nothing
+    // logged and nothing calibrated was shown a single "signal" reading "You
+    // are on Postpartum Day 0 (Not Calibrated)", under a summary claiming it
+    // came from her logs. Three things wrong at once: nothing had been logged,
+    // Day 0 asserts she gave birth today, and the absence of data was being
+    // counted as evidence -- in the one panel whose whole job is to show the
+    // working.
     const observedSignals = [];
     if (sleepHours !== null) observedSignals.push(`You logged ${sleepHours} hours of sleep`);
     if (bleeding) observedSignals.push(`Your lochia bleeding is currently ${bleeding}`);
     if (mood) observedSignals.push(`You reported feeling ${mood}`);
     if (physicalComfort) observedSignals.push(`Your physical status is ${physicalComfort}`);
-    observedSignals.push(`You are on Postpartum Day ${daysSinceBirth} (${phaseName})`);
+    if (timing?.isConfigured) {
+      observedSignals.push(`You are on Postpartum Day ${daysSinceBirth} (${phaseName})`);
+    }
 
     const transparency = {
       title: 'Why is Docsy suggesting this?',
-      summary: `I synthesized ${observedSignals.length} personal recovery signals from your logs:`,
+      summary: observedSignals.length === 0
+        ? 'None of this comes from your own entries yet. Set your delivery date and log a check-in, and this panel will show exactly what it drew on.'
+        : `I drew on ${observedSignals.length} thing${observedSignals.length === 1 ? '' : 's'} you have logged:`,
       signals: observedSignals,
       rationale: `Because tissue remodeling and hormonal shifts require prioritizing ${priorities.map((p) => p.category).join(', ')} rather than demanding high output today.`,
     };

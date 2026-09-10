@@ -30,8 +30,16 @@ import {
 	refreshAuthToken,
 	saveMyWeight,
 	logout,
+	deleteMyAccount,
 } from '../controllers/authController.js';
+import {
+  acceptMyConsent,
+  getMyConsent,
+  getMyConsentHistory,
+  withdrawMyConsent,
+} from '../controllers/consentController.js';
 import { optionalAuth } from '../middleware/optionalAuth.js';
+import { requireAuth } from '../middleware/requireAuth.js';
 import { submitFeedback } from '../controllers/feedbackController.js';
 import {
   loginRateLimiter,
@@ -74,5 +82,14 @@ router.get('/me/nutrition/answers', optionalAuth, getNutritionAnswers);
 router.post('/me/nutrition/generate-plan', optionalAuth, generateNutritionPlan);
 router.get('/me/nutrition/plan', optionalAuth, getNutritionPlan);
 router.post('/me/feedback', optionalAuth, submitFeedback);
+// Consent. requireAuth throughout: a consent record that cannot name whose
+// consent it is proves nothing, which is the whole reason these exist.
+router.get('/me/consent', requireAuth, getMyConsent);
+router.post('/me/consent', requireAuth, acceptMyConsent);
+router.post('/me/consent/withdraw', requireAuth, withdrawMyConsent);
+router.get('/me/consent/history', requireAuth, getMyConsentHistory);
+// Permanent account deletion. requireAuth, not optionalAuth: an
+// unauthenticated caller must be refused, never silently treated as nobody.
+router.delete('/me', requireAuth, deleteMyAccount);
 
 export default router;

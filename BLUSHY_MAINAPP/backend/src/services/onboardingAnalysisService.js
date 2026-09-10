@@ -115,7 +115,7 @@ function ruleSummary(areas) {
  * Never throws: this runs as a side effect of finishing signup, and a failure
  * here must not be able to break onboarding.
  */
-export async function analyseOnboarding(answers, { signal } = {}) {
+export async function analyseOnboarding(answers, { signal, userId = null } = {}) {
   const allowed = deriveFocusAreas(answers);
   const fallback = {
     focusAreas: allowed,
@@ -153,7 +153,7 @@ export async function analyseOnboarding(answers, { signal } = {}) {
         max_tokens: 220,
         temperature: 0.2,
       }),
-    });
+    }, { feature: 'onboarding_analysis', userId });
 
     if (!response?.ok) return fallback;
 

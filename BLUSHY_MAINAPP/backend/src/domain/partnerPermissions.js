@@ -211,6 +211,33 @@ const GRANT_INDEX = (() => {
   return index;
 })();
 
+/**
+ * The legacy flags a v1 patch implies, so both vocabularies stay in step.
+ *
+ * Two permission vocabularies are live at once: the v1 keys this module
+ * defines, and the older `shareMood` / `shareSleep` / `allowDecoderMan` flags
+ * still stored on the connection and still read by `partnerRepository` and the
+ * decoder endpoint. `normalizePermissions` already reads the old names when the
+ * new ones are absent; this is the same mapping in the write direction, so a
+ * change made through the v1 endpoint is visible to the older readers instead
+ * of silently disagreeing with them.
+ *
+ * Returns only the flags that have a mapping. Keys with no legacy equivalent
+ * contribute nothing.
+ */
+export function legacyFlagsForPatch(patch = {}) {
+  const flags = {};
+  for (const [key, value] of Object.entries(patch)) {
+    if (typeof value !== 'boolean') continue;
+    const definition = PERMISSIONS[key];
+    if (!definition) continue;
+    for (const legacyKey of definition.legacyKeys) {
+      flags[legacyKey] = value;
+    }
+  }
+  return flags;
+}
+
 export function permissionForGrant(grant) {
   return GRANT_INDEX.get(grant) ?? null;
 }

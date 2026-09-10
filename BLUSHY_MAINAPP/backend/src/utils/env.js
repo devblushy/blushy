@@ -93,7 +93,26 @@ export const env = {
   // Connection pool bounds. See the comments in `utils/db.js` for why the
   // driver's defaults are wrong here; these are sized for a cluster that
   // allows 500 connections in total.
-  mongoMaxPoolSize: Number(process.env.MONGO_MAX_POOL_SIZE ?? 20),
+  // Set to false on instances that should serve traffic but never run the
+  // background jobs. Left true, the lease in schedulerLease.js still ensures
+  // only one process actually runs them.
+  schedulersEnabled: (process.env.SCHEDULERS_ENABLED ?? 'true') !== 'false',
+
+  // Per *process*, not per instance.
+  //
+  // The cluster allows 500 connections in total. At 20 each that is 25
+  // processes, which is fine for 25 single-process instances -- but the moment
+  // anything runs several workers per instance the arithmetic is workers x
+  // instances, and the sixth instance simply cannot connect. WEB_CONCURRENCY is
+  // the conventional name for that worker count, so the budget is divided by it
+  // rather than silently multiplied.
+  mongoMaxPoolSize: Math.max(
+    5,
+    Math.floor(
+      Number(process.env.MONGO_MAX_POOL_SIZE ?? 20)
+      / Math.max(1, Number(process.env.WEB_CONCURRENCY ?? 1)),
+    ),
+  ),
   mongoWaitQueueTimeoutMs: Number(process.env.MONGO_WAIT_QUEUE_TIMEOUT_MS ?? 10000),
   mongoMaxIdleTimeMs: Number(process.env.MONGO_MAX_IDLE_TIME_MS ?? 60000),
 

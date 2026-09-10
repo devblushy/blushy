@@ -11,6 +11,7 @@ class NutritionPlanService {
     nutritionGoals = [],
     cyclePhase = null,
     role = 'woman',
+    userId = null,
   }) {
     if (!env.aiChatApiKey) {
       throw createHttpError(503, 'AI nutrition planning is not configured. Add GROK_API_KEY in backend .env');
@@ -45,7 +46,7 @@ class NutritionPlanService {
           // "invalid format", which said nothing about why.
           max_tokens: 16000,
         }),
-      });
+      }, { feature: 'nutrition_plan', userId });
     } catch (error) {
       logger.error('Unable to reach AI provider', error);
       throw createHttpError(502, 'Unable to reach the AI provider right now.');

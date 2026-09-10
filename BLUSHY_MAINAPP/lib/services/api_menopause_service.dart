@@ -727,129 +727,6 @@ class MenopauseOverviewData {
     );
   }
 
-  static MenopauseOverviewData fallback() => MenopauseOverviewData(
-        lifeStage: 'menopause',
-        chapterTitle: 'Your New Chapter',
-        subheading: 'Understanding your body. Protecting your health. Living fully.',
-        lifeMode: 'normal',
-        privateMode: false,
-        sectionOrder: const [
-          'editorial_greeting',
-          'today_with_docsy',
-          'how_am_i_today',
-          'what_changed',
-          'what_been_steady',
-          'what_do_i_need_actions',
-          'my_health_domains',
-          'my_normal',
-          'my_treatment',
-          'my_questions',
-          'prepare_for_care',
-          'my_health_story',
-          'teach_me_30s',
-        ],
-        todayWithDocsy: MenopauseTodayBrief(
-          openingHeadline: 'Understanding your body. Protecting your vitality.',
-          doNothingAffirmation: "You're doing okay. Nothing urgent stands out from what you've logged. Go live your life. ❤️",
-          whatMattersToday: [
-            'Keep moving comfortably: 20 minutes of brisk walking promotes cardiovascular elasticity.',
-            'Protect bone density: Include calcium-rich foods and natural sunshine for Vitamin D.',
-          ],
-          whyToday: 'Tailored to your current baseline and steady health rhythm.',
-          promptPills: [
-            'Is 3 AM waking common in menopause?',
-            'How can I protect my bone density?',
-            'Tell me about localized vaginal comfort options',
-          ],
-        ),
-        myNormal: MenopauseMyNormal(
-          status: 'Calibrating your baseline',
-          description: 'Blushy learns your individual normal rather than comparing you to generic population averages.',
-          confidence: 'Early Baseline',
-          markers: [
-            MenopauseNormalMarker(domain: 'Sleep', baseline: 'Usually 6–7 hrs', status: 'steady'),
-            MenopauseNormalMarker(domain: 'Hot Flashes', baseline: 'Usually 0–1/day', status: 'steady'),
-            MenopauseNormalMarker(domain: 'Energy', baseline: 'Usually steady daytime pace', status: 'steady'),
-            MenopauseNormalMarker(domain: 'Intimate Comfort', baseline: 'Usually comfortable', status: 'steady'),
-            MenopauseNormalMarker(domain: 'Mood', baseline: 'Usually calm & resilient', status: 'steady'),
-            MenopauseNormalMarker(domain: 'Joints & Movement', baseline: 'Usually mobile without stiffness', status: 'steady'),
-          ],
-        ),
-        whatChanged: const [],
-        whatBeenSteady: [
-          MenopauseShiftItem(
-            id: 's_sleep_steady',
-            title: 'Sleep rhythm has remained steady',
-            detail: 'Your sleep duration and night comfort have stayed consistent throughout the recent week.',
-            timeframe: 'Past 7 Days',
-            icon: 'bedtime_rounded',
-            colorHex: '0xFF0D9488',
-          ),
-          MenopauseShiftItem(
-            id: 's_flashes_calm',
-            title: 'Temperature balance has been calm',
-            detail: 'No disruptive hot flashes or night sweats were reported over recent check-ins.',
-            timeframe: 'Past 7 Days',
-            icon: 'ac_unit_rounded',
-            colorHex: '0xFF2563EB',
-          ),
-        ],
-        healthDomains: MenopauseDomain.defaults(),
-        treatments: [
-          MenopauseTreatment(
-            id: 't_transdermal_patch',
-            name: 'Estradiol Transdermal Patch',
-            category: 'Hormone Therapy (MHT)',
-            dose: '50 mcg/day twice weekly',
-            startDate: '2026-08-10',
-            notes: 'Started for nighttime temperature regulation and sleep maintenance.',
-          ),
-          MenopauseTreatment(
-            id: 't_vit_d3_k2',
-            name: 'Vitamin D3 (2000 IU) + K2',
-            category: 'Bone & Muscle Supplement',
-            dose: '1 capsule daily with morning meal',
-            startDate: '2026-07-24',
-            notes: 'Prescribed to support calcium bone mineralization.',
-          ),
-        ],
-        treatmentResponse: [
-          MenopauseTreatmentResponse(
-            treatmentId: 't_transdermal_patch',
-            name: 'Estradiol Transdermal Patch',
-            category: 'Hormone Therapy (MHT)',
-            dose: '50 mcg/day twice weekly',
-            startDate: '2026-08-10',
-            daysActive: 28,
-            beforeSummary: const {'flashesReported': 4, 'sleepDisruptions': 3},
-            afterSummary: const {'flashesReported': 1, 'sleepDisruptions': 1},
-            attributionNote: 'These patterns changed after starting this treatment. Blushy observes longitudinal correlations; discuss individual response with your clinician.',
-          ),
-        ],
-        questions: [
-          MenopauseQuestion(
-            id: 'q_bone_density',
-            text: 'When should I have my first DEXA bone density scan?',
-            category: 'Bone & Muscle',
-            createdAt: '2026-09-07',
-          ),
-          MenopauseQuestion(
-            id: 'q_gsm_relief',
-            text: 'Is localized low-dose vaginal estrogen safe for long-term comfort?',
-            category: 'Intimate & Urinary',
-            createdAt: '2026-09-07',
-          ),
-          MenopauseQuestion(
-            id: 'q_cholesterol',
-            text: 'Should we re-check my fasting lipid panel now that my periods have ended?',
-            category: 'Heart & Metabolic',
-            createdAt: '2026-09-07',
-          ),
-        ],
-        teachMeIn30Seconds: MenopauseTeachMeItem.defaults(),
-        healthStory: MenopauseHealthStoryItem.defaults(),
-        recentCheckinsCount: 0,
-      );
 
   Map<String, dynamic> toJson() => {
         'lifeStage': lifeStage,
@@ -980,25 +857,47 @@ class MenopauseWhyAmISeeingThis {
 class ApiMenopauseService {
   static const String _overviewKey = 'menopause_overview_cache.json';
 
-  static Future<MenopauseOverviewData?> getOverview() async {
-    try {
-      final res = await ApiContractClient.get(
-        '/menopause/overview',
-        parse: (data) => MenopauseOverviewData.fromJson(Map<String, dynamic>.from(data as Map)),
-      );
-      if (res.data != null) {
-        BlushyStorage.write(_overviewKey, res.data!.toJson());
-        return res.data;
-      }
-    } catch (_) {}
+  /// The menopause overview, with the server's own state preserved.
+  ///
+  /// This used to collapse every outcome into a nullable and, when it had
+  /// nothing, return `MenopauseOverviewData.fallback()` -- 123 lines that
+  /// manufactured an entire personal history: a "My Normal" baseline ("Usually
+  /// 6-7 hrs", "Usually 0-1/day"), findings over the "Past 7 Days" saying sleep
+  /// had stayed steady and no hot flashes were reported, and an active
+  /// transdermal patch treatment. None of it measured, all of it shown to
+  /// anyone whose request failed. That constructor is gone.
+  ///
+  /// Now the caller can tell the four cases apart: fresh data, cached data
+  /// after a failure (stale), no data, and an actual error or offline.
+  static Future<ApiResult<MenopauseOverviewData>> getOverview() async {
+    final res = await ApiContractClient.get<MenopauseOverviewData>(
+      '/menopause/overview',
+      parse: (data) => MenopauseOverviewData.fromJson(Map<String, dynamic>.from(data as Map)),
+    );
 
+    if (res.data != null) {
+      try {
+        BlushyStorage.write(_overviewKey, res.data!.toJson());
+      } catch (_) {}
+      return res;
+    }
+
+    // The request did not come back with anything usable. A cached copy is
+    // worth showing, but it is labelled stale rather than passed off as fresh.
     final cached = BlushyStorage.read(_overviewKey);
     if (cached.isNotEmpty) {
       try {
-        return MenopauseOverviewData.fromJson(cached);
+        return ApiResult<MenopauseOverviewData>(
+          data: MenopauseOverviewData.fromJson(cached),
+          state: ApiState.stale,
+          lastUpdated: res.lastUpdated,
+          source: res.source,
+        );
       } catch (_) {}
     }
-    return MenopauseOverviewData.fallback();
+
+    // Nothing cached either, so the real reason travels to the caller.
+    return res;
   }
 
   static Future<bool> recordCheckin(Map<String, dynamic> checkinData) async {

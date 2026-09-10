@@ -16,6 +16,9 @@ import '../../home_screen.dart';
 import '../../widgets/cycle_tracker_image.dart';
 import '../../../../shared/docsy_avatar.dart';
 import 'stage_shared_components.dart';
+import '../../../../shared/user_display_name.dart';
+import '../../../../services/api_contract_client.dart';
+import '../../../../shared/stage_empty_notice.dart';
 
 /// ════════════════════════════════════════════════════════════════════════════
 /// STAGE 4: UNDERSTANDING MY BODY — HEALTH INTELLIGENCE & PATTERN SYNTHESIS
@@ -44,6 +47,10 @@ class HormonalHealthDashboard extends StatefulWidget {
 }
 
 class _HormonalHealthDashboardState extends State<HormonalHealthDashboard> {
+
+  /// How the last cycle-data load went, so a failed request is not drawn as an
+  /// account with nothing in it.
+  ApiState _cycleState = ApiState.loading;
   // ─── Core Cycle & Health State ──────────────────────────────────────────────
   DateTime? _lastPeriodStartDate;
   int _currentCycleDay = 14;
@@ -207,14 +214,18 @@ class _HormonalHealthDashboardState extends State<HormonalHealthDashboard> {
       }
 
       try {
-        final prediction = await ApiPeriodService().getPredictions();
+        final result = await ApiPeriodService().getPredictionsResult();
+        _cycleState = result.state;
+        final prediction = result.data;
         if (prediction != null && prediction.hasData && prediction.lastPeriodStartDate != null) {
           final pStart = DateTime.tryParse(prediction.lastPeriodStartDate!);
           if (pStart != null) start = pStart;
           if (prediction.cycleLengthDays > 0) _cycleLength = prediction.cycleLengthDays;
           if (prediction.periodLengthDays > 0) _periodLength = prediction.periodLengthDays;
         }
-      } catch (_) {}
+      } catch (_) {
+        _cycleState = ApiState.offline;
+      }
 
       if (start != null) {
         _lastPeriodStartDate = start;
@@ -359,16 +370,9 @@ class _HormonalHealthDashboardState extends State<HormonalHealthDashboard> {
   // 01 — EDITORIAL GREETING + "TODAY" IDENTITY (Unboxed & Subtle)
   // ════════════════════════════════════════════════════════════════
   Widget _buildEditorialGreeting(BuildContext context) {
-    String userName = 'nithya';
-    try {
-      final profile = BlushyStorage.read('user_profile.json');
-      if (profile is Map) {
-        final name = profile['name'] ?? profile['firstName'] ?? profile['profile']?['name'];
-        if (name is String && name.trim().isNotEmpty) {
-          userName = name.trim();
-        }
-      }
-    } catch (_) {}
+    // Read `name`, `firstName` and `profile.name` -- none of which onboarding
+    // writes -- and so always fell through to the literal 'nithya'.
+    final String userName = userDisplayName(context);
 
     final hour = DateTime.now().hour;
     final timeGreeting = hour < 12
@@ -2110,7 +2114,20 @@ class _HormonalHealthDashboardState extends State<HormonalHealthDashboard> {
                     Text('• Focus: $_userHealthContext', style: GoogleFonts.manrope(fontSize: 12)),
                     Text('• Logged Signals: ${_selectedSignals.isEmpty ? "None logged today" : _selectedSignals.join(", ")}', style: GoogleFonts.manrope(fontSize: 12)),
                     Text('• Active Treatments: ${_treatments.isEmpty ? "None recorded" : _treatments.map((t) => t["name"]).join(", ")}', style: GoogleFonts.manrope(fontSize: 12)),
-                    Text('• Baseline Cycle: $_cycleLength Days', style: GoogleFonts.manrope(fontSize: 12)),
+                    // Printed only when it came from logged periods. This line
+                    // used to show the 32-day default to someone who had
+                    // logged nothing, in a brief headed "Clinical Brief".
+                    Text(
+                      _hasLoggedPeriod
+                          ? '• Baseline Cycle: $_cycleLength days (from your logged periods)'
+                          : '• Baseline Cycle: not established yet, no periods logged',
+                      style: GoogleFonts.manrope(fontSize: 12),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      'All entries are self-reported.',
+                      style: GoogleFonts.manrope(fontSize: 10.5, color: textMuted),
+                    ),
                   ],
                 ),
               ),
@@ -2431,6 +2448,14 @@ class _HormonalHealthDashboardState extends State<HormonalHealthDashboard> {
         children: [
           _buildEditorialGreeting(context),
           const SizedBox(height: 8),
+          StageStateNotice(
+            state: _cycleState,
+            hasData: _hasLoggedPeriod,
+            emptyMessage: 'Log the first day of your last period and this page '
+                'starts working from your own cycle instead of general guidance.',
+            onRetry: _loadPeriodData,
+          ),
+
           _buildTodayWithDocsyHero(context),
           const SizedBox(height: 14),
           _buildCycleTrackerCard(context),

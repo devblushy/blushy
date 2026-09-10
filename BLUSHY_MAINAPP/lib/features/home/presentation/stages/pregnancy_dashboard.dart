@@ -9,6 +9,8 @@ import '../../../../services/api_contract_client.dart';
 import '../../../../services/api_pregnancy_service.dart';
 import '../doctor_summary_screen.dart';
 import 'stage_shared_components.dart';
+import '../../../../shared/stage_empty_notice.dart';
+import '../../../../shared/user_display_name.dart';
 
 class PregnancyDashboard extends StatefulWidget {
   final bool isNested;
@@ -39,6 +41,13 @@ class _PregnancyDashboardState extends State<PregnancyDashboard> {
   ScrollController get _effectiveScrollController => widget.scrollController ?? _internalScrollController;
 
   // ─── Real-Time Dynamic Pregnancy State ─────────────────────────────
+  // There was no loading flag at all: the dashboard rendered its empty
+  // shell immediately and the real figures appeared later, so a slow
+  // response looked like a pregnancy with no data rather than one still
+  // loading (spec sections 4 and 31).
+  bool _isLoading = true;
+  /// The server's own verdict on the last load (spec §4, §31).
+  ApiState _overviewState = ApiState.loading;
   PregnancyOverviewData? _overview;
   PregnancyTodayBriefData? _todayBrief;
   Map<String, dynamic>? _baselineData;
@@ -139,8 +148,18 @@ class _PregnancyDashboardState extends State<PregnancyDashboard> {
   }
 
   Future<void> _loadAllPregnancyData() async {
-    final pc = BlushyOSProvider.of(context).personalContext;
-    final dueDateStr = pc.dueDate?.toIso8601String().sliceSafe(0, 10);
+    // `get`, not `BlushyOSProvider.of`.
+    //
+    // initState calls this, and everything before the first await runs inside
+    // it -- so `.of(context)` registered an inherited dependency before
+    // initState had completed, which Flutter asserts against. The screen threw
+    // on every build. Only the due date is read here and it does not need to be
+    // reactive, so a non-registering lookup is enough.
+    final pc = context
+        .getInheritedWidgetOfExactType<BlushyOSProvider>()
+        ?.notifier
+        ?.personalContext;
+    final dueDateStr = pc?.dueDate?.toIso8601String().sliceSafe(0, 10);
 
     // Parallel fetch
     final overviewFuture = ApiPregnancyService.getOverview(dueDate: dueDateStr);
@@ -158,19 +177,27 @@ class _PregnancyDashboardState extends State<PregnancyDashboard> {
     ]);
 
     if (!mounted) return;
-    final ovRes = results[0] as ApiResult<PregnancyOverviewData>;
-    final brRes = results[1] as ApiResult<PregnancyTodayBriefData>;
-    final baseRes = results[2] as ApiResult<Map<String, dynamic>>;
-    final memRes = results[3] as ApiResult<List<Map<String, dynamic>>>;
-    final qRes = results[4] as ApiResult<List<Map<String, dynamic>>>;
 
-    setState(() {
+    // try/finally so the loading flag always clears. Without it, one failed
+    // cast or a throwing future would leave the dashboard on its spinner for
+    // ever, which is a worse failure than the missing loading state this
+    // replaces.
+    try {
+      final ovRes = results[0] as ApiResult<PregnancyOverviewData>;
+      final brRes = results[1] as ApiResult<PregnancyTodayBriefData>;
+      final baseRes = results[2] as ApiResult<Map<String, dynamic>>;
+      final memRes = results[3] as ApiResult<List<Map<String, dynamic>>>;
+      final qRes = results[4] as ApiResult<List<Map<String, dynamic>>>;
+
+      _overviewState = ovRes.state;
       if (ovRes.data != null) _overview = ovRes.data;
       if (brRes.data != null) _todayBrief = brRes.data;
       if (baseRes.data != null) _baselineData = baseRes.data;
       if (memRes.data != null) _memories = memRes.data!;
       if (qRes.data != null) _questions = qRes.data!;
-    });
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 
   Future<void> _submitDailyCheckIn() async {
@@ -323,15 +350,12 @@ class _PregnancyDashboardState extends State<PregnancyDashboard> {
 
   // 01 — Editorial Greeting & Date
   Widget _buildEditorialGreeting(PersonalContext pc) {
-    String userName = 'mama';
-    try {
-      final decoded = BlushyStorage.read('user_profile.json');
-      userName = decoded['name'] ?? decoded['profile']?['name'] ?? pc.userName ?? 'mama';
-    } catch (_) {
-      userName = pc.userName ?? 'mama';
-    }
-    if (userName.trim().isEmpty) userName = 'mama';
-    userName = userName.trim().split(' ').first;
+    // The user's own name, and a neutral address when it is not known.
+    //
+    // This read the stored profile under `name` and `profile.name`, keys
+    // onboarding has never written, and fell through to "mama" -- so the screen
+    // addressed everyone the same way regardless of who they were.
+    final String userName = userFirstName(context);
 
     final hour = DateTime.now().hour;
     final timeGreeting = hour < 12
@@ -363,7 +387,7 @@ class _PregnancyDashboardState extends State<PregnancyDashboard> {
             ),
           ),
           Text(
-            '${userName.toLowerCase()}.',
+            '$userName.',
             style: GoogleFonts.cormorantGaramond(
               fontSize: 28,
               fontWeight: FontWeight.w600,
@@ -2003,6 +2027,21 @@ class _PregnancyDashboardState extends State<PregnancyDashboard> {
     final osState = BlushyOSProvider.of(context);
     final pc = osState.personalContext;
 
+    if (_isLoading) {
+      return wrapStageDashboardLayout(
+        context: context,
+        isNested: widget.isNested,
+        scaffoldKey: _scaffoldKey,
+        child: const Center(
+          child: CircularProgressIndicator(color: crimsonPrimary),
+        ),
+      );
+    }
+
+    // Nothing came back from the server, so the sections below are the stage's
+    // general content rather than anything worked out from her pregnancy.
+    final bool hasServerData = _overview != null || _todayBrief != null;
+
     return wrapStageDashboardLayout(
       context: context,
       isNested: widget.isNested,
@@ -2018,6 +2057,18 @@ class _PregnancyDashboardState extends State<PregnancyDashboard> {
               // 01: Editorial Greeting
               _buildEditorialGreeting(pc),
               const SizedBox(height: 20),
+              StageStateNotice(
+                state: _overviewState,
+                hasData: hasServerData,
+                emptyMessage:
+                    'There is nothing recorded for your pregnancy yet, so what follows is '
+                    'general guidance rather than anything based on your own entries. Add '
+                    'your due date and a check-in to see it worked out for you.',
+                onRetry: () {
+                  setState(() => _isLoading = true);
+                  _loadAllPregnancyData();
+                },
+              ),
 
               // 02: Today with Docsy (Today's Pregnancy Brief ⭐)
               _buildTodaysPregnancyBrief(),

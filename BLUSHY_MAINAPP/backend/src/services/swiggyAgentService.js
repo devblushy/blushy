@@ -206,7 +206,7 @@ Common errors you should handle and explain to the user:
           tool_choice: 'auto',
           max_tokens: 500,
         }),
-      });
+      }, { feature: 'swiggy_agent' });
 
       if (!response.ok) {
         const errText = await response.text();

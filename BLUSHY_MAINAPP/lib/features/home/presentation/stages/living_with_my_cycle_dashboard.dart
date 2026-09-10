@@ -13,8 +13,10 @@ import '../../../../services/api_period_service.dart';
 import '../../../../services/api_sia_service.dart';
 import '../../home_screen.dart';
 import '../../widgets/cycle_tracker_image.dart';
+import '../../widgets/real_insights_list.dart';
 import '../../../../shared/docsy_avatar.dart';
 import 'stage_shared_components.dart';
+import '../../../../shared/user_display_name.dart';
 
 /// ════════════════════════════════════════════════════════════════════════════
 /// STAGE 3: LIVING WITH MY CYCLE — THE HUMAN-FIRST AI INTELLIGENCE LAYER
@@ -49,7 +51,12 @@ class _LivingWithMyCycleDashboardState extends State<LivingWithMyCycleDashboard>
   int _currentCycleDay = 14;
   int _cycleLength = 28;
   int _periodLength = 5;
-  bool _hasLoggedPeriod = true;
+  // Starts false, like the other cycle dashboards. Starting true meant the
+  // first frame rendered the Day 14 fallback as though a period had been
+  // logged, and only corrected once the async load returned -- which against a
+  // sleeping backend is tens of seconds of simulated cycle data (spec §4:
+  // never show simulated cycle days to a user with no period data).
+  bool _hasLoggedPeriod = false;
   StreamSubscription? _periodEventSub;
 
   // Real-time AI Companion (Docsy) State
@@ -298,11 +305,10 @@ class _LivingWithMyCycleDashboardState extends State<LivingWithMyCycleDashboard>
   // 01 — EDITORIAL GREETING + "TODAY" IDENTITY (Unboxed & Subtle)
   // ════════════════════════════════════════════════════════════════
   Widget _buildEditorialGreeting(BuildContext context) {
-    String userName = 'nithya';
-    try {
-      final decoded = BlushyStorage.read('user_profile.json');
-      userName = decoded['name'] ?? decoded['profile']?['name'] ?? 'nithya';
-    } catch (_) {}
+    // Was: decoded['name'] ?? decoded['profile']?['name'] ?? 'nithya'.
+    // Onboarding writes profile.preferredName, so neither key existed and every
+    // user was greeted as "nithya".
+    final String userName = userDisplayName(context);
 
     final hour = DateTime.now().hour;
     final timeGreeting = hour < 12
@@ -1626,94 +1632,24 @@ class _LivingWithMyCycleDashboardState extends State<LivingWithMyCycleDashboard>
   // ════════════════════════════════════════════════════════════════
   // 09 — "A PATTERN I NOTICED" (Blushy Intelligence)
   // ════════════════════════════════════════════════════════════════
+  /// Patterns the server derived from this user's own logs.
+  ///
+  /// This card used to be a fixed literal under the heading "CYCLICAL PATTERN
+  /// DETECTED": "You tend to sleep ~40 minutes less during the 3 days before
+  /// your period starts. You've logged this pattern across 3 of your recent
+  /// cycles." Every figure in it was invented, and it was shown to everyone,
+  /// including accounts that had logged nothing at all.
+  ///
+  /// RealInsightsList exists for exactly this. It asks the pattern engine,
+  /// which will not report anything until it has six paired observations and a
+  /// correlation above its floor, and renders the insufficient-data case as
+  /// such instead of filling it in (spec sections 7 and 8).
   Widget _buildPatternIntelligenceSection(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildEyebrow('A Pattern I Noticed'),
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: cardBorderColor),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(6),
-                    decoration: const BoxDecoration(
-                      color: Color(0xFFF3E8FF),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.insights_rounded,
-                      size: 14,
-                      color: Color(0xFF7C3AED),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    'CYCLICAL PATTERN DETECTED',
-                    style: GoogleFonts.manrope(
-                      fontSize: 10.5,
-                      fontWeight: FontWeight.w800,
-                      color: const Color(0xFF7C3AED),
-                      letterSpacing: 0.8,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10),
-              Text(
-                'You tend to sleep ~40 minutes less during the 3 days before your period starts. You’ve logged this pattern across 3 of your recent cycles.',
-                style: GoogleFonts.manrope(
-                  fontSize: 12.5,
-                  fontWeight: FontWeight.w500,
-                  color: const Color(0xFF221510),
-                  height: 1.45,
-                ),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                'Based on your logged sleep & symptom history.',
-                style: GoogleFonts.manrope(
-                  fontSize: 10.5,
-                  fontStyle: FontStyle.italic,
-                  color: const Color(0xFF7A6B72),
-                ),
-              ),
-              const SizedBox(height: 12),
-              InkWell(
-                onTap: () {
-                  _openDocsyWithPrompt(
-                    context,
-                    'Why does sleep duration drop in the late luteal phase before my period and how can I fix it?',
-                  );
-                },
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      'Understand this pattern',
-                      style: GoogleFonts.manrope(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                        color: const Color(0xFF7C3AED),
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    const Icon(Icons.arrow_forward_rounded, size: 13, color: Color(0xFF7C3AED)),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
+        const RealInsightsList(title: 'What your logs show'),
       ],
     );
   }
@@ -2144,20 +2080,47 @@ class _LivingWithMyCycleDashboardState extends State<LivingWithMyCycleDashboard>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Patient Cycle Summary (Last 90 Days):',
+              _hasLoggedPeriod ? 'Cycle summary (from your logs):' : 'Cycle summary:',
               style: GoogleFonts.manrope(fontSize: 12, fontWeight: FontWeight.w700, color: const Color(0xFF221510)),
             ),
             const SizedBox(height: 8),
-            Text('• Average Cycle Length: $_cycleLength Days\n• Average Flow Duration: $_periodLength Days\n• Current Cycle Day: Day $_currentCycleDay ($_currentPhaseName)\n• Logged Symptoms: ${_selectedNoticings.isEmpty ? "None logged today" : _selectedNoticings.join(", ")}',
-                style: GoogleFonts.manrope(fontSize: 11.5, color: const Color(0xFF5E5057), height: 1.4)),
+            // Only figures that came from logged periods are printed. This
+            // block used to print the defaults -- a 28-day cycle, a 5-day flow
+            // and Day 14 -- to someone who had logged nothing, under the
+            // heading "Patient Cycle Summary (Last 90 Days)". A clinician
+            // reading that would be reading numbers nobody measured.
+            Text(
+              _hasLoggedPeriod
+                  ? '• Cycle length: $_cycleLength days\n'
+                      '• Flow duration: $_periodLength days\n'
+                      '• Current cycle day: Day $_currentCycleDay ($_currentPhaseName)\n'
+                      '• Symptoms logged today: ${_selectedNoticings.isEmpty ? "none" : _selectedNoticings.join(", ")}'
+                  : 'No periods have been logged yet, so there is nothing to summarise. '
+                      'Log a period start date and this will fill in from your own history.',
+              style: GoogleFonts.manrope(fontSize: 11.5, color: const Color(0xFF5E5057), height: 1.4),
+            ),
+            if (_hasLoggedPeriod) ...[
+              const SizedBox(height: 6),
+              Text(
+                'Self-reported. Cycle day and phase are estimates calculated from your logged dates, not clinical measurements.',
+                style: GoogleFonts.manrope(fontSize: 10, color: const Color(0xFF7A6B72), height: 1.35),
+              ),
+            ],
             const SizedBox(height: 14),
             Text(
-              'Suggested Questions for Clinician:',
+              'Questions you might ask:',
               style: GoogleFonts.manrope(fontSize: 12, fontWeight: FontWeight.w700, color: const Color(0xFF221510)),
             ),
             const SizedBox(height: 6),
-            Text('1. Are my luteal phase fatigue patterns standard?\n2. What non-hormonal options relieve my cyclic bloating?',
-                style: GoogleFonts.manrope(fontSize: 11.5, color: const Color(0xFF5E5057), height: 1.4)),
+            // Phrased as prompts rather than as her own reported symptoms.
+            // These were "Are my luteal phase fatigue patterns standard?" and
+            // "What relieves my cyclic bloating?" -- naming complaints she may
+            // never have had.
+            Text(
+              '1. Is the pattern I am seeing in my cycle typical?\n'
+              '2. Which of the symptoms I track are worth investigating?',
+              style: GoogleFonts.manrope(fontSize: 11.5, color: const Color(0xFF5E5057), height: 1.4),
+            ),
           ],
         ),
         actions: [

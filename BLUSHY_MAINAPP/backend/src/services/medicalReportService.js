@@ -119,7 +119,7 @@ If it is not a medical report/prescription (e.g. general chat photo, screenshot 
           max_tokens: 300,
           response_format: { type: 'json_object' },
         }),
-      });
+      }, { feature: 'medical_report_parse', userId });
 
       if (response.ok) {
         const json = await response.json();

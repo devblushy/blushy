@@ -18,6 +18,7 @@ import {
 } from '../domain/sharedActivities.js';
 import { buildPartnerCareSuggestions, buildPartnerSharedDataPayload, buildCycleInfo } from '../services/partnerSuggestionService.js';
 import { getDynamicPartnerNeeds } from '../services/partnerNeedsService.js';
+import { aiFetch } from '../utils/aiRequest.js';
 
 const DEFAULT_PERMISSIONS = {
   shareMood: false,
@@ -728,22 +729,30 @@ async function updateConnectionPermissions({ connectionId, actorUserId, permissi
     (key) => nextPermissions[key] !== currentPermissions[key]
   );
 
+  // Three different rules govern these keys, and the caller needs to know
+  // which one refused. All three used to throw a bare
+  // FORBIDDEN_PERMISSION_UPDATE that the controller rendered as "only the
+  // permission owner can update access controls" -- which is wrong for the two
+  // role rules below. The permission owner is the woman, and she is still
+  // refused `allowDecoderMan`, so that message sent her looking for an
+  // ownership problem that does not exist.
+  const refuse = (key, rule) => {
+    const error = new Error('FORBIDDEN_PERMISSION_UPDATE');
+    error.permissionKey = key;
+    error.permissionRule = rule;
+    throw error;
+  };
+
   for (const key of changedKeys) {
     if (key === 'allowAiSuggestionsWoman') {
-      if (actorRole !== 'woman') {
-        const error = new Error('FORBIDDEN_PERMISSION_UPDATE');
-        throw error;
-      }
+      // Governs suggestions shown to her, so it is hers to set.
+      if (actorRole !== 'woman') refuse(key, 'requires_woman');
     } else if (key === 'allowAiSuggestionsMan' || key === 'allowDecoderMan') {
-      if (actorRole !== 'man') {
-        const error = new Error('FORBIDDEN_PERMISSION_UPDATE');
-        throw error;
-      }
+      // His own features; ownership of the shared data is irrelevant here.
+      if (actorRole !== 'man') refuse(key, 'requires_man');
     } else {
-      if (!current.canManagePermissions) {
-        const error = new Error('FORBIDDEN_PERMISSION_UPDATE');
-        throw error;
-      }
+      // The data-sharing flags, which only the person sharing may change.
+      if (!current.canManagePermissions) refuse(key, 'requires_owner');
     }
   }
 
@@ -800,7 +809,7 @@ async function decodeMessageHelper({ message, cycleInfo, recentHistory }) {
   }
 
   try {
-    const response = await fetch(aiChatApiUrl, {
+    const response = await aiFetch(aiChatApiUrl, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${aiChatApiKey}`,
@@ -828,7 +837,7 @@ Latest Partner Message to Decode: "${message}"`,
         ],
         max_tokens: 80,
       }),
-    });
+    }, { feature: 'partner_decoder_helper' });
 
     if (response.ok) {
       const payload = await response.json();

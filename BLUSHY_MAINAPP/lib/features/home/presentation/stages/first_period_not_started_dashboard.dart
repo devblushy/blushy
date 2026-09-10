@@ -12,6 +12,9 @@ import '../../home_screen.dart';
 import '../../services/home_event_bus.dart';
 import '../../../sia/open_docsy.dart';
 import '../../../sia/sia_screen.dart';
+import '../../../../shared/user_display_name.dart';
+import '../../../../services/api_contract_client.dart';
+import '../../../../shared/stage_empty_notice.dart';
 
 class FirstPeriodNotStartedDashboard extends StatefulWidget {
   final bool isNested;
@@ -28,6 +31,11 @@ class FirstPeriodNotStartedDashboard extends StatefulWidget {
 }
 
 class _FirstPeriodNotStartedDashboardState extends State<FirstPeriodNotStartedDashboard> {
+
+  /// How the last insight load went. This stage has no cycle to report on, so
+  /// the only thing worth saying is whether today's note actually came from
+  /// the server or is the seeded fallback.
+  ApiState _insightState = ApiState.loading;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   late final ScrollController _internalScrollController = ScrollController();
   ScrollController get _effectiveScrollController => widget.scrollController ?? _internalScrollController;
@@ -309,7 +317,9 @@ class _FirstPeriodNotStartedDashboardState extends State<FirstPeriodNotStartedDa
     setState(() => _isLoadingAiInsights = true);
 
     try {
-      final insights = await ApiSiaService().getHealthInsights();
+      final result = await ApiSiaService().getHealthInsightsResult();
+      if (mounted) _insightState = result.state;
+      final insights = result.data ?? const <String, dynamic>{};
       if (mounted && insights.isNotEmpty) {
         final thought = insights['thought'] ?? insights['summary'] ?? insights['insight'] ?? insights['headline'];
         if (thought is String && thought.trim().isNotEmpty) {
@@ -319,7 +329,9 @@ class _FirstPeriodNotStartedDashboardState extends State<FirstPeriodNotStartedDa
         }
       }
     } catch (_) {
-      // Graceful fallback to daily seeded thought
+      // Graceful fallback to the daily seeded thought, but record that the
+      // note on screen is not from her own data.
+      if (mounted) _insightState = ApiState.offline;
     } finally {
       if (mounted) setState(() => _isLoadingAiInsights = false);
     }
@@ -836,11 +848,10 @@ class _FirstPeriodNotStartedDashboardState extends State<FirstPeriodNotStartedDa
   // 00 — EDITORIAL GREETING (UNBOXED, Cormorant & Manrope)
   // ════════════════════════════════════════════════════════════════
   Widget _buildEditorialGreeting(BuildContext context) {
-    String userName = 'nithya';
-    try {
-      final decoded = BlushyStorage.read('user_profile.json');
-      userName = decoded['name'] ?? decoded['profile']?['name'] ?? 'nithya';
-    } catch (_) {}
+    // Was: decoded['name'] ?? decoded['profile']?['name'] ?? 'nithya'.
+    // Onboarding writes profile.preferredName, so neither key existed and every
+    // user was greeted as "nithya".
+    final String userName = userDisplayName(context);
 
     final hour = DateTime.now().hour;
     final timeGreeting = hour < 12
@@ -863,7 +874,7 @@ class _FirstPeriodNotStartedDashboardState extends State<FirstPeriodNotStartedDa
             ),
           ),
           Text(
-            '${userName.toLowerCase()}.',
+            '$userName.',
             style: GoogleFonts.cormorantGaramond(
               fontSize: 28,
               fontWeight: FontWeight.w600,
@@ -1841,6 +1852,14 @@ class _FirstPeriodNotStartedDashboardState extends State<FirstPeriodNotStartedDa
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildEditorialGreeting(context),
+                  StageStateNotice(
+                    state: _insightState,
+                    // There is no period to have logged at this stage, so the
+                    // seeded note is the normal case rather than a gap.
+                    hasData: true,
+                    emptyMessage: '',
+                    onRetry: _fetchDynamicAiInsights,
+                  ),
                   _buildYourJourneyCard(context),
                   const SizedBox(height: 18),
                   _buildTodayAiMoment(context),

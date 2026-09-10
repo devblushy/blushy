@@ -6,7 +6,19 @@ import { normalizeRole as normalizeRoleValue } from '../utils/role.js';
 const MAX_MESSAGES = 12;
 
 class AIChatService {
-  async createReply({ messages, role = 'woman', user = null, languageCode = 'en', aiContext = {} }) {
+  /**
+   * `systemPrompt` is a server-built instruction for a specific task, added
+   * after the base persona prompt.
+   *
+   * It is a separate parameter rather than a `{ role: 'system' }` entry in
+   * `messages` on purpose. `messages` arrives from the request body, so
+   * `normalizeMessages` deliberately collapses every incoming role to `user`
+   * or `assistant` -- otherwise a client could post its own system turn and
+   * overwrite the safety rules, the medication prohibition and the
+   * anti-fabrication instructions. Callers that legitimately need to steer a
+   * single request pass it here, where the client cannot reach it.
+   */
+  async createReply({ messages, role = 'woman', user = null, languageCode = 'en', aiContext = {}, systemPrompt = '' }) {
     if (!env.aiChatApiKey) {
       throw createHttpError(503, 'Docsy is not configured yet. Add GROK_API_KEY in the backend .env file.');
     }
@@ -56,6 +68,9 @@ class AIChatService {
               role: 'system',
               content: buildSystemPrompt({ role, user, languageCode, aiContext }),
             },
+            ...(typeof systemPrompt === 'string' && systemPrompt.trim()
+              ? [{ role: 'system', content: systemPrompt.trim() }]
+              : []),
             ...normalizedMessages.map((message) => ({
               role: message.role,
               content: message.content,
@@ -67,7 +82,7 @@ class AIChatService {
           frequency_penalty: 0.1,
           presence_penalty: 0.1,
         }),
-      });
+      }, { feature: 'docsy_chat', userId: user?.userId ?? user?.user_id ?? null });
     } catch {
       throw createHttpError(502, 'Unable to reach the AI provider right now.');
     }
@@ -93,7 +108,7 @@ class AIChatService {
     };
   }
 
-  async generatePartnerMoodSuggestion(partnerMood) {
+  async generatePartnerMoodSuggestion(partnerMood, userId = null) {
     if (!env.aiChatApiKey) return null;
 
     try {
@@ -113,7 +128,7 @@ class AIChatService {
           ],
           max_tokens: 50,
         }),
-      });
+      }, { feature: 'partner_mood_suggestion', userId });
 
       if (!response.ok) return null;
       const payload = await response.json();
@@ -123,7 +138,7 @@ class AIChatService {
     }
   }
 
-  async generatePartnerChatSuggestions(chatMessages, viewerRole, connectionId, mode = 'default') {
+  async generatePartnerChatSuggestions(chatMessages, viewerRole, connectionId, mode = 'default', userId = null) {
     if (!env.aiChatApiKey) return [];
     if (!Array.isArray(chatMessages) || chatMessages.length === 0) return [];
 
@@ -191,7 +206,7 @@ ${messagesText}`,
           ],
           max_tokens: 100,
         }),
-      });
+      }, { feature: 'partner_chat_suggestions', userId });
 
       if (!response.ok) return [];
       const payload = await response.json();
@@ -274,7 +289,7 @@ Do not include markdown code block fences or any other text outside the JSON obj
             max_tokens: 450,
             temperature: 0.78,
           }),
-        });
+        }, { feature: 'daily_health_insight', userId: user?.userId ?? null });
 
         if (response.ok) {
           const payload = await response.json();
@@ -301,54 +316,65 @@ Do not include markdown code block fences or any other text outside the JSON obj
     return this._fallbackStageInsight(lifeStage, cycleDay, phaseName);
   }
 
+  /**
+   * What is shown when the model could not be reached.
+   *
+   * These used to assert bodily state that nothing had measured -- "your body
+   * is dedicating energy toward natural uterine cleansing", "your biological
+   * signals suggest the fertile window may be open" -- to any user in that
+   * stage, including one who had logged nothing, and labelled it
+   * `ttc_intelligence` / `cycle_intelligence` so it read as derived analysis.
+   *
+   * Spec §7 forbids personalized hormone claims without validated lab or device
+   * data, and §8 forbids fabricating medical data. A fallback cannot know
+   * anything about her body, so it no longer says anything about her body: it
+   * reports that the insight is unavailable and offers actions that are true
+   * whatever her data says. `source` names it a fallback so the client can
+   * label it rather than presenting it as analysis.
+   */
   _fallbackStageInsight(lifeStage, cycleDay, phaseName) {
     const stage = String(lifeStage).toLowerCase();
 
+    const base = {
+      note: 'This is a general note, not based on your logs.',
+      source: 'unavailable_fallback',
+      aiGenerated: false,
+    };
+
     if (stage.includes('ttc') || stage.includes('conceive') || stage.includes('fertility')) {
       return {
-        headline: 'Your Fertile Window Looks Active',
-        thought: 'Your biological signals suggest the fertile window may be open. You don’t need to keep checking everything today; sperm viability spans several days in fertile fluid, so take things at an unhurried, collaborative pace.',
-        note: 'Low-cortisol evenings and unpressured connection support both hormonal balance and nervous system ease.',
-        suggestions: ['Notice cervical fluid texture', 'Take an afternoon LH check between 12-4 PM', 'Schedule a relaxing activity together tonight'],
-        source: 'ttc_intelligence',
+        ...base,
+        headline: 'Today’s Note Isn’t Ready',
+        thought: 'Docsy could not put together your reflection just now. Your logged signals are safe and nothing has been lost. Fertile-window indicators come from what you record, so they will be here once this reconnects.',
+        suggestions: ['Log cervical fluid if you tracked it', 'Record an LH test result', 'Check back shortly'],
       };
     }
 
     if (stage.includes('hormonal') || stage.includes('pcos') || stage.includes('endo')) {
       return {
-        headline: 'Nurturing Hormonal Harmony',
-        thought: 'Your body is continuously balancing metabolic signals and endocrine transitions. Honoring gentle physical pacing, low-glycemic nourishment, and steady hydration supports restorative resilience today.',
-        note: 'Consistent, restorative sleep and gentle pelvic release exercises help steady systemic inflammation.',
-        suggestions: ['Hydrate with electrolyte-rich water', 'Practice 5 minutes of deep belly breathing', 'Log pelvic comfort signals'],
-        source: 'stage_intelligence',
+        ...base,
+        headline: 'Today’s Note Isn’t Ready',
+        thought: 'Docsy could not put together your reflection just now. Nothing you have logged is affected, and your condition profile is unchanged.',
+        suggestions: ['Log how you are feeling today', 'Note any symptoms you want to raise with a clinician', 'Check back shortly'],
       };
     }
 
     if (stage.includes('cycle') || stage.includes('menstrual')) {
-      if (cycleDay && cycleDay <= 5) {
-        return {
-          headline: 'Honoring Your Menstrual Reset',
-          thought: 'Your body is dedicating energy toward natural uterine cleansing. Lower stamina is biological wisdom, inviting quiet focus and warmth.',
-          note: 'Warm herbal tea and magnesium-rich nourishment ease natural smooth-muscle contraction.',
-          suggestions: ['Keep a warm heat pad nearby', 'Rest without guilt', 'Hydrate with warm fluids'],
-          source: 'cycle_intelligence',
-        };
-      }
       return {
-        headline: cycleDay ? `Cycle Day ${cycleDay} · ${phaseName || 'Rhythm'}` : 'Tuning Into Your Cycle',
-        thought: 'Docsy tracks your biological rhythm in real time. Your daily signals unlock personalized hormone forecasts, nutrition tips, and energy rhythms.',
-        note: 'Tracking your daily signals helps Blushy discover what is normal for your unique body.',
-        suggestions: ['Log today’s mood and energy', 'Tune into subtle bodily signals', 'Stay hydrated'],
-        source: 'cycle_intelligence',
+        ...base,
+        // Cycle day is a figure the deterministic engine computed, so it can be
+        // shown. What it might mean for her body is not something to invent.
+        headline: cycleDay ? `Cycle Day ${cycleDay}${phaseName ? ` · ${phaseName}` : ''}` : 'Today’s Note Isn’t Ready',
+        thought: 'Docsy could not put together your reflection just now. Your cycle history and logs are unaffected.',
+        suggestions: ['Log today’s mood and energy', 'Record any symptoms', 'Check back shortly'],
       };
     }
 
     return {
-      headline: 'Understanding Your Body',
-      thought: 'Docsy is ready to tune into your rhythm. Log your daily signals and sensations to unlock tailored hormone insights, comfort guidance, and baseline pattern tracking.',
-      note: 'Tracking your daily signals helps Blushy discover what is normal for your unique body.',
-      suggestions: ['Check in with how your body feels', 'Practice mindful breathing', 'Log daily wellness'],
-      source: 'baseline_intelligence',
+      ...base,
+      headline: 'Today’s Note Isn’t Ready',
+      thought: 'Docsy could not put together your reflection just now. Nothing you have logged is affected.',
+      suggestions: ['Log today’s mood and energy', 'Record any symptoms', 'Check back shortly'],
     };
   }
 }
@@ -362,6 +388,11 @@ function normalizeMessages(messages) {
   return messages
     .filter((message) => message && typeof message === 'object')
     .map((message) => ({
+      // Anything that is not `assistant` becomes `user`, including `system`.
+      // These messages come from the request body, so a preserved system role
+      // would be a client-supplied instruction sitting alongside the safety
+      // prompt. Server-built instructions go through `createReply`'s
+      // `systemPrompt` parameter instead.
       role: message.role === 'assistant' ? 'assistant' : 'user',
       content: typeof message.content === 'string' ? message.content.trim() : '',
     }))
@@ -392,7 +423,7 @@ function buildSystemPrompt({ role, user, languageCode, aiContext }) {
   const prompts = [
     'You are Docsy, a warm, casual, emotionally intelligent best friend and AI companion. You are a supportive listener, gynecologist-level women’s health expert, and empathetic companion.',
     'TONE & PERSONALITY: Speak naturally like a close, caring best friend: casual, warm, balanced, and approachable. Neither stiff/clinical/formal nor overly informal/slangy. Never sound like a robotic AI or formal medical textbook.',
-    'EMPATHY: Validate feelings first with genuine empathy. Listen deeply before responding. Offer comfort, advice, humor, or warmth naturally.',
+    'EMPATHY: Validate feelings first, listening deeply before responding. Offer comfort, advice, humour or warmth naturally.',
     'GIRLFRIEND REGISTER: Talk to her the way a close girlfriend would -- warm, informal, a little playful, plainly on her side. Use her own words back to her. Short sentences are fine. Never lecture, never read like a pamphlet or a leaflet.',
 
     // Shape taken from the reply she pointed at as the tone she wants:
@@ -426,10 +457,7 @@ function buildSystemPrompt({ role, user, languageCode, aiContext }) {
 
     // Conversational Continuity Rules
     'CONVERSATIONAL CONTINUITY:',
-    '- Every message MUST feel like a natural, ongoing conversation with a close friend.',
-    '- Do NOT attempt to wrap up, conclude, or end the chat at the end of your response.',
-    '- Do NOT use canned closing statements or wrap-up questions that feel like ending a session.',
-    '- Keep the chat flowing naturally, open, and engaging so chatting feels effortless.',
+    '- Never wrap up, conclude or end the chat, and never use canned closing statements. Every reply should feel like an ongoing conversation with a close friend.',
     // Reasoning is off for latency, and the reasoning replies were the ones
     // that reliably ended on a question ("How is the rest of your day shaping
     // up?"). That is the behaviour worth keeping, so it is now asked for
@@ -475,15 +503,17 @@ function buildSystemPrompt({ role, user, languageCode, aiContext }) {
     `Today is ${currentDate} in Asia/Kolkata timezone.`,
     
     // Response Style & Real-time Voice Guidelines
-    'REAL-TIME VOICE & CHAT CONVERSATION GUIDELINES:',
-    '- Always write your name as "Docsy". Never "Dr. Docsy", never S.I.A., never all-caps DOCSY.',
-    '- Voice replies are spoken words only: no symbols, no formatting, nothing that has to be seen to make sense.',
-    '- Listen deeply to the user’s emotional tone. Validate their feelings first with empathy.',
-    '- Keep replies casual, warm, conversational, and direct (1 to 3 paragraphs). Avoid robotic bulleted lists or formal textbook structures.',
+    'Always write your name as "Docsy". Never "Dr. Docsy", never S.I.A., never all-caps DOCSY.',
+    '- Keep replies to one to three short paragraphs.',
+    // Only meaningful when the reply will be spoken. Sent on every text
+    // message too, it was paying for guidance that did not apply.
+    aiContext?.isVoiceCall
+      ? '- This reply will be spoken aloud: words only, no symbols or formatting, nothing that has to be seen to make sense.'
+      : '',
     `You MUST reply entirely in ${replyLanguage}.`,
     
     // Final Guardrails
-    'Never discuss: coding help, financial advice, legal advice, or politics.',
+    'Never discuss: coding help, financial advice, or legal advice.',
     'If the user seems in real crisis (self-harm, severe medical emergency), gently urge them to seek immediate professional help.'
   ];
 

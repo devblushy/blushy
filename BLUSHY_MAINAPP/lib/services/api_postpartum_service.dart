@@ -257,55 +257,67 @@ class ApiPostpartumService {
   static const String _briefKey = 'postpartum_brief_cache.json';
 
   /// Fetches complete Postpartum Command Center overview.
-  static Future<PostpartumOverviewData?> getOverview() async {
-    try {
-      final res = await ApiContractClient.get(
-        '/postpartum/overview',
-        parse: (data) => PostpartumOverviewData.fromJson(Map<String, dynamic>.from(data as Map)),
-      );
-      if (res.data != null) {
-        try {
-          // Cache the overview
-          BlushyStorage.write(_overviewKey, res.data!.toJson());
-        } catch (_) {}
-        return res.data;
-      }
-    } catch (_) {}
+  /// Preserves the server's state instead of collapsing it to a nullable, so
+  /// the caller can distinguish fresh data, a cached copy shown after a failure
+  /// (stale), genuinely no data, and an error or offline request.
+  static Future<ApiResult<PostpartumOverviewData>> getOverview() async {
+    final res = await ApiContractClient.get<PostpartumOverviewData>(
+      '/postpartum/overview',
+      parse: (data) => PostpartumOverviewData.fromJson(Map<String, dynamic>.from(data as Map)),
+    );
 
-    // Fallback to cache or clean initial state
+    if (res.data != null) {
+      try {
+        BlushyStorage.write(_overviewKey, res.data!.toJson());
+      } catch (_) {}
+      return res;
+    }
+
     final cached = BlushyStorage.read(_overviewKey);
     if (cached.isNotEmpty) {
       try {
-        return PostpartumOverviewData.fromJson(cached);
+        return ApiResult<PostpartumOverviewData>(
+          data: PostpartumOverviewData.fromJson(cached),
+          state: ApiState.stale,
+          lastUpdated: res.lastUpdated,
+          source: res.source,
+        );
       } catch (_) {}
     }
 
-    return null;
+    return res;
   }
 
   /// Fetches dynamic Today with Docsy briefing.
-  static Future<PostpartumTodayBriefData?> getTodayBrief() async {
-    try {
-      final res = await ApiContractClient.get(
-        '/postpartum/today-brief',
-        parse: (data) => PostpartumTodayBriefData.fromJson(Map<String, dynamic>.from(data as Map)),
-      );
-      if (res.data != null) {
-        try {
-          BlushyStorage.write(_briefKey, res.data!.toJson());
-        } catch (_) {}
-        return res.data;
-      }
-    } catch (_) {}
+  /// Preserves the server's state instead of collapsing it to a nullable, so
+  /// the caller can distinguish fresh data, a cached copy shown after a failure
+  /// (stale), genuinely no data, and an error or offline request.
+  static Future<ApiResult<PostpartumTodayBriefData>> getTodayBrief() async {
+    final res = await ApiContractClient.get<PostpartumTodayBriefData>(
+      '/postpartum/today-brief',
+      parse: (data) => PostpartumTodayBriefData.fromJson(Map<String, dynamic>.from(data as Map)),
+    );
+
+    if (res.data != null) {
+      try {
+        BlushyStorage.write(_briefKey, res.data!.toJson());
+      } catch (_) {}
+      return res;
+    }
 
     final cached = BlushyStorage.read(_briefKey);
     if (cached.isNotEmpty) {
       try {
-        return PostpartumTodayBriefData.fromJson(cached);
+        return ApiResult<PostpartumTodayBriefData>(
+          data: PostpartumTodayBriefData.fromJson(cached),
+          state: ApiState.stale,
+          lastUpdated: res.lastUpdated,
+          source: res.source,
+        );
       } catch (_) {}
     }
 
-    return null;
+    return res;
   }
 
   /// Updates delivery calibration.

@@ -268,6 +268,39 @@ class ApiAuthService implements AuthService {
 
   Future<void> logout() => signOut();
 
+  /// Permanently deletes the account and everything stored against it:
+  /// `DELETE /auth/me`
+  ///
+  /// Returns true only when the server confirms the deletion. On success the
+  /// local session is purged the same way [signOut] does, so the app cannot be
+  /// left holding a token for an account that no longer exists.
+  ///
+  /// The typed confirmation is what the endpoint requires; it guards against an
+  /// accidental call, not an unauthorised one, since the request is
+  /// authenticated.
+  Future<bool> deleteAccount() async {
+    final token = AuthStorage.getToken();
+    if (token == null || token.isEmpty) return false;
+
+    try {
+      final response = await _dio.delete(
+        '/auth/me',
+        data: {'confirm': 'DELETE'},
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
+      );
+      if (response.statusCode != 200) return false;
+    } catch (e) {
+      debugPrint('BlushyAuth: Account deletion failed: $e');
+      return false;
+    }
+
+    // Only after the server has confirmed. Clearing first would strand the
+    // account with no way back into it if the request had failed.
+    await OfflineEventQueue.instance.clear();
+    AuthStorage.clearSession();
+    return true;
+  }
+
   /// Sends frontend onboarding answers directly to the Node.js/Express backend API endpoint:
   /// `PUT /api/auth/me/onboarding`
   Future<Map<String, dynamic>> saveOnboardingAnswers(Map<String, dynamic> rawAnswers) async {

@@ -54,6 +54,7 @@ import '../../widgets/monthly_journey_card.dart';
 import '../../widgets/auto_carousel_cards.dart';
 import '../../../../theme/scale.dart';
 import '../../home_section_order.dart';
+import '../../../../shared/user_display_name.dart';
 
 String _getTimeBasedGreetingPrefix() {
   final istNow = DateTime.now().toUtc().add(
@@ -5919,9 +5920,9 @@ Widget _buildStage1LetsTalkSection() {
 
 
   Widget _buildNotStartedHomeOS(PersonalContext pc, BlushyOSState state) {
-    final String displayName = (pc.userName != null && pc.userName!.isNotEmpty)
-        ? pc.userName!
-        : "there";
+    // Resolved centrally, so this also picks up a name that reached storage
+    // before app state had it.
+    final String displayName = userDisplayName(context);
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -8881,9 +8882,7 @@ Widget _buildStage2LetsTalkSection() {
   Widget _buildHormonalPersonalizedDocsyCard(PersonalContext pc) {
     _initStage4FromPersonalContext(pc);
 
-    final String name = pc.userName != null && pc.userName!.trim().isNotEmpty
-        ? pc.userName!.trim()
-        : "there";
+    final String name = userDisplayName(context);
 
     final Map<String, Map<String, dynamic>> conditionMeta = {
       'pcos': {
@@ -9777,9 +9776,7 @@ Widget _buildStage2LetsTalkSection() {
 
   /// Real-Time Stage 4 Living Docsy Insight & Synthesis Card
   Widget _buildHormonalDocsyLiveReactionCard(PersonalContext pc) {
-    final String name = pc.userName != null && pc.userName!.trim().isNotEmpty
-        ? pc.userName!.trim()
-        : "there";
+    final String name = userDisplayName(context);
 
     final Map<String, List<Map<String, dynamic>>> protocols = {
       'pcos': [

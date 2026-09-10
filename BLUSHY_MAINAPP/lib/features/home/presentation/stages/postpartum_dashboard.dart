@@ -5,11 +5,13 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../../core/state.dart';
-import '../../../../core/storage.dart';
+import '../../../../services/api_contract_client.dart';
 import '../../../../services/api_postpartum_service.dart';
 import '../../../sia/open_docsy.dart';
 import '../doctor_summary_screen.dart';
 import 'stage_shared_components.dart';
+import '../../../../shared/stage_empty_notice.dart';
+import '../../../../shared/user_display_name.dart';
 
 class PostpartumDashboard extends StatefulWidget {
   final bool isNested;
@@ -41,6 +43,8 @@ class _PostpartumDashboardState extends State<PostpartumDashboard> {
 
   // ─── Real-Time Dynamic Postpartum State ────────────────────────────
   PostpartumOverviewData? _overview;
+  /// The server's own verdict on the last load (spec §4, §31).
+  ApiState _overviewState = ApiState.loading;
   PostpartumTodayBriefData? _todayBrief;
   bool _isLoading = true;
   bool _isLowEnergyMode = false;
@@ -86,13 +90,16 @@ class _PostpartumDashboardState extends State<PostpartumDashboard> {
   }
 
   Future<void> _loadPostpartumData() async {
-    final overview = await ApiPostpartumService.getOverview();
-    final brief = await ApiPostpartumService.getTodayBrief();
+    final overviewRes = await ApiPostpartumService.getOverview();
+    final briefRes = await ApiPostpartumService.getTodayBrief();
 
     if (!mounted) return;
+    final overview = overviewRes.data;
+    final brief = briefRes.data;
     setState(() {
       _overview = overview;
       _todayBrief = brief;
+      _overviewState = overviewRes.state;
       _isLowEnergyMode = overview?.isLowEnergyMode ?? false;
       _isLoading = false;
 
@@ -168,15 +175,12 @@ class _PostpartumDashboardState extends State<PostpartumDashboard> {
 
   // 01: EDITORIAL GREETING & WHERE AM I? (Unboxed)
   Widget _buildEditorialGreeting(PersonalContext pc) {
-    String userName = 'mama';
-    try {
-      final decoded = BlushyStorage.read('user_profile.json');
-      userName = decoded['name'] ?? decoded['profile']?['name'] ?? pc.userName ?? 'mama';
-    } catch (_) {
-      userName = pc.userName ?? 'mama';
-    }
-    if (userName.trim().isEmpty) userName = 'mama';
-    userName = userName.trim().split(' ').first;
+    // The user's own name, and a neutral address when it is not known.
+    //
+    // This read the stored profile under `name` and `profile.name`, keys
+    // onboarding has never written, and fell through to "mama" -- so the screen
+    // addressed everyone the same way regardless of who they were.
+    final String userName = userFirstName(context);
 
     final hour = DateTime.now().hour;
     final timeGreeting = hour < 12
@@ -209,7 +213,7 @@ class _PostpartumDashboardState extends State<PostpartumDashboard> {
             ),
           ),
           Text(
-            '${userName.toLowerCase()}.',
+            '$userName.',
             style: GoogleFonts.cormorantGaramond(
               fontSize: 28,
               fontWeight: FontWeight.w600,
@@ -849,13 +853,14 @@ class _PostpartumDashboardState extends State<PostpartumDashboard> {
       'sleepHours': _sleepHours.toInt(),
     });
 
-    final brief = await ApiPostpartumService.getTodayBrief();
-    final overview = await ApiPostpartumService.getOverview();
+    final briefRes = await ApiPostpartumService.getTodayBrief();
+    final overviewRes = await ApiPostpartumService.getOverview();
 
     if (!mounted) return;
     setState(() {
-      _todayBrief = brief;
-      _overview = overview;
+      _todayBrief = briefRes.data;
+      _overview = overviewRes.data;
+      _overviewState = overviewRes.state;
       _isSavingCheckin = false;
       _checkinSaved = true;
     });
@@ -2192,6 +2197,22 @@ class _PostpartumDashboardState extends State<PostpartumDashboard> {
                   // 01: WHERE AM I? (Unboxed Editorial Greeting & Orientation)
                   _buildEditorialGreeting(pc),
                   const SizedBox(height: 16),
+
+                  // Nothing came back from the server, so the sections below are
+                  // the stage's general content rather than her recovery
+                  // (spec §4, §31).
+                  StageStateNotice(
+                    state: _overviewState,
+                    hasData: _overview != null || _todayBrief != null,
+                    emptyMessage:
+                        'There is nothing recorded for your recovery yet, so what follows '
+                        'is general guidance rather than anything worked out from your own '
+                        'entries. Add your birth date and a check-in to see it tailored to you.',
+                    onRetry: () {
+                      setState(() => _isLoading = true);
+                      _loadPostpartumData();
+                    },
+                  ),
 
                   // 🚨 Context-Aware Urgent Safety Interruption if triggered
                   if (shouldInterrupt) ...[

@@ -9,6 +9,7 @@ import '../../../../services/api_checkin_service.dart';
 import '../../../../services/api_sia_service.dart';
 import '../../widgets/blushy_period_tracker_card.dart';
 import 'stage_shared_components.dart';
+import '../../../../shared/user_display_name.dart';
 
 class TryingToConceiveDashboard extends StatefulWidget {
   final bool isNested;
@@ -333,13 +334,9 @@ class _TryingToConceiveDashboardState extends State<TryingToConceiveDashboard> {
   // 01 — EDITORIAL GREETING (Unboxed, 2-Line Cormorant Garamond, Italic Crimson)
   // ════════════════════════════════════════════════════════════════════
   Widget _buildEditorialGreeting(BuildContext context) {
-    String userName = 'lovely';
-    try {
-      final profile = BlushyStorage.read('user_profile.json');
-      if (profile.isNotEmpty && profile['name'] != null && profile['name'].toString().trim().isNotEmpty) {
-        userName = profile['name'].toString().trim().split(' ').first;
-      }
-    } catch (_) {}
+    // Read `name`, a key onboarding never writes, so this always fell through
+    // to the literal 'lovely'.
+    final String userName = userFirstName(context);
 
     final hour = DateTime.now().hour;
     final timeGreeting = hour < 12
@@ -362,7 +359,7 @@ class _TryingToConceiveDashboardState extends State<TryingToConceiveDashboard> {
             ),
           ),
           Text(
-            '${userName.toLowerCase()}.',
+            '$userName.',
             style: GoogleFonts.cormorantGaramond(
               fontSize: 28,
               fontWeight: FontWeight.w600,
@@ -943,7 +940,67 @@ class _TryingToConceiveDashboardState extends State<TryingToConceiveDashboard> {
   // ════════════════════════════════════════════════════════════════════
   // 06 — FERTILE WINDOW TIMELINE (Continuum + "Couldn't try today?")
   // ════════════════════════════════════════════════════════════════════
+  /// The first and last cycle day of the estimated fertile window.
+  ///
+  /// Five days before the estimated ovulation day through ovulation itself,
+  /// which is the same span `_estimatedCyclePhase` uses to decide whether today
+  /// is in the window. Both derive from the cycle length the server returned.
+  (int, int) get _fertileWindowDays {
+    final ovulation = _estimatedOvulationDay;
+    final start = (ovulation - 5).clamp(_periodLength + 1, ovulation);
+    return (start, ovulation);
+  }
+
+  bool _isFertileCycleDay(int day) {
+    final (start, end) = _fertileWindowDays;
+    return day >= start && day <= end;
+  }
+
   Widget _buildFertileWindowTimelineCard(BuildContext context) {
+    // Nothing is known about this cycle until a period has been logged, and a
+    // fertile window drawn from a default cycle length is a guess presented as
+    // a finding. Say so instead.
+    if (!_hasLoggedPeriod) {
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: cardBg,
+          borderRadius: cardRadius,
+          border: Border.all(color: cardBorderColor, width: 1.0),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildSectionHeaderWithIcon(
+              title: 'FERTILE WINDOW CONTINUUM',
+              icon: Icons.timeline_rounded,
+              badgeColor: const Color(0xFFE11D48),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Log the first day of your last period and Blushy can estimate '
+              'your fertile window. Until then there is nothing to place you on.',
+              style: GoogleFonts.manrope(fontSize: 12, height: 1.45, color: textMuted),
+            ),
+          ],
+        ),
+      );
+    }
+
+    // Each node is a real cycle day either side of today.
+    final today = _currentCycleDay;
+    final nodes = <(String, int)>[
+      ('Earlier', today - 2),
+      ('Yesterday', today - 1),
+      ('TODAY', today),
+      ('Tomorrow', today + 1),
+      ('Later', today + 2),
+    ];
+    final fertile = [for (final (_, day) in nodes) _isFertileCycleDay(day)];
+    final (windowStart, windowEnd) = _fertileWindowDays;
+    final todayIsFertile = fertile[2];
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
@@ -962,28 +1019,44 @@ class _TryingToConceiveDashboardState extends State<TryingToConceiveDashboard> {
           ),
           const SizedBox(height: 12),
           Text(
-            'Your Current Multi-Day Window',
+            todayIsFertile
+                ? 'Your Current Multi-Day Window'
+                : 'Your Estimated Window: Day $windowStart to Day $windowEnd',
             style: GoogleFonts.cormorantGaramond(fontSize: 20, fontWeight: FontWeight.w700, color: textMain),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Today is Cycle Day $today. Estimated from your cycle length, not measured.',
+            style: GoogleFonts.manrope(fontSize: 10.5, color: textMuted),
           ),
           const SizedBox(height: 14),
 
-          // Visual Continuum Bar
+          // Visual continuum. Each dot is a real cycle day, and a segment is
+          // only marked fertile when both days it joins fall in the window.
           Row(
             children: [
-              _buildContinuumNode('Earlier', false),
-              Expanded(child: Container(height: 3, color: cardBorderColor)),
-              _buildContinuumNode('Yesterday', false),
-              Expanded(child: Container(height: 3, color: crimsonPrimary)),
-              _buildContinuumNode('TODAY', true),
-              Expanded(child: Container(height: 3, color: crimsonPrimary)),
-              _buildContinuumNode('Tomorrow', false),
-              Expanded(child: Container(height: 3, color: cardBorderColor)),
-              _buildContinuumNode('Later', false),
+              for (var i = 0; i < nodes.length; i++) ...[
+                if (i > 0)
+                  Expanded(
+                    child: Container(
+                      height: 3,
+                      color: (fertile[i - 1] && fertile[i]) ? crimsonPrimary : cardBorderColor,
+                    ),
+                  ),
+                _buildContinuumNode(
+                  nodes[i].$1,
+                  isCurrent: i == 2,
+                  isFertile: fertile[i],
+                ),
+              ],
             ],
           ),
           const SizedBox(height: 14),
 
-          // Low-Cortisol Reassurance: "Couldn't try today?"
+          // Low-cortisol reassurance. Only while the window is still open --
+          // telling someone they have not missed their chance after ovulation
+          // has passed is not reassurance, it is wrong.
+          if (todayIsFertile)
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
@@ -2076,14 +2149,20 @@ class _TryingToConceiveDashboardState extends State<TryingToConceiveDashboard> {
     );
   }
 
-  Widget _buildContinuumNode(String label, bool isCurrent) {
+  /// One day on the fertile-window continuum.
+  ///
+  /// [isCurrent] marks today, [isFertile] whether that day falls inside the
+  /// estimated window. They were previously the same thing, which is how the
+  /// bar came to show today as fertile regardless of the cycle.
+  Widget _buildContinuumNode(String label, {required bool isCurrent, required bool isFertile}) {
+    final colour = isFertile ? crimsonPrimary : const Color(0xFFCBD5E1);
     return Column(
       children: [
         Container(
           width: isCurrent ? 14 : 10,
           height: isCurrent ? 14 : 10,
           decoration: BoxDecoration(
-            color: isCurrent ? crimsonPrimary : const Color(0xFFCBD5E1),
+            color: colour,
             shape: BoxShape.circle,
             border: isCurrent ? Border.all(color: Colors.white, width: 2) : null,
           ),
@@ -2094,7 +2173,7 @@ class _TryingToConceiveDashboardState extends State<TryingToConceiveDashboard> {
           style: GoogleFonts.manrope(
             fontSize: 9.5,
             fontWeight: isCurrent ? FontWeight.w800 : FontWeight.w500,
-            color: isCurrent ? crimsonPrimary : textMuted,
+            color: isFertile ? crimsonPrimary : textMuted,
           ),
         ),
       ],
