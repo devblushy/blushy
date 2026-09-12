@@ -623,7 +623,6 @@ class _EverydayWellnessDashboardState extends State<EverydayWellnessDashboard>
     final followUps = _buildGeneratedFollowUps();
 
     return Column(
-      key: _checkInKey,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
@@ -645,7 +644,15 @@ class _EverydayWellnessDashboardState extends State<EverydayWellnessDashboard>
               if (_checkinSafety != null)
                 _buildCheckinSafetyBanner(_checkinSafety!),
               if (_loggedSymptoms.isEmpty)
-                _buildCheckinPrompt()
+                Text(
+                  'Nothing to ask yet. Log today\'s symptoms above and the '
+                  'questions worth asking will appear here.',
+                  style: GoogleFonts.manrope(
+                    fontSize: 13,
+                    height: 1.4,
+                    color: BlushyColors.secondaryText,
+                  ),
+                )
               else if (followUps is SizedBox)
                 // She logged, but nothing she logged has a follow-up rule.
                 Text(
@@ -664,50 +671,117 @@ class _EverydayWellnessDashboardState extends State<EverydayWellnessDashboard>
     );
   }
 
-  /// Shown before anything is logged, pointing at the one place to do it.
-  Widget _buildCheckinPrompt() {
+  /// Symptom logging, as its own section.
+  ///
+  /// Deliberately not part of CHECK IN. The check-in is the follow-up
+  /// questions today's entries earned; this is the way in to make those
+  /// entries. They were merged before, and the merge had a cost that was easy
+  /// to miss: the button sat inside the check-in's *empty* state, so the only
+  /// way to open the sheet vanished the moment anything was logged.
+  /// Correcting a mis-tapped symptom then meant hunting for a row in RECENTLY
+  /// to tap.
+  ///
+  /// Always present, therefore -- logging a second symptom an hour later, or
+  /// fixing the first, is the ordinary case rather than the exception.
+  ///
+  /// Which groups the sheet offers is decided by the life stage, through
+  /// [SymptomCategories.forStage] and the key from [_resolveStageKey], so this
+  /// one section asks a different set of questions in each stage without
+  /// needing a variant per stage.
+  Widget _buildLogSymptoms() {
+    final logged = _loggedLabels;
+    final hasLogged = logged.isNotEmpty;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Nothing logged yet today.',
-          style: GoogleFonts.manrope(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: BlushyColors.text,
-          ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4),
+          child: SectionHeading("LOG SYMPTOMS"),
         ),
-        const SizedBox(height: 4),
-        Text(
-          'Log today\'s symptoms and this fills in with what is worth asking.',
-          style: GoogleFonts.manrope(
-            fontSize: 12,
-            height: 1.4,
-            color: BlushyColors.secondaryText,
-          ),
-        ),
-        const SizedBox(height: 14),
-        SizedBox(
-          width: double.infinity,
-          child: FilledButton(
-            onPressed: _openSymptomSheet,
-            style: FilledButton.styleFrom(
-              backgroundColor: BlushyColors.primary,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 13),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+        const SizedBox(height: BlushySpace.xs),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                hasLogged ? 'Logged today' : 'Nothing logged yet today.',
+                style: GoogleFonts.manrope(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: BlushyColors.text,
+                ),
               ),
-            ),
-            child: Text(
-              "Log today's symptoms",
-              style: GoogleFonts.manrope(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
+              const SizedBox(height: 4),
+              Text(
+                hasLogged
+                    ? _loggedSummaryLine(logged)
+                    : 'Log what you are feeling today. What you are asked '
+                        'about follows your stage.',
+                style: GoogleFonts.manrope(
+                  fontSize: 12,
+                  height: 1.4,
+                  color: BlushyColors.secondaryText,
+                ),
               ),
-            ),
+              const SizedBox(height: 14),
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton(
+                  onPressed: _openSymptomSheet,
+                  style: FilledButton.styleFrom(
+                    backgroundColor: BlushyColors.primary,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 13),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: Text(
+                    hasLogged ? "Edit today's symptoms" : "Log today's symptoms",
+                    style: GoogleFonts.manrope(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
+      ],
+    );
+  }
+
+  /// What is already down for today, named rather than counted.
+  ///
+  /// Capped: this is a reminder of what is recorded, not the record itself --
+  /// the sheet reopens with every one of them still selected.
+  String _loggedSummaryLine(Set<String> logged) {
+    const maxNamed = 4;
+    final names = logged.toList()..sort();
+    if (names.length <= maxNamed) {
+      return names.join(', ');
+    }
+    return '${names.take(maxNamed).join(', ')} +${names.length - maxNamed} more';
+  }
+
+  /// The logging section and the check-in, in that order.
+  ///
+  /// Two sections with their own headings rather than one merged block:
+  /// logging is what she does, the check-in is what the app asks back.
+  Widget _buildLogAndCheckIn() {
+    return Column(
+      // Every "go and log something" control scrolls here. It used to carry
+      // the reader to CHECK IN, which since the split holds no control at all;
+      // on the pair, the logging button is the first thing in view.
+      key: _checkInKey,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildLogSymptoms(),
+        const SizedBox(height: 32),
+        _buildCheckIn(),
       ],
     );
   }
@@ -7001,7 +7075,7 @@ Widget _buildStage2LetsTalkSection() {
   }
 
   // --- SECTION 3: CHECK IN (One-tap logging) ---
-  Widget _buildLivingCheckIn() => _buildCheckIn();
+  Widget _buildLivingCheckIn() => _buildLogAndCheckIn();
 
   Widget _buildLivingHorizontalSelector(
     String label,
@@ -8222,7 +8296,7 @@ Widget _buildStage2LetsTalkSection() {
   }
 
   // --- SECTION 3: TODAY'S CHECK-IN (One-tap logging) ---
-  Widget _buildHormonalCheckIn() => _buildCheckIn();
+  Widget _buildHormonalCheckIn() => _buildLogAndCheckIn();
 
   // --- SECTION 4: DOCSY INSIGHTS (Observations) ---
   /// Condition profile (spec section 14).
@@ -14318,7 +14392,7 @@ Widget _buildStage2LetsTalkSection() {
   }
 
   // --- SECTION 4: TODAY'S CHECK-IN ---
-  Widget _buildPregnancyCheckIn() => _buildCheckIn();
+  Widget _buildPregnancyCheckIn() => _buildLogAndCheckIn();
 
   // --- SECTION 5: DOCSY INSIGHTS ---
   /// Server-derived patterns. Replaced a hardcoded list that asserted
@@ -15589,7 +15663,7 @@ Widget _buildStage2LetsTalkSection() {
                       const SizedBox(height: 32),
                       _buildPostpartumWellbeing(),
                       const SizedBox(height: 32),
-                      _buildCheckIn(),
+                      _buildLogAndCheckIn(),
                       const SizedBox(height: 32),
                       _buildLivingSiaInsights(),
                       const SizedBox(height: 32),
@@ -15633,7 +15707,7 @@ Widget _buildStage2LetsTalkSection() {
                       const SizedBox(height: 48),
                       _buildPostpartumWellbeing(),
                       const SizedBox(height: 48),
-                      _buildCheckIn(),
+                      _buildLogAndCheckIn(),
                       const SizedBox(height: 32),
                       _buildLivingSiaInsights(),
                       const SizedBox(height: 48),
@@ -15679,7 +15753,7 @@ Widget _buildStage2LetsTalkSection() {
                       const SizedBox(height: 24),
                       _buildPostpartumWellbeing(),
                       const SizedBox(height: 24),
-                      _buildCheckIn(),
+                      _buildLogAndCheckIn(),
                       const SizedBox(height: 32),
                       _buildLivingSiaInsights(),
                       const SizedBox(height: 24),
@@ -15744,7 +15818,7 @@ Widget _buildStage2LetsTalkSection() {
   }
 
   // --- SECTION 3: TODAY'S CHECK-IN ---
-  Widget _buildPeriWellbeing() => _buildCheckIn();
+  Widget _buildPeriWellbeing() => _buildLogAndCheckIn();
 
   // --- SECTION 4: DOCSY INSIGHTS ---
   /// Server-derived patterns. Replaced a hardcoded list that asserted
@@ -16145,11 +16219,11 @@ Widget _buildStage2LetsTalkSection() {
         : "Wellness Score: Not Logged";
     final String scoreSubtitle = loggedCount > 0
         ? "Calculated from $loggedCount logged health marker(s) today"
-        : "Complete Today's Check-In below to generate your score";
+        : "Log today's symptoms to generate your score";
 
     final String quoteText = loggedCount > 0
         ? "\"You have logged $loggedCount health marker(s) today. Continuing daily check-ins helps track long-term wellbeing and bone health consistency.\""
-        : "\"No wellbeing data logged for today yet. Use 'Today's Check-In' below to record your sleep, mood, energy, and activity.\"";
+        : "\"No wellbeing data logged for today yet. Use Log Symptoms to record your sleep, mood, energy, and activity.\"";
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -16345,7 +16419,7 @@ Widget _buildStage2LetsTalkSection() {
   }
 
   // --- SECTION 3: TODAY'S CHECK-IN ---
-  Widget _buildMenoCheckIn() => _buildCheckIn();
+  Widget _buildMenoCheckIn() => _buildLogAndCheckIn();
 
   // --- SECTION 4: DOCSY INSIGHTS ---
   /// Server-derived patterns. Replaced a hardcoded list that asserted
@@ -16945,7 +17019,7 @@ Widget _buildStage2LetsTalkSection() {
         : "Wellness Score: Not Logged";
     final String scoreSubtitle = loggedCount > 0
         ? "Calculated from $loggedCount of $totalMetrics selected onboarding habit(s) today"
-        : "Complete Today's Check-In below to generate your score";
+        : "Log today's symptoms to generate your score";
 
     final List<String> loggedNames = displayMetrics
         .where((m) => m['val'] != 'Not Logged')
@@ -16954,7 +17028,7 @@ Widget _buildStage2LetsTalkSection() {
 
     final String quoteText = loggedCount > 0
         ? "\"You have logged $loggedCount selected wellness habit(s) today (${loggedNames.join(', ')}). Keep logging daily to track your long-term health pattern.\""
-        : "\"No lifestyle data logged for today yet. Use 'Today's Check-In' below to record your selected sleep, mood, energy, and hydration choices.\"";
+        : "\"No lifestyle data logged for today yet. Use Log Symptoms to record your selected sleep, mood, energy, and hydration choices.\"";
 
     final calc = CycleCalculation.compute(
       lastPeriodStart: pc.lastPeriodStart,
@@ -17185,7 +17259,7 @@ Widget _buildStage2LetsTalkSection() {
   }
 
   // --- SECTION 3: TODAY'S CHECK-IN ---
-  Widget _buildWellnessCheckIn() => _buildCheckIn();
+  Widget _buildWellnessCheckIn() => _buildLogAndCheckIn();
 
   // --- SECTION 4: DOCSY INSIGHTS ---
   /// Server-derived patterns. Replaced a hardcoded list that asserted

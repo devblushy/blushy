@@ -12,6 +12,7 @@
 
 import { env } from '../utils/env.js';
 import { LIFE_MODES, POSTMENOPAUSAL_BLEEDING_ALERT } from './menopauseData.js';
+import { jsonLanguageInstruction } from '../utils/language.js';
 
 export class DocsyMenopauseService {
   /**
@@ -19,6 +20,7 @@ export class DocsyMenopauseService {
    * Supports "Do nothing" when steady or exhausted.
    */
   static async generateDailyBrief({
+    languageCode = 'en',
     profile = {},
     checkins = [],
     myNormal = {},
@@ -62,7 +64,7 @@ PHILOSOPHY RULES:
   "promptPills": [
     "3 specific, personalized questions she might want to ask Docsy today"
   ]
-}`;
+}${jsonLanguageInstruction(languageCode)}`;
 
       const res = await fetch(env.grokApiUrl, {
         method: 'POST',
@@ -169,7 +171,7 @@ PHILOSOPHY RULES:
   /**
    * Structured "Is This Normal?" clinical resolver.
    */
-  static async resolveIsThisNormal({ userQuery, checkins = [], myNormal = {}, lifeMode = 'normal' }) {
+  static async resolveIsThisNormal({ userQuery, checkins = [], myNormal = {}, lifeMode = 'normal', languageCode = 'en' }) {
     const trimmed = (userQuery || '').trim();
     if (!trimmed) {
       return {
@@ -211,7 +213,7 @@ Return ONLY valid JSON (no markdown):
   "whatYouCanTry": "2-3 practical, low-friction comfort steps",
   "whenToCheckWithDoctor": "Specific red flags or persistence duration when she should consult a clinician",
   "suggestedTracking": "A short suggestion on what to log in Blushy (e.g., 'Track 3 AM waking for 7 days')"
-}`;
+}${jsonLanguageInstruction(languageCode)}`;
 
         const res = await fetch(env.grokApiUrl, {
           method: 'POST',

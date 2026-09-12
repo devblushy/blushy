@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'api_base_url.dart';
 import 'api_contract_client.dart';
 import 'auth_storage.dart';
+import 'log_redaction.dart';
 
 class PeriodEntry {
   final String? id;
@@ -280,10 +281,12 @@ class ApiPeriodService {
               '${entries.map((e) => e.periodStartDate.toIso8601String().split('T').first).toList()}');
           return entries;
         }
-        debugPrint('[period] entries: 200 but no list in body: ${res.body}');
+        debugPrint('[period] entries: 200 but no list in body '
+            '(${shapeOf(res.body)})');
         return [];
       }
-      debugPrint('[period] getPeriodEntries FAILED ${res.statusCode} -> ${res.body}');
+      debugPrint('[period] getPeriodEntries FAILED ${res.statusCode} '
+          '(${shapeOf(res.body)})');
     } catch (e) {
       debugPrint('[period] getPeriodEntries error: $e');
     }

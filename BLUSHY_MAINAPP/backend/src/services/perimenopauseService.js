@@ -5,12 +5,14 @@
 
 import { PerimenopauseStateService } from './perimenopauseStateService.js';
 import { DocsyPerimenopauseService } from './docsyPerimenopauseService.js';
+import { resolveUserLanguage } from '../utils/language.js';
 import {
   TRANSITION_PHASES,
   ACTION_PATHWAYS,
   CLINICIAN_DISCUSSION_TOPICS,
   CONTEXTUAL_ARTICLES,
 } from './perimenopauseData.js';
+import { todayIso } from '../utils/appCalendar.js';
 
 // In-memory data store with disk persistence support
 const store = {
@@ -21,15 +23,6 @@ const store = {
   questions: new Map(), // userId -> [questions...]
   notes: new Map(), // userId -> [naturalNotes...]
 };
-
-function todayIso() {
-  return new Intl.DateTimeFormat('en-CA', {
-    timeZone: 'Asia/Kolkata',
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  }).format(new Date());
-}
 
 export class PerimenopauseService {
   /**
@@ -300,6 +293,7 @@ export class PerimenopauseService {
     const connections = PerimenopauseStateService.detectConnections(checkins);
 
     return DocsyPerimenopauseService.generateDailyBrief({
+      languageCode: await resolveUserLanguage(userId),
       profile,
       recentCheckins: checkins,
       confidence,

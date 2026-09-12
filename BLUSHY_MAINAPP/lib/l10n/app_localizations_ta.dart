@@ -67,7 +67,7 @@ class AppLocalizationsTa extends AppLocalizations {
 
   @override
   String get stateOfflineWithCache =>
-      'இணைப்பு இல்லை. கடைDocsyகச் சேமித்த காட்சி காண்பிக்கப்படுகிறது.';
+      'Not connected. Showing your last saved view.';
 
   @override
   String get stateOfflineNoCache =>
@@ -200,7 +200,7 @@ class AppLocalizationsTa extends AppLocalizations {
   String get siaAsk => 'Docsyவிடம் கேள்';
 
   @override
-  String get siaThinking => 'Typing....';
+  String get siaThinking => 'டைங்ங்....';
 
   @override
   String get siaVoiceTranscribed =>
@@ -605,7 +605,7 @@ class AppLocalizationsTa extends AppLocalizations {
   String get oTermsOfService => 'சேவை விதிமுறைகள்';
 
   @override
-  String get oMedicalDisclaimer => 'Medical Disclaimer';
+  String get oMedicalDisclaimer => 'மருத்துவ அறிக்கையாளர்';
 
   @override
   String get oWhenIsYourBirthday => 'உங்கள் பிறந்தநாள் எப்போது?';
@@ -931,16 +931,16 @@ class AppLocalizationsTa extends AppLocalizations {
   String get ldTermsConditions => 'விதிமுறைகள் & நிபந்தனைகள்';
 
   @override
-  String get ldMedicalDisclaimer => 'Medical Disclaimer';
+  String get ldMedicalDisclaimer => 'மருத்துவ அறிக்கையாளர்';
 
   @override
-  String get ldTabPrivacy => 'Privacy';
+  String get ldTabPrivacy => 'அந்தரங்கம்';
 
   @override
-  String get ldTabTerms => 'Terms';
+  String get ldTabTerms => 'உறுப்பு';
 
   @override
-  String get ldTabDisclaimer => 'Disclaimer';
+  String get ldTabDisclaimer => 'அவதூறாக்கி';
 
   @override
   String get ldPrivacyPolicy2 => '📜 தனியுரிமைக் கொள்கை';
@@ -1185,348 +1185,353 @@ class AppLocalizationsTa extends AppLocalizations {
       'இது அநாமதேயமாகப் பதிவிடப்பட்டது, எனவே திறக்க சுயவிவரம் இல்லை. எழுதியவர் பெயர் தெரிவிக்க வேண்டாம் என்று தேர்ந்தெடுத்தார், அது அவர்களின் விருப்பம்.';
 
   @override
-  String get dashFocusTopic => 'FOCUS TOPIC';
+  String get dashFocusTopic => 'தலைப்பு ஃபோகஸ் செய்';
 
   @override
   String get dashScrollDownContinueLearning =>
-      'Scroll down to Continue Learning section';
+      'படிக்கும் பகுதியை தொடர்வதற்கு கீழே உருட்டு';
 
   @override
   String get dashSmallLessonsDesignedStage =>
-      'Small lessons designed for your stage.';
+      'உங்கள் நிலைக்காக வடிவமைக்கப்பட்ட சிறிய பாடங்கள்.';
 
   @override
-  String get dashDailyDiscovery => 'DAILY DISCOVERY';
+  String get dashDailyDiscovery => 'தினமும் கண்டுபிடிக்கப்பட்டது';
 
   @override
   String get dashSweatGlandsBecomeMore =>
-      'Sweat glands become more active during puberty. Drinking plenty of water and washing daily helps keep you fresh, confident, and clean.';
+      'தேனீக்கள் வளருகையில் அதிக சுறுசுறுப்பானவையாய் ஆகின்றன.';
 
   @override
-  String get dashRead => 'Read';
+  String get dashRead => 'படி';
 
   @override
-  String get dashLinkCopiedShareFamily => 'Link copied to share with family!';
+  String get dashLinkCopiedShareFamily =>
+      'குடும்பத்துடன் பகிர்வதற்காக நகல் எடுத்த இணைப்பு!';
 
   @override
-  String get dashQuestionsGirlsOftenAsk => 'Questions Girls Often Ask';
+  String get dashQuestionsGirlsOftenAsk => 'பெண்களின் கேள்விகள்';
 
   @override
-  String get dashGirls => 'Girls';
+  String get dashGirls => 'பெண்கள்';
 
   @override
-  String get dashGrowingTogether => 'Growing Together';
+  String get dashGrowingTogether => 'ஒன்றாக வளருதல்';
 
   @override
-  String get dashSupportiveCommunityPreview => 'Supportive Community Preview';
+  String get dashSupportiveCommunityPreview => 'துணைபுரியும் சமுதாய முன்பார்வை';
 
   @override
   String get dashHowDoITrack =>
-      'How do I track if I haven\'t got my period yet?';
+      'நான் இன்னும் என் காலம் இல்லை என்றால் நான் எப்படி கண்காணிக்க வேண்டும்?';
 
   @override
   String get dashCanFocusLearningDischarge =>
-      'You can focus on learning, discharge changes and kits here! Docsy helps guide you.';
+      'டாக்ஸி உங்களுக்கு வழிகாட்டியாக இருக்கிறார்.';
 
   @override
-  String get dashReadWhatOthersAre => 'Read what others are sharing';
+  String get dashReadWhatOthersAre =>
+      'மற்றவர்கள் எதை பகிர்ந்துகொள்கிறார்கள் என்பதை வாசியுங்கள்';
 
   @override
   String get dashRealConversationsFromCommunity =>
-      'Real conversations from the community, not examples.';
+      'சமுதாயத்தின் உண்மையான உரையாடல்கள், முன்மாதிரிகள் அல்ல, ஆனால் உண்மையான உரையாடல்கள்.';
 
   @override
   String get dashRedirectingCommunitySpace =>
-      'Redirecting to Community Space...';
+      'சமுதாய விண்வெளிக்கு திரும்புதல்...';
 
   @override
-  String get dashJoinCommunity => 'Join Community';
+  String get dashJoinCommunity => 'சமுதாயத்தில் சேர்';
 
   @override
-  String get dashSharedReading => 'SHARED READING';
+  String get dashSharedReading => 'பகிரப்பட்ட வாசிப்பு';
 
   @override
   String get dashShareArticlesAboutGrowing =>
-      'Share articles about growing up with your parent safely.';
+      'உங்கள் பெற்றோருடன் பாதுகாப்பாக வளருவதைப் பற்றிய கட்டுரைகளை பகிர்ந்து கொள்ளுங்கள்.';
 
   @override
   String get dashArticleSharedParentAccount =>
-      'Article shared with Parent account!';
+      'பெற்றோர் கணக்குக்கு பிரிவு பகிரப்படுகிறது!';
 
   @override
-  String get dashSendParent => 'Send to Parent';
+  String get dashSendParent => 'தாய்க்கு அனுப்பு';
 
   @override
-  String get dashOpeningSharedLibrary => 'Opening Shared Library...';
+  String get dashOpeningSharedLibrary => 'பகிரப்பட்ட நூலகத்தை திறக்கிறது...';
 
   @override
-  String get dashSharedLibrary => 'Shared Library';
+  String get dashSharedLibrary => 'பகிரப்பட்ட நூலகம்';
 
   @override
-  String get dashLetSTalkWeekly => 'LET\'S TALK • WEEKLY PROMPT';
+  String get dashLetSTalkWeekly => '• வாரத்திற்கு ஒரு முறை பேசலாம்';
 
   @override
-  String get dashFirstPeriodKitChecklist => 'FIRST PERIOD KIT CHECKLIST';
+  String get dashFirstPeriodKitChecklist => 'முதல் கால அட்டவணை';
 
   @override
-  String get dashSharedJourney => 'SHARED JOURNEY';
+  String get dashSharedJourney => 'பகிரப்பட்ட பிரயாணம்';
 
   @override
   String get dashDisplayLearningProgressCompleted =>
-      'Display learning progress completed together. The child decides what is visible.';
+      'பிள்ளைகள் காணக்கூடியவற்றைத் தீர்மானிக்கிறார்கள்.';
 
   @override
-  String get dashLearningCycleCompanion => 'Your learning cycle companion.';
+  String get dashLearningCycleCompanion => 'உங்கள் கற்கும் சுழற்சி தோழி.';
 
   @override
-  String get dashPastDays => 'PAST 30 DAYS';
+  String get dashPastDays => '30 நாட்கள் கடந்தன';
 
   @override
   String get dashSCompletelyNormalFirst =>
-      'It\'s completely normal for your first few cycles to be irregular. Your body is gently finding its own natural rhythm.';
+      'உங்கள் முதல் சில சுழற்சிகள் ஒழுங்கற்றதாக இருக்க இது முற்றிலும் இயல்பானது. உங்கள் உடல் அதன் இயற்கைத் தோராயமாக இருக்கிறது.';
 
   @override
-  String get dashVoiceNote => 'Voice Note';
+  String get dashVoiceNote => 'குரல் குறிப்பு';
 
   @override
   String get dashMStudio => 'M Studio';
 
   @override
   String get dashCommunityDiscussionsStories =>
-      'Community Discussions & Stories';
+      'சமூக உரையாடல்கள் மற்றும் கதைகள்';
 
   @override
-  String get dashQuestionsPeopleAreAsking => 'Questions people are asking';
+  String get dashQuestionsPeopleAreAsking => 'மக்கள் கேட்கும் கேள்விகள்';
 
   @override
-  String get dashOpenCommunityReadReply =>
-      'Open the community to read and reply.';
+  String get dashOpenCommunityReadReply => 'என்று கேட்டார்.';
 
   @override
-  String get dashTipsPeopleAreSharing => 'Tips people are sharing';
+  String get dashTipsPeopleAreSharing => 'டிப்ஸ் மக்கள் பகிர்ந்துகொள்கிறார்கள்';
 
   @override
-  String get dashOpenDiscussions => 'Open Discussions';
+  String get dashOpenDiscussions => 'விரிவுரைகளை திற';
 
   @override
   String get dashSharedReadingParentResources =>
-      'SHARED READING & PARENT RESOURCES';
+      'பகிரப்பட்ட வாசிப்பு & பெற்றோர் மூலங்கள்';
 
   @override
   String get dashSendCycleArticlesParent =>
-      'Send cycle articles to parent or consult conversation guides.';
+      'என்று உங்களையே கேட்டுக்கொள்ளுங்கள்.';
 
   @override
-  String get dashArticleSharedParent => 'Article shared with Parent!';
+  String get dashArticleSharedParent =>
+      'பிரிவு பெற்றோருடன் பகிர்ந்து கொள்ளப்படுகிறது!';
 
   @override
-  String get dashShare => 'Share';
+  String get dashShare => 'பகிர்வு';
 
   @override
   String get dashOpeningParentResourceLibrary =>
-      'Opening Parent Resource library...';
+      'மூல மூல நூலகத்தை திறக்கிறது...';
 
   @override
-  String get dashGuides => 'Guides';
+  String get dashGuides => 'வழிகாட்டிகள்';
 
   @override
-  String get dashConversationPrompt => 'CONVERSATION PROMPT';
+  String get dashConversationPrompt => 'உரையாடல் தூண்டி';
 
   @override
-  String get dashFirstPeriodKitStatus => 'FIRST PERIOD KIT STATUS';
+  String get dashFirstPeriodKitStatus => 'முதல் கால அளவு';
 
   @override
   String get dashDocsySafetyParentNever =>
-      ' Docsy Safety: Your parent never has access to your private chat logs, notes, or moods.';
+      'டாக்ஸி பாதுகாப்பு: உங்கள் பெற்றோர் உங்கள் அந்தரங்க அரட்டை சாட்களை, குறிப்புகள், அல்லது மனநிலைகளை ஒருபோதும் பயன்படுத்துவதில்லை.';
 
   @override
-  String get dashTodaySLoggedSignals => 'TODAY\'S LOGGED SIGNALS';
+  String get dashTodaySLoggedSignals => 'இன்றைய பதிவு அடையாளங்கள்';
 
   @override
-  String get dashLogEditPeriod => 'Log / Edit Period';
+  String get dashLogEditPeriod => 'லாக் / திருத்த நேரம்';
 
   @override
   String get dashConfirmCorrectPeriodStart =>
-      'Confirm or correct your period start and end dates below.';
+      'உங்கள் காலாவதி மற்றும் முடிவு தேதிகளை உறுதி செய்யவும் அல்லது சரிசெய்யவும்.';
 
   @override
-  String get dashPeriodStartDate => 'PERIOD START DATE';
+  String get dashPeriodStartDate => 'துவக்க தேதி';
 
   @override
-  String get dashPeriodEndDateOptional => 'PERIOD END DATE (OPTIONAL)';
+  String get dashPeriodEndDateOptional =>
+      'காலாவதியான முடிவு தேதி (தேவைப்பட்டால்)';
 
   @override
-  String get dashCancel => 'Cancel';
+  String get dashCancel => 'ரத்து செய்';
 
   @override
-  String get dashSave => 'Save';
+  String get dashSave => 'சேமி';
 
   @override
-  String get dashExplainInsight => 'Explain Insight';
+  String get dashExplainInsight => 'உட்பார்வையை விளக்குங்கள்';
 
   @override
-  String get dashDocsySReflection => 'DOCSY\'S REFLECTION';
+  String get dashDocsySReflection => 'Docsy ன் பரிமாணம்';
 
   @override
   String get dashHormonalRhythmTracker => 'Hormonal Rhythm Tracker';
 
   @override
-  String get dashRecentCycleHistory => 'RECENT CYCLE HISTORY';
+  String get dashRecentCycleHistory => 'சமீபத்திய சுழற்சி வரலாறு';
 
   @override
   String get dashNextPeriodMayArrive =>
-      'Your next period may arrive within the next few weeks. Because your cycles vary, this is only an estimate.';
+      'அடுத்த சில வாரங்களுக்குள் உங்கள் அடுத்த காலம் வரக்கூடும்.';
 
   @override
-  String get dashWeightOptional => 'WEIGHT (OPTIONAL)';
+  String get dashWeightOptional => 'எடை (தேவைப்பட்டால்)';
 
   @override
-  String get dashFromLogs => 'FROM YOUR LOGS';
+  String get dashFromLogs => 'உங்கள் பதிவேட்டில் இருந்து';
 
   @override
   String get dashBlushyCanPullTogether =>
-      'Blushy can pull together what you have logged over a date range you choose. You decide what stays in before you share it.';
+      'அதை பகிர்ந்துகொள்வதற்கு முன்பு என்ன இருக்கிறது என்பதை நீங்கள் தீர்மானிக்கிறீர்கள்.';
 
   @override
   String get dashRecordWhatReportedWhat =>
-      'A record of what you reported and what the app noticed. Not a diagnosis.';
+      'நீங்கள் சொல்லியவைகளையும், நீங்கள் கவனித்தவைகளையும் பற்றிய ஒரு பதிவு.';
 
   @override
   String get dashAiGeneratedTrendsAcross =>
-      'AI-generated trends across multiple cycle logs';
+      'பல சுழற்சி உருளல் வழியாக II- இயக்கத்தின் போக்குகள்';
 
   @override
-  String get dashAskDocsy => 'Ask Docsy';
+  String get dashAskDocsy => 'Docsy யை கேள்';
 
   @override
-  String get dashWhyMatters => 'Why This Matters';
+  String get dashWhyMatters => 'இது ஏன் முக்கியம்?';
 
   @override
-  String get dashPriority => 'Priority';
+  String get dashPriority => 'முன்னுரிமை';
 
   @override
-  String get dashReviewedGuidance => 'Reviewed guidance';
+  String get dashReviewedGuidance => 'மறுபார்வை வழிகாட்டி';
 
   @override
-  String get dashDerived => 'Derived';
+  String get dashDerived => 'தருநர்';
 
   @override
-  String get dashFertilityJourney => 'Your Fertility Journey';
+  String get dashFertilityJourney => 'உங்கள் அரிய வாழ்க்கைப் பயணம்';
 
   @override
   String get dashOvulationLoggedSuccessfully =>
-      'Ovulation logged successfully!';
+      'காப்பகத்தில் வெற்றி தோல்வி அடைந்தது!';
 
   @override
-  String get dashLogOvulation => 'Log Ovulation';
+  String get dashLogOvulation => 'பதிவேடு ஏற்றம்';
 
   @override
-  String get dashBasalBodyTemperatureBbt => 'BASAL BODY TEMPERATURE (BBT)';
+  String get dashBasalBodyTemperatureBbt => 'பாஸ்டல் உடலின் வெப்பநிலை (bt)';
 
   @override
-  String get dashNotesMStudio => 'NOTES & M STUDIO';
+  String get dashNotesMStudio => 'குறிப்புகள் & M ஸ்டோடியோ';
 
   @override
-  String get dashTtcMStudioEntry => 'TTC M Studio Entry';
+  String get dashTtcMStudioEntry => 'TTC MD ஸ்டுடியோ உள்ளீடு';
 
   @override
-  String get dashSharedTimelineReminders => 'Shared Timeline & Reminders';
+  String get dashSharedTimelineReminders =>
+      'பகிரப்பட்ட காலக்கெடு & நினைவுக்குறிப்புகள்';
 
   @override
-  String get dashEncouragingMessage => 'Encouraging Message:';
+  String get dashEncouragingMessage => 'உற்சாகமிதப்படுத்தும் செய்தி:';
 
   @override
   String get dashPartnerTasksConversationStarters =>
-      'PARTNER TASKS & CONVERSATION STARTERS';
+      'துணை பணிகள் & உரையாடல் தொடக்கங்கள்';
 
   @override
-  String get dashLearnMore => 'Learn More';
+  String get dashLearnMore => 'அதிகத்தைக் கற்றுக்கொள்ளுங்கள்';
 
   @override
-  String get dashKickCountDaily => 'KICK COUNT (DAILY)';
+  String get dashKickCountDaily => 'துரத்தும் எண்ணிக்கை( மிதமாக)';
 
   @override
-  String get dashOptionalHealthData => 'OPTIONAL HEALTH DATA';
+  String get dashOptionalHealthData => 'விருப்பமான உடல்நல தகவல்';
 
   @override
-  String get dashLogBloodPressure => 'Log Blood Pressure';
+  String get dashLogBloodPressure => 'பதிவேடு இரத்த அழுத்தம்';
 
   @override
-  String get dashBloodPressure => 'Blood Pressure';
+  String get dashBloodPressure => 'இரத்த அழுத்தம்';
 
   @override
-  String get dashLogBloodSugar => 'Log Blood Sugar';
+  String get dashLogBloodSugar => 'பதிவேடு இரத்தச் சுருக்கம்';
 
   @override
-  String get dashBloodSugar => 'Blood Sugar';
+  String get dashBloodSugar => 'இரத்தக் குழாய்';
 
   @override
   String get dashPregnancyMStudioEntry => 'Pregnancy M Studio Entry';
 
   @override
-  String get dashPregnancyPrepLists => 'Pregnancy Prep & Lists';
+  String get dashPregnancyPrepLists => 'கருத்தரிப்பு முன்பொருத்த பட்டியல்கள்';
 
   @override
-  String get dashSharedPregnancyTimeline => 'Shared Pregnancy Timeline';
+  String get dashSharedPregnancyTimeline => 'பகிரப்பட்ட கர்ப்ப நேர வரி';
 
   @override
   String get dashCoordinatedChecklistsTasks =>
-      'Coordinated Checklists & Tasks:';
+      'ஒருங்கிணைந்த சோதனை பட்டியல்கள் & பணிகள்:';
 
   @override
   String get dashPostpartumMStudioEntry => 'Postpartum M Studio Entry';
 
   @override
-  String get dashMotherBabyCoordinatedTasks => 'Mother-Baby Coordinated Tasks';
+  String get dashMotherBabyCoordinatedTasks =>
+      'தாய்-பாபி ஒருங்கிணைக்கப்பட்ட பணிகள்';
 
   @override
-  String get dashTransitionTrackingHistory => 'Transition Tracking & History';
+  String get dashTransitionTrackingHistory => 'மாற்றத்தின் & வரலாறு';
 
   @override
-  String get dashViewFullHistory => 'View Full History';
+  String get dashViewFullHistory => 'முழு வரலாற்றை பார்வையிடு';
 
   @override
-  String get dashMStudioReflection => 'M Studio Reflection';
+  String get dashMStudioReflection => 'ஸ்டுடியோ ரெக்ஸ்';
 
   @override
-  String get dashLongTermWellnessOverview => 'Long-Term Wellness Overview';
+  String get dashLongTermWellnessOverview => 'நீண்ட டெர்மின் ஒளிவுமறைவு';
 
   @override
-  String get dashTodaySCheck => 'Today\'s Check-In';
+  String get dashTodaySCheck => 'பதிவேடு இன்றைய அறிகுறிகள்';
 
   @override
-  String get dashViewHealthHistory => 'View Health History';
+  String get dashViewHealthHistory => 'உடல்நல வரலாறு';
 
   @override
-  String get dashBloodPressureOptional => 'BLOOD PRESSURE (OPTIONAL)';
+  String get dashBloodPressureOptional => 'இரத்த அழுத்தம் (தேவைப்பட்டால்)';
 
   @override
   String get dashEmpoweredPostMenopauseWellness =>
-      'EMPOWERED POST-MENOPAUSE WELLNESS CARDS';
+      'சக்தியூட்டும் பின்தங்கக்கூடிய துணுக்கு அட்டைகள்';
 
   @override
   String get dashWhyMattersEncouragesSustainable =>
-      'Why This Matters: Encourages sustainable heart, joint and bone vitalities.';
+      'உங்கள் இருதயத்தையும் இருதயத்தையும் பக்குவப்படுத்துங்கள்.';
 
   @override
-  String get dashDailyLifestyleOverview => 'Daily Lifestyle Overview';
+  String get dashDailyLifestyleOverview => 'தினசரி வாழ்க்கை பாணி மேலோட்டம்';
 
   @override
-  String get dashCycleOverview => 'CYCLE OVERVIEW';
+  String get dashCycleOverview => 'சுழற்சி விவரம்';
 
   @override
-  String get dashViewWellnessHistory => 'View Wellness History';
+  String get dashViewWellnessHistory => 'தோற்றத்தின் வரலாறு';
 
   @override
   String get dashRecordCurrentWeightKg =>
-      'Record your current weight in kg to track trends over time.';
+      'உங்கள் தற்போதைய எடையை காலாவதியான போக்கில் பதிவு செய்யவும்.';
 
   @override
-  String get dashAiGeneratedHabitInsights => 'AI-Generated Habit Insights';
+  String get dashAiGeneratedHabitInsights => 'AI- உருவாக்கிய பழக்க பார்வைகள்';
 
   @override
   String get dashWhyMattersSupportsOverall =>
-      'Why This Matters: Supports overall physical health and emotional vitality.';
+      'இது ஏன் முக்கியம்: மொத்தமாக உடல் ஆரோக்கியத்தையும் உணர்ச்சிப்பூர்வ ஆற்றலையும் ஆதரிக்கிறது.';
 
   @override
   String get languageChoiceTitle => 'உங்கள் மொழியைத் தேர்ந்தெடுங்கள்';
@@ -1540,4 +1545,607 @@ class AppLocalizationsTa extends AppLocalizations {
 
   @override
   String get dashLogTodayCheckIn => 'இன்றைய செக்-இன் பதிவு செய்யுங்கள்';
+
+  @override
+  String get lwmcTodayWithDocsy => 'இன்று டக்ஸியுடன்';
+
+  @override
+  String get lwmcAskDocsy => 'Docsy யை கேள்';
+
+  @override
+  String get lwmcNoPeriodLoggedYet => 'இன்னும் பதிவு செய்யப்பட்ட காலம் இல்லை';
+
+  @override
+  String get lwmcDocsySSuggestion => 'டாக்ஸியின் ஆலோசனை';
+
+  @override
+  String get lwmcAskDocsy2 => 'Docsy யை கேள் SS';
+
+  @override
+  String get lwmcTry => 'Try →';
+
+  @override
+  String get lwmcViewPlan => 'திட்டம் 77 யை பார்வையிடு';
+
+  @override
+  String get lwmcRead => '77 - ஐ வாசியுங்கள்';
+
+  @override
+  String get lwmcPrepareMyVisitSummary =>
+      'என்னுடைய சந்திப்பின் சுருக்கத்தை தயார்படுத்து';
+
+  @override
+  String get lwmcSomethingFeelsDifferent => 'ஏதோவொன்று வேறுபடுகிறது';
+
+  @override
+  String get lwmcTellDocsyWhatHappened =>
+      'என்ன நடந்தது என்பதை டாக்ஸியிடம் சொல்லுங்கள்';
+
+  @override
+  String get lwmcSubmitToDocsy => 'ஆவணத்திற்கு சமர்ப்பி';
+
+  @override
+  String get lwmcClinicalVisitSummary => 'க்ளினிக்கின் மறுபார்வை சுருக்கம்';
+
+  @override
+  String get lwmcClose => 'மூடு';
+
+  @override
+  String get lwmcExpandWithDocsy => 'Docsy உடன் விரிவாக்கு';
+
+  @override
+  String get fpnsChange => 'மாற்று';
+
+  @override
+  String get fpnsFirstPeriodKit => 'முதல் பக்க கீட்';
+
+  @override
+  String get fpnsSaveDone => 'சேமித்தல் முடிந்தது';
+
+  @override
+  String get fpnsLogAPeriodStart => 'ஒரு துவக்கத்தை பதி';
+
+  @override
+  String get fpnsYourBodyLately => 'சமீபத்தில் உங்கள் உடல்';
+
+  @override
+  String get fpnsMilestones => 'கால்சியம்';
+
+  @override
+  String get fpnsFirstPeriodKit2 => 'முதல் பகுதி அட்டை';
+
+  @override
+  String get fpnsIfItHappensToday => 'இன்று நடக்கும் என்றால்';
+
+  @override
+  String get fpnsSeeFull5StepGuide => 'முழு 5- அடி வழிகாட்டியை பார்க்கவும்';
+
+  @override
+  String get fpnsTalk => '◆ பேசுங்கள்';
+
+  @override
+  String get fpnsShareWithMom => 'அம்மாவுடன் பங்கிடு';
+
+  @override
+  String get fpnsNextQuestion => 'அடுத்த கேள்வி';
+
+  @override
+  String get fpnsKeepExploring => 'ஆராய்தல்';
+
+  @override
+  String get fpnsUpdatedDaily => 'தினசரி புதுப்பிக்கப்பட்டது';
+
+  @override
+  String get fpnsReadArticle => 'கட்டுரையை வாசியுங்கள்';
+
+  @override
+  String get fpsNoPeriodLoggedYet => 'இன்னும் பதிவு செய்யப்பட்ட காலம் இல்லை';
+
+  @override
+  String get fpsInsightsForYourPhase => 'உங்கள் நிலைக்கான உட்பார்வை';
+
+  @override
+  String get fpsQuickGuides => 'விரைவான வழிகாட்டிகள்';
+
+  @override
+  String get fpsCrampRescue => 'க்ரம்ப் - ரைட்';
+
+  @override
+  String get fpsSchoolTips => 'பள்ளி துப்புகள்';
+
+  @override
+  String get fpsMySchoolBagKit => 'என் பள்ளி பேக் கிட்';
+
+  @override
+  String get fpsThingsIMNoticingLately =>
+      'சமீபத்தில் நான் கவனிக்கும் காரியங்கள்';
+
+  @override
+  String get fpsUnderstandWithDocsy => 'டாக்ஸியுடன் புரிந்துகொள்ளுங்கள் 74';
+
+  @override
+  String get fpsCrampRescue2 => 'கிராம்பி காப்பகம்';
+
+  @override
+  String get fpsIFeelBetter => 'நான்சிறந்தஉதவி';
+
+  @override
+  String get fpsShareWithMom => 'அம்மாவுடன் பகிர்ந்துகொள்';
+
+  @override
+  String get hhLogPeriodDate => 'பதிவு காலாவதியான தேதி';
+
+  @override
+  String get hhFlowIntensity => 'அதிர்வெண்';
+
+  @override
+  String get hhSavePeriodDate => 'தேதியை சேமி';
+
+  @override
+  String get hhTodayWithDocsy => 'இன்று டக்ஸியுடன்';
+
+  @override
+  String get hhExploreWithDocsy => 'Docsyயுடன் பின்னோக்கி';
+
+  @override
+  String get hhYourCycle => 'உங்கள் சுழற்சி';
+
+  @override
+  String get hhNoPeriodLoggedYet => 'இன்னும் பதிவு செய்யப்பட்ட காலம் இல்லை';
+
+  @override
+  String get hhFlareComfortModeActive =>
+      'நெகிழ்வட்டு ஆறுதல் முறைமை செயலில் உள்ளது';
+
+  @override
+  String get hhExitFlareMode => 'நெகிழ்வு முறைமையில் இருந்து வெளியேறுக';
+
+  @override
+  String get hhDailySignals => 'தினசரி அறிகுறிகள்';
+
+  @override
+  String get hhVoiceNotes => 'குரல் / குறிப்புகள்';
+
+  @override
+  String get hhAnalyzeWithDocsy => 'Docsy உடன் ஆராய்தல்';
+
+  @override
+  String get hhPatternMemoryBuilding => 'தோரணி நினைவக கட்டுமானம்';
+
+  @override
+  String get hhAskDocsy => 'Docsy யை கேள்';
+
+  @override
+  String get hhNoTreatmentsRecordedYet =>
+      'இதுவரை பதிவு செய்யப்பட்ட எந்த சிகிச்சைகளும் இல்லை';
+
+  @override
+  String get hhAddTreatmentProtocol => 'சிகிச்சை / நெறிமுறையை சேர்';
+
+  @override
+  String get hhSaveTreatment => 'சிகிச்சையை சேமி';
+
+  @override
+  String get hhAskDocsy2 => 'Docsy யை கேள்';
+
+  @override
+  String get hhUploadAnotherRecord => 'வேறு பதிவேட்டை பதிவேற்று.';
+
+  @override
+  String get hhSaveRecord => 'பதிவேட்டை சேமி';
+
+  @override
+  String get hhDoctorVisitBrief => 'டாக்டர் சுருக்கமாகச் சந்திக்கிறார்';
+
+  @override
+  String get hhCreateDoctorSummary => 'மருத்துவ சுருக்கத்தை உருவாக்கு';
+
+  @override
+  String get hhClinicalBrief => 'க்ளினிக் சுருக்கம்';
+
+  @override
+  String get hhClose => 'மூடு';
+
+  @override
+  String get hhUpdate => 'இற்றைப்படுத்தல்';
+
+  @override
+  String get hhAddTrustedContact => 'நம்பகமான தொடர்பை சேர்';
+
+  @override
+  String get hhAddSupportContact => 'ஆதரவை சேர்';
+
+  @override
+  String get hhSaveContact => 'தொடர்பினை சேமி';
+
+  @override
+  String get hhCheckWithDocsy => 'Docsy யில் சரிப்பார்';
+
+  @override
+  String get menoTodayWithDocsy => 'இன்று டக்ஸியுடன்';
+
+  @override
+  String get menoAskDocsyToday => 'இன்று Docsy யை கேள்';
+
+  @override
+  String get menoSaveTodaySLog => 'இன்றைய பதிவை சேமி';
+
+  @override
+  String get menoNothingMuchToday => 'இன்று அதிகம்';
+
+  @override
+  String get menoWhatSSteady => 'நிலையான என்ன';
+
+  @override
+  String get menoLearnGuidance => 'Learn guidance →';
+
+  @override
+  String get menoMyNormal => 'என் இயல்பான';
+
+  @override
+  String get menoMyTreatmentJourney => 'சிகிச்சை பயணம்';
+
+  @override
+  String get menoAdd => 'சேர்';
+
+  @override
+  String get menoActive => 'செயலில் உள்ள';
+
+  @override
+  String get menoMyQuestionsInbox => 'பெட்டியில் என்னுடைய கேள்விகள்';
+
+  @override
+  String get menoSaveQuestion => 'கேள்வியைச் சேமி';
+
+  @override
+  String get menoRead30sSummary => '30 - களின் சுருக்கத்தை வாசியுங்கள் 74';
+
+  @override
+  String get menoSomethingFeelsDifferent => 'ஏதோ வித்தியாசமான உணர்கிறது';
+
+  @override
+  String get menoPrepareDoctorConsultation => 'மருத்துவருக்கான கலந்துரையாடல்';
+
+  @override
+  String get menoUnderstandNote => 'குறிப்பைப் புரிந்துகொள்ளவும்';
+
+  @override
+  String get menoConfirmWhatYouLogged => 'நீங்கள் புகுந்ததை உறுதிசெய்யுங்கள்';
+
+  @override
+  String get menoCancel => 'ரத்து செய்';
+
+  @override
+  String get menoConfirmSave => 'சேமிப்பதை உறுதிசெய்';
+
+  @override
+  String get menoAskDocsy => 'Docsy யை கேள்';
+
+  @override
+  String get menoPrepareDoctorSummary => 'மருத்துவ சுருக்கத்தை தயார்படுத்து';
+
+  @override
+  String get menoSaveQuestionForDoctor => 'டாக்டருக்கு கேள்வியை சேமி';
+
+  @override
+  String get menoSaveToQuestionsInbox => 'உள்ளக பெட்டியில் சேமிக்கவும்';
+
+  @override
+  String get menoAddMedicationOrSupplement =>
+      'மருந்துகள் அல்லது கூடுதல் மருந்துகள்';
+
+  @override
+  String get menoSaveTreatment => 'சிகிச்சையை சேமி';
+
+  @override
+  String get periTodayWithDocsy => 'இன்று டக்ஸியுடன்';
+
+  @override
+  String get periMidlifeCompanionIntelligence => 'நடுத்தர வாழ்க்கைத் தோழர்கள்';
+
+  @override
+  String get periMyChangingCycle => 'என் சுழற்சி';
+
+  @override
+  String get periNonPredictiveMidlifeRhythm => 'Non-Predictive Midlife Rhythm';
+
+  @override
+  String get periLogPeriod => 'பதிவேடு காலாவதி';
+
+  @override
+  String get periStatus => 'நிலை';
+
+  @override
+  String get periRecentCycleIntervals => 'சமீபத்திய சுழற்சி இடைவெளிகள்';
+
+  @override
+  String get periWhatYouVeBeenNoticing => 'நீங்கள் கவனிக்கும் என்ன';
+
+  @override
+  String get periLogCheckIn => 'பதிவேடு சோதனை';
+
+  @override
+  String get periWhatChangedConnections => 'இணைப்புகளை மாற்றியது என்ன';
+
+  @override
+  String get periWeeklyShift => 'வார ஷிப்ட்';
+
+  @override
+  String get periDiscoveredConnections => 'கண்டுபிடிக்கப்பட்ட இணைப்புகள்';
+
+  @override
+  String get periYourCurrentFocus => 'உங்கள் தற்போதைய குவிப்பு';
+
+  @override
+  String get periAdd => '& சேர்';
+
+  @override
+  String get periTell => 'சொல்';
+
+  @override
+  String get periYour1PageAppointmentBrief =>
+      'உங்கள் முதல் பக்க சந்திப்பு சுருக்கம்';
+
+  @override
+  String get periViewBrief => 'சுருக்கத்தை பார்';
+
+  @override
+  String get periCopyForDoctor => 'மருத்துவர்க்கு நகல் எடு';
+
+  @override
+  String get periIntimateSexualHealth => 'ஓரினப்புணர்ச்சி';
+
+  @override
+  String get periMyStoryTimeline => 'என் கதை காலவரிசை';
+
+  @override
+  String get periKeepExploring => 'ஆராய்தல்';
+
+  @override
+  String get periLogPeriodStartDate => 'பதிவேடு துவக்க தேதி';
+
+  @override
+  String get periSaveObservation => 'பார்வையை சேமி';
+
+  @override
+  String get periDailyTransitionCheckIn => 'தினசரி மாற்று சரிபார்ப்பு';
+
+  @override
+  String get periCompleteCheckIn => 'முழு சரிபார்ப்பு-உள்ளமை';
+
+  @override
+  String get periAddTreatmentSupport => 'சிகிச்சை / ஆதரவு சேர்';
+
+  @override
+  String get periCancel => 'ரத்து செய்';
+
+  @override
+  String get periSave => 'சேமி';
+
+  @override
+  String get periClinicianBriefPreview => 'கிளினிசியன் சுருக்கமான முன்காட்சி';
+
+  @override
+  String get periClose => 'மூடு';
+
+  @override
+  String get periCopy => 'படியெடு';
+
+  @override
+  String get ppTodayWithDocsy => 'இன்று டக்ஸியுடன்';
+
+  @override
+  String get ppYour4thTrimesterCompanion =>
+      'உங்கள் 4 - வது ட்ரிமெஸ்டர் துணைவர்';
+
+  @override
+  String get ppSavedSynced => 'சேமிக்கப்பட்டது & ஒத்திசைக்கப்பட்டது';
+
+  @override
+  String get ppTalkToDocsy => 'டாக்ஸியுடன் பேசுங்கள் 77';
+
+  @override
+  String get ppTodayIDPrioritize => 'இன்று,நான்தவறாமல்';
+
+  @override
+  String get ppNoticedShifts => 'குறிப்புரை மாற்றுதல்';
+
+  @override
+  String get ppWhatSBeenSteady => 'என்னநிலையாகஇருந்தது';
+
+  @override
+  String get ppObservingInitialBaseline => 'துவக்க தளவரியைப் பார்க்கிறது';
+
+  @override
+  String get ppIMDoneForToday => 'நான்இன்றுசெய்யிறேன்';
+
+  @override
+  String get ppTonightWindDown => 'நேற்றிரவு காற்று';
+
+  @override
+  String get ppActiveNursingStopwatch => 'இயங்கும் பராமரிப்பாளர் க்வாட்';
+
+  @override
+  String get ppLoggedWetDiaper => 'Logged Wet Diaper 💧';
+
+  @override
+  String get ppLoggedSoiledDiaper => 'Logged Soiled Diaper 💩';
+
+  @override
+  String get ppDailyRecoveryProgression => 'தினமும் குணமடைதல்';
+
+  @override
+  String get ppBuildDoctorSummary => 'Build Doctor Summary →';
+
+  @override
+  String get ppTimelineGuideline => 'காலக்கெடு திசை';
+
+  @override
+  String get ppRecommendation => 'பரிந்துரைக்கப்படுகிறது';
+
+  @override
+  String get ppAskDocsyMore => 'அதிகமாக Docsy யை கேள் SS';
+
+  @override
+  String get ppClose => 'மூடு';
+
+  @override
+  String get ppTalkToDocsy2 => 'டாக்ஸியுடன் பேசுக';
+
+  @override
+  String get ppAskForHelp => 'உதவியை கோரவும்';
+
+  @override
+  String get ppResumeNormalMode => 'இயல்பான முறைமையை தொடர்';
+
+  @override
+  String get ppCalibratePostpartumPath => 'போஸ்ட்பார்ட்டம் பாதையை அளவிடு';
+
+  @override
+  String get ppBabySBirthDate => 'குழந்தை பிறந்த நாள்';
+
+  @override
+  String get ppDeliveryPath => 'விடுவிக்கும் பாதை';
+
+  @override
+  String get ppVaginalBirth => 'விகுணப் பிறப்பு';
+
+  @override
+  String get ppCSection => 'C- செறிவு';
+
+  @override
+  String get ppFeedingMethod => 'போஷிப்பு முறை';
+
+  @override
+  String get ppCancel => 'ரத்து செய்';
+
+  @override
+  String get ppSaveCalibrate => 'கலவையை சேமி';
+
+  @override
+  String get ppINeedHelpToday => 'இன்று எனக்கு உதவி தேவை';
+
+  @override
+  String get ppGenerateShare => 'பகிர்வை உருவாக்கு';
+
+  @override
+  String get ppClinicalSafetyTriage => 'க்ளினிக்கில் பாதுகாப்பு';
+
+  @override
+  String get ppTalkToDocsyNow => 'இப்போது டாக்ஸியுடன் பேசுங்கள்';
+
+  @override
+  String get ppWhatHappenedEvent => 'WHAT HAPPENED (EVENT)';
+
+  @override
+  String get ppWhatChangedObservedShift => 'மாற்றியது (விழிவு காணப்பட்டது)';
+
+  @override
+  String get ppUnderstandWithDocsy => 'டாக்ஸியுடன் புரிந்துகொள்ளுங்கள் 74';
+
+  @override
+  String get ppClinicalSafetyAlert => 'க்ளினிக் பாதுகாப்பு';
+
+  @override
+  String get pregAddToPregnancyStory => 'மாதவிடாய் கதையில் சேர்';
+
+  @override
+  String get pregCancel => 'ரத்து செய்';
+
+  @override
+  String get pregSaveMemory => 'நினைவகத்தை சேமி';
+
+  @override
+  String get pregTodayWithDocsy => 'இன்று டக்ஸியுடன்';
+
+  @override
+  String get pregYourBodyToday => 'இன்று உங்கள் உடல்';
+
+  @override
+  String get pregBabyThisWeek => 'Baby This Week';
+
+  @override
+  String get pregOneThingToKnow => 'அறிய ஒரு விஷயம்';
+
+  @override
+  String get pregOneThingToDo => 'செய்ய வேண்டிய ஒரு விஷயம்';
+
+  @override
+  String get pregYourGestationalTimeline => 'உங்கள் பராமரிப்பு காலக்கெடு';
+
+  @override
+  String get pregSetupRequired => 'தேவையான அமைப்பு';
+
+  @override
+  String get pregSetEstimatedDueDate => 'நிலுவை தேதியை அமை';
+
+  @override
+  String get pregDailyMaternalCheckIn => 'தினசரி தாய் சோதனை';
+
+  @override
+  String get pregExploreWithDocsy => 'Docsyயுடன் பின்னோக்கி';
+
+  @override
+  String get pregWhatSHappeningThisWeek => 'என்ன நடக்கிறது இந்த வாரம்';
+
+  @override
+  String get pregSetDueDate => 'நிலுவை தேதி அமை';
+
+  @override
+  String get pregYourNextAppointment => 'அடுத்த சந்திப்பு ஏற்பாடு';
+
+  @override
+  String get pregBuildDoctorSummary => 'மருத்துவ சுருக்கத்தை உருவாக்கு';
+
+  @override
+  String get pregAddDoctorQuestion => 'டாக்டர் கேள்வியைச் சேர்';
+
+  @override
+  String get pregAdd => 'சேர்';
+
+  @override
+  String get pregShareWithPartner => 'துணையுடன் பங்கிடு';
+
+  @override
+  String get pregMyPregnancyStory => 'என் கருத்தரிப்பு கதை';
+
+  @override
+  String get pregAddMoment => '& சேர் மாதிரி';
+
+  @override
+  String get pregNoMomentsRecordedYet => 'ச. மு.';
+
+  @override
+  String get pregAddFirstMoment => 'முதல் குறிப்பை சேர்';
+
+  @override
+  String get preg30SecondExplainer => '30- இரண்டாவது விளக்கி';
+
+  @override
+  String get pregAdd2 => '& சேர்';
+
+  @override
+  String get ttcTodaySBiomarkerLog => 'இன்றைய பயோமிக்டர் பதிவேடு';
+
+  @override
+  String get ttcNaturalCycleToCycleRhythm =>
+      'இயற்கை சுழற்சியிலிருந்து Cycle Rhythm';
+
+  @override
+  String get ttcHonestSignalCoverage => 'நேர்மையாக சிக்னல் மறைமுகம்';
+
+  @override
+  String get ttcGenerateClinicalReport => 'கிளினிகல் அறிக்கையை உருவாக்கு';
+
+  @override
+  String get ttcLogPeriodDate => 'பதிவு காலாவதியான தேதி';
+
+  @override
+  String get ttcPauseFertilityTracking => 'இடைநிலைப் போக்கை நிறுத்துதல்';
+
+  @override
+  String get ttcPauseFor1Week => '1 வாரத்திற்கான தாமதம்';
+
+  @override
+  String get ttcPauseUntilNextPeriod => 'அடுத்த கால இடைவெளி வரை தாமதி';
 }

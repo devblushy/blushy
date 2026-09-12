@@ -246,7 +246,7 @@ export async function sendEmailVerification(payload, context = {}) {
   const emailHash = hashEmail(email);
   const rawCode = generateUnusedCode();
   if (env.nodeEnv !== 'production') {
-    logger.info(`🔑 [DEV OTP CODE] Verification code for ${email} is: ${rawCode}`);
+    logger.info(`🔑 [DEV OTP CODE] Verification code for ${email} is: ${rawCode}`); // sensitive-log-ok: guarded by nodeEnv !== 'production' two lines up
   }
   const verificationToken = signVerificationToken({
     emailHash,
@@ -310,15 +310,27 @@ export async function sendEmailVerification(payload, context = {}) {
     throw createHttpError(502, 'Unable to send verification email. Please try again later.');
   }
 
+  // The code is what proves the caller owns the address, so returning it in
+  // the same response defeats the check entirely: anyone could register an
+  // address they do not control and read the code straight out of the JSON.
+  //
+  // It used to be listed unconditionally here. The
+  // `emailDeliveryFallbackEnabled` guard covered only the failure branch
+  // above, and the spread on the last line re-added a `verificationLink` that
+  // was already three lines up -- which is why the guard looked like it
+  // applied to this path too. It never did.
+  //
+  // Behind the flag it stays, because a developer with no mail delivery still
+  // has to get past this screen. render.yaml sets the flag to "false", so
+  // production sends nothing back but the acknowledgement.
   return {
     message: 'Verification email sent successfully.',
     expiresIn: 600,
     mode,
-    verificationLink,
-    code: rawCode,
-    otp: rawCode,
-    ...(env.emailDeliveryFallbackEnabled ? { verificationLink } : {}),
     deliveryFallbackUsed: false,
+    ...(env.emailDeliveryFallbackEnabled
+      ? { verificationLink, code: rawCode, otp: rawCode }
+      : {}),
   };
 }
 
@@ -488,7 +500,7 @@ async function sendPasswordResetCode(payload, context = {}) {
 
   const rawCode = generateUnusedCode();
   if (env.nodeEnv !== 'production') {
-    logger.info(`🔑 [DEV RESET OTP CODE] Password reset code for ${email} is: ${rawCode}`);
+    logger.info(`🔑 [DEV RESET OTP CODE] Password reset code for ${email} is: ${rawCode}`); // sensitive-log-ok: guarded by nodeEnv !== 'production' two lines up
   }
   const codeHash = await bcrypt.hash(rawCode, 10);
 

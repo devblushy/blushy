@@ -10,6 +10,8 @@ import '../../../../services/api_sia_service.dart';
 import '../../widgets/blushy_period_tracker_card.dart';
 import 'stage_shared_components.dart';
 import '../../../../shared/user_display_name.dart';
+import '../../widgets/log_symptoms_section.dart';
+import '../../../../l10n/app_localizations.dart';
 
 class TryingToConceiveDashboard extends StatefulWidget {
   final bool isNested;
@@ -640,8 +642,7 @@ class _TryingToConceiveDashboardState extends State<TryingToConceiveDashboard> {
               const SizedBox(height: 14),
 
               // Quick-Log Biomarkers Matrix (Soft & Elegant)
-              Text(
-                'TODAY\'S BIOMARKER LOG',
+              Text(AppLocalizations.of(context).ttcTodaySBiomarkerLog,
                 style: GoogleFonts.manrope(
                   fontSize: 10.0,
                   fontWeight: FontWeight.w800,
@@ -1129,8 +1130,7 @@ class _TryingToConceiveDashboardState extends State<TryingToConceiveDashboard> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Natural Cycle-to-Cycle Rhythm',
+                    Text(AppLocalizations.of(context).ttcNaturalCycleToCycleRhythm,
                       style: GoogleFonts.manrope(fontSize: 13, fontWeight: FontWeight.w800, color: textMain),
                     ),
                     Text(
@@ -1184,8 +1184,7 @@ class _TryingToConceiveDashboardState extends State<TryingToConceiveDashboard> {
             badgeColor: const Color(0xFF0D9488),
           ),
           const SizedBox(height: 12),
-          Text(
-            'Honest Signal Coverage',
+          Text(AppLocalizations.of(context).ttcHonestSignalCoverage,
             style: GoogleFonts.cormorantGaramond(fontSize: 20, fontWeight: FontWeight.w700, color: textMain),
           ),
           const SizedBox(height: 12),
@@ -1779,8 +1778,7 @@ class _TryingToConceiveDashboardState extends State<TryingToConceiveDashboard> {
                 Share.share(summary, subject: 'Blushy Clinical Fertility Report');
               },
               icon: const Icon(Icons.picture_as_pdf_rounded, size: 15, color: Colors.white),
-              label: Text(
-                'Generate Clinical Report',
+              label: Text(AppLocalizations.of(context).ttcGenerateClinicalReport,
                 style: GoogleFonts.manrope(fontSize: 12.5, fontWeight: FontWeight.w800, color: Colors.white),
               ),
               style: ElevatedButton.styleFrom(
@@ -1847,7 +1845,7 @@ class _TryingToConceiveDashboardState extends State<TryingToConceiveDashboard> {
                 children: [
                   Center(child: Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.grey.shade300, borderRadius: BorderRadius.circular(2)))),
                   const SizedBox(height: 18),
-                  Text('Log Period Date', style: GoogleFonts.cormorantGaramond(fontSize: 26, fontWeight: FontWeight.w700, color: textMain)),
+                  Text(AppLocalizations.of(context).ttcLogPeriodDate, style: GoogleFonts.cormorantGaramond(fontSize: 26, fontWeight: FontWeight.w700, color: textMain)),
                   const SizedBox(height: 8),
                   Text(
                     'Be gentle with yourself today. When your cycle restarts, Blushy calibrates your next fertile rhythm smoothly.',
@@ -1967,7 +1965,7 @@ class _TryingToConceiveDashboardState extends State<TryingToConceiveDashboard> {
             children: [
               Center(child: Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.grey.shade300, borderRadius: BorderRadius.circular(2)))),
               const SizedBox(height: 16),
-              Text('Pause Fertility Tracking', style: GoogleFonts.cormorantGaramond(fontSize: 22, fontWeight: FontWeight.w700, color: textMain)),
+              Text(AppLocalizations.of(context).ttcPauseFertilityTracking, style: GoogleFonts.cormorantGaramond(fontSize: 22, fontWeight: FontWeight.w700, color: textMain)),
               const SizedBox(height: 8),
               Text(
                 'Taking a break is completely healthy and normal. Your historical timeline stays safe. Choose how you’d like to pause:',
@@ -1975,14 +1973,14 @@ class _TryingToConceiveDashboardState extends State<TryingToConceiveDashboard> {
               ),
               const SizedBox(height: 16),
               ListTile(
-                title: Text('Pause for 1 week', style: GoogleFonts.manrope(fontSize: 13, fontWeight: FontWeight.w700)),
+                title: Text(AppLocalizations.of(context).ttcPauseFor1Week, style: GoogleFonts.manrope(fontSize: 13, fontWeight: FontWeight.w700)),
                 onTap: () {
                   setState(() => _isTtcPaused = true);
                   Navigator.pop(ctx);
                 },
               ),
               ListTile(
-                title: Text('Pause until next period', style: GoogleFonts.manrope(fontSize: 13, fontWeight: FontWeight.w700)),
+                title: Text(AppLocalizations.of(context).ttcPauseUntilNextPeriod, style: GoogleFonts.manrope(fontSize: 13, fontWeight: FontWeight.w700)),
                 onTap: () {
                   setState(() => _isTtcPaused = true);
                   Navigator.pop(ctx);
@@ -2226,6 +2224,8 @@ class _TryingToConceiveDashboardState extends State<TryingToConceiveDashboard> {
 
       // 03. Period / Cycle Rhythm Tracker (Stage 2 Canonical Reusable Tracker)
       _buildPeriodTrackerCard(context),
+      const SizedBox(height: 22),
+      const LogSymptomsSection(stageKey: 'tryingtoconceive'),
       const SizedBox(height: 18),
 
       // 04. Fertility Signal Confidence & Compass

@@ -25,7 +25,7 @@ async function main() {
     process.exit(1);
   }
 
-  console.log(`brevo key : ${env.brevoApiKey ? 'set' : 'NOT SET'}`);
+  console.log(`brevo key : ${env.brevoApiKey ? 'set' : 'NOT SET'}`); // sensitive-log-ok: prints 'set'/'NOT SET', never the key
   console.log(`smtp host : ${env.smtpHost || 'NOT SET'}`);
   console.log(`from      : ${env.emailFrom || 'NOT SET'}`);
   console.log(`sending to: ${to}\n`);

@@ -1470,7 +1470,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dashLongTermWellnessOverview => 'Long-Term Wellness Overview';
 
   @override
-  String get dashTodaySCheck => 'Today\'s Check-In';
+  String get dashTodaySCheck => 'Log Today\'s Symptoms';
 
   @override
   String get dashViewHealthHistory => 'View Health History';
@@ -1518,4 +1518,599 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dashLogTodayCheckIn => 'Log today\'s check-in';
+
+  @override
+  String get lwmcTodayWithDocsy => 'TODAY WITH DOCSY';
+
+  @override
+  String get lwmcAskDocsy => 'Ask Docsy';
+
+  @override
+  String get lwmcNoPeriodLoggedYet => 'No period logged yet';
+
+  @override
+  String get lwmcDocsySSuggestion => 'DOCSY’S SUGGESTION';
+
+  @override
+  String get lwmcAskDocsy2 => 'Ask Docsy →';
+
+  @override
+  String get lwmcTry => 'Try →';
+
+  @override
+  String get lwmcViewPlan => 'View Plan →';
+
+  @override
+  String get lwmcRead => 'Read →';
+
+  @override
+  String get lwmcPrepareMyVisitSummary => 'Prepare my visit summary';
+
+  @override
+  String get lwmcSomethingFeelsDifferent => 'Something Feels Different';
+
+  @override
+  String get lwmcTellDocsyWhatHappened => 'Tell Docsy What Happened';
+
+  @override
+  String get lwmcSubmitToDocsy => 'Submit to Docsy';
+
+  @override
+  String get lwmcClinicalVisitSummary => 'Clinical Visit Summary';
+
+  @override
+  String get lwmcClose => 'Close';
+
+  @override
+  String get lwmcExpandWithDocsy => 'Expand with Docsy';
+
+  @override
+  String get fpnsChange => 'Change';
+
+  @override
+  String get fpnsFirstPeriodKit => 'First-Period Kit';
+
+  @override
+  String get fpnsSaveDone => 'Save & Done';
+
+  @override
+  String get fpnsLogAPeriodStart => 'Log a period start';
+
+  @override
+  String get fpnsYourBodyLately => 'Your body, lately';
+
+  @override
+  String get fpnsMilestones => 'Milestones';
+
+  @override
+  String get fpnsFirstPeriodKit2 => 'First-period kit';
+
+  @override
+  String get fpnsIfItHappensToday => 'If it happens today';
+
+  @override
+  String get fpnsSeeFull5StepGuide => 'See full 5-step guide';
+
+  @override
+  String get fpnsTalk => 'Talk →';
+
+  @override
+  String get fpnsShareWithMom => 'Share with Mom';
+
+  @override
+  String get fpnsNextQuestion => 'Next question';
+
+  @override
+  String get fpnsKeepExploring => 'Keep exploring';
+
+  @override
+  String get fpnsUpdatedDaily => 'Updated Daily';
+
+  @override
+  String get fpnsReadArticle => 'Read article';
+
+  @override
+  String get fpsNoPeriodLoggedYet => 'No period logged yet';
+
+  @override
+  String get fpsInsightsForYourPhase => 'Insights for your phase';
+
+  @override
+  String get fpsQuickGuides => 'Quick Guides';
+
+  @override
+  String get fpsCrampRescue => 'Cramp Rescue →';
+
+  @override
+  String get fpsSchoolTips => 'School Tips';
+
+  @override
+  String get fpsMySchoolBagKit => 'My School Bag Kit';
+
+  @override
+  String get fpsThingsIMNoticingLately => 'Things I’m noticing lately';
+
+  @override
+  String get fpsUnderstandWithDocsy => 'Understand with Docsy →';
+
+  @override
+  String get fpsCrampRescue2 => 'Cramp Rescue';
+
+  @override
+  String get fpsIFeelBetter => 'I feel better';
+
+  @override
+  String get fpsShareWithMom => 'Share with Mom →';
+
+  @override
+  String get hhLogPeriodDate => 'Log Period Date';
+
+  @override
+  String get hhFlowIntensity => 'Flow Intensity';
+
+  @override
+  String get hhSavePeriodDate => 'Save Period Date';
+
+  @override
+  String get hhTodayWithDocsy => 'TODAY WITH DOCSY';
+
+  @override
+  String get hhExploreWithDocsy => 'Explore with Docsy';
+
+  @override
+  String get hhYourCycle => 'YOUR CYCLE';
+
+  @override
+  String get hhNoPeriodLoggedYet => 'No period logged yet';
+
+  @override
+  String get hhFlareComfortModeActive => 'FLARE COMFORT MODE ACTIVE';
+
+  @override
+  String get hhExitFlareMode => 'Exit Flare Mode';
+
+  @override
+  String get hhDailySignals => 'DAILY SIGNALS';
+
+  @override
+  String get hhVoiceNotes => 'Voice / Notes';
+
+  @override
+  String get hhAnalyzeWithDocsy => 'Analyze with Docsy';
+
+  @override
+  String get hhPatternMemoryBuilding => 'Pattern Memory Building';
+
+  @override
+  String get hhAskDocsy => 'Ask Docsy';
+
+  @override
+  String get hhNoTreatmentsRecordedYet => 'No treatments recorded yet';
+
+  @override
+  String get hhAddTreatmentProtocol => 'Add Treatment / Protocol';
+
+  @override
+  String get hhSaveTreatment => 'Save Treatment';
+
+  @override
+  String get hhAskDocsy2 => 'Ask Docsy ›';
+
+  @override
+  String get hhUploadAnotherRecord => 'Upload another record';
+
+  @override
+  String get hhSaveRecord => 'Save Record';
+
+  @override
+  String get hhDoctorVisitBrief => 'DOCTOR VISIT BRIEF';
+
+  @override
+  String get hhCreateDoctorSummary => 'Create doctor summary';
+
+  @override
+  String get hhClinicalBrief => 'Clinical Brief';
+
+  @override
+  String get hhClose => 'Close';
+
+  @override
+  String get hhUpdate => 'Update';
+
+  @override
+  String get hhAddTrustedContact => 'Add trusted contact';
+
+  @override
+  String get hhAddSupportContact => 'Add Support Contact';
+
+  @override
+  String get hhSaveContact => 'Save Contact';
+
+  @override
+  String get hhCheckWithDocsy => 'Check with Docsy';
+
+  @override
+  String get menoTodayWithDocsy => 'TODAY WITH DOCSY';
+
+  @override
+  String get menoAskDocsyToday => 'ASK DOCSY TODAY';
+
+  @override
+  String get menoSaveTodaySLog => 'Save Today\'s Log';
+
+  @override
+  String get menoNothingMuchToday => 'Nothing much today';
+
+  @override
+  String get menoWhatSSteady => 'WHAT\'S STEADY';
+
+  @override
+  String get menoLearnGuidance => 'Learn guidance →';
+
+  @override
+  String get menoMyNormal => 'MY NORMAL';
+
+  @override
+  String get menoMyTreatmentJourney => 'MY TREATMENT JOURNEY';
+
+  @override
+  String get menoAdd => 'Add';
+
+  @override
+  String get menoActive => 'Active';
+
+  @override
+  String get menoMyQuestionsInbox => 'MY QUESTIONS INBOX';
+
+  @override
+  String get menoSaveQuestion => 'Save Question';
+
+  @override
+  String get menoRead30sSummary => 'Read 30s summary →';
+
+  @override
+  String get menoSomethingFeelsDifferent => 'Something feels different';
+
+  @override
+  String get menoPrepareDoctorConsultation => 'Prepare Doctor Consultation';
+
+  @override
+  String get menoUnderstandNote => 'Understand Note';
+
+  @override
+  String get menoConfirmWhatYouLogged => 'Confirm What You Logged';
+
+  @override
+  String get menoCancel => 'Cancel';
+
+  @override
+  String get menoConfirmSave => 'Confirm & Save';
+
+  @override
+  String get menoAskDocsy => 'Ask Docsy';
+
+  @override
+  String get menoPrepareDoctorSummary => 'Prepare Doctor Summary';
+
+  @override
+  String get menoSaveQuestionForDoctor => 'Save question for doctor';
+
+  @override
+  String get menoSaveToQuestionsInbox => 'Save to Questions Inbox';
+
+  @override
+  String get menoAddMedicationOrSupplement => 'Add medication or supplement';
+
+  @override
+  String get menoSaveTreatment => 'Save Treatment';
+
+  @override
+  String get periTodayWithDocsy => 'TODAY WITH DOCSY';
+
+  @override
+  String get periMidlifeCompanionIntelligence =>
+      'Midlife Companion Intelligence';
+
+  @override
+  String get periMyChangingCycle => 'MY CHANGING CYCLE';
+
+  @override
+  String get periNonPredictiveMidlifeRhythm => 'Non-Predictive Midlife Rhythm';
+
+  @override
+  String get periLogPeriod => 'Log Period';
+
+  @override
+  String get periStatus => 'Status';
+
+  @override
+  String get periRecentCycleIntervals => 'Recent Cycle Intervals';
+
+  @override
+  String get periWhatYouVeBeenNoticing => 'WHAT YOU\'VE BEEN NOTICING';
+
+  @override
+  String get periLogCheckIn => 'Log Check-In';
+
+  @override
+  String get periWhatChangedConnections => 'WHAT CHANGED & CONNECTIONS';
+
+  @override
+  String get periWeeklyShift => 'Weekly Shift';
+
+  @override
+  String get periDiscoveredConnections => 'Discovered Connections';
+
+  @override
+  String get periYourCurrentFocus => 'YOUR CURRENT FOCUS';
+
+  @override
+  String get periAdd => '+ Add';
+
+  @override
+  String get periTell => 'Tell';
+
+  @override
+  String get periYour1PageAppointmentBrief => 'Your 1-Page Appointment Brief';
+
+  @override
+  String get periViewBrief => 'View Brief';
+
+  @override
+  String get periCopyForDoctor => 'Copy for Doctor';
+
+  @override
+  String get periIntimateSexualHealth => 'INTIMATE & SEXUAL HEALTH';
+
+  @override
+  String get periMyStoryTimeline => 'MY STORY · TIMELINE';
+
+  @override
+  String get periKeepExploring => 'KEEP EXPLORING';
+
+  @override
+  String get periLogPeriodStartDate => 'Log Period Start Date';
+
+  @override
+  String get periSaveObservation => 'Save Observation';
+
+  @override
+  String get periDailyTransitionCheckIn => 'Daily Transition Check-In';
+
+  @override
+  String get periCompleteCheckIn => 'Complete Check-In';
+
+  @override
+  String get periAddTreatmentSupport => 'Add Treatment / Support';
+
+  @override
+  String get periCancel => 'Cancel';
+
+  @override
+  String get periSave => 'Save';
+
+  @override
+  String get periClinicianBriefPreview => 'Clinician Brief Preview';
+
+  @override
+  String get periClose => 'Close';
+
+  @override
+  String get periCopy => 'Copy';
+
+  @override
+  String get ppTodayWithDocsy => 'TODAY WITH DOCSY';
+
+  @override
+  String get ppYour4thTrimesterCompanion => 'Your 4th Trimester Companion';
+
+  @override
+  String get ppSavedSynced => 'Saved & Synced';
+
+  @override
+  String get ppTalkToDocsy => 'Talk to Docsy →';
+
+  @override
+  String get ppTodayIDPrioritize => 'TODAY, I\'D PRIORITIZE';
+
+  @override
+  String get ppNoticedShifts => 'NOTICED SHIFTS';
+
+  @override
+  String get ppWhatSBeenSteady => 'WHAT\'S BEEN STEADY';
+
+  @override
+  String get ppObservingInitialBaseline => 'Observing Initial Baseline';
+
+  @override
+  String get ppIMDoneForToday => 'I\'M DONE FOR TODAY';
+
+  @override
+  String get ppTonightWindDown => 'TONIGHT WIND-DOWN';
+
+  @override
+  String get ppActiveNursingStopwatch => 'Active Nursing Stopwatch';
+
+  @override
+  String get ppLoggedWetDiaper => 'Logged Wet Diaper 💧';
+
+  @override
+  String get ppLoggedSoiledDiaper => 'Logged Soiled Diaper 💩';
+
+  @override
+  String get ppDailyRecoveryProgression => 'DAILY RECOVERY PROGRESSION';
+
+  @override
+  String get ppBuildDoctorSummary => 'Build Doctor Summary →';
+
+  @override
+  String get ppTimelineGuideline => 'TIMELINE GUIDELINE';
+
+  @override
+  String get ppRecommendation => 'RECOMMENDATION';
+
+  @override
+  String get ppAskDocsyMore => 'Ask Docsy More →';
+
+  @override
+  String get ppClose => 'Close';
+
+  @override
+  String get ppTalkToDocsy2 => 'Talk to Docsy';
+
+  @override
+  String get ppAskForHelp => 'Ask for Help';
+
+  @override
+  String get ppResumeNormalMode => 'Resume Normal Mode';
+
+  @override
+  String get ppCalibratePostpartumPath => 'Calibrate Postpartum Path';
+
+  @override
+  String get ppBabySBirthDate => 'BABY\'S BIRTH DATE';
+
+  @override
+  String get ppDeliveryPath => 'DELIVERY PATH';
+
+  @override
+  String get ppVaginalBirth => 'Vaginal Birth';
+
+  @override
+  String get ppCSection => 'C-Section';
+
+  @override
+  String get ppFeedingMethod => 'FEEDING METHOD';
+
+  @override
+  String get ppCancel => 'Cancel';
+
+  @override
+  String get ppSaveCalibrate => 'Save & Calibrate';
+
+  @override
+  String get ppINeedHelpToday => 'I Need Help Today';
+
+  @override
+  String get ppGenerateShare => 'Generate & Share';
+
+  @override
+  String get ppClinicalSafetyTriage => 'Clinical Safety Triage';
+
+  @override
+  String get ppTalkToDocsyNow => 'Talk to Docsy Now';
+
+  @override
+  String get ppWhatHappenedEvent => 'WHAT HAPPENED (EVENT)';
+
+  @override
+  String get ppWhatChangedObservedShift => 'WHAT CHANGED (OBSERVED SHIFT)';
+
+  @override
+  String get ppUnderstandWithDocsy => 'Understand with Docsy →';
+
+  @override
+  String get ppClinicalSafetyAlert => 'CLINICAL SAFETY ALERT';
+
+  @override
+  String get pregAddToPregnancyStory => 'Add to Pregnancy Story';
+
+  @override
+  String get pregCancel => 'Cancel';
+
+  @override
+  String get pregSaveMemory => 'Save Memory';
+
+  @override
+  String get pregTodayWithDocsy => 'TODAY WITH DOCSY';
+
+  @override
+  String get pregYourBodyToday => 'Your Body Today';
+
+  @override
+  String get pregBabyThisWeek => 'Baby This Week';
+
+  @override
+  String get pregOneThingToKnow => 'ONE THING TO KNOW';
+
+  @override
+  String get pregOneThingToDo => 'ONE THING TO DO';
+
+  @override
+  String get pregYourGestationalTimeline => 'YOUR GESTATIONAL TIMELINE';
+
+  @override
+  String get pregSetupRequired => 'Setup Required';
+
+  @override
+  String get pregSetEstimatedDueDate => 'Set Estimated Due Date';
+
+  @override
+  String get pregDailyMaternalCheckIn => 'DAILY MATERNAL CHECK-IN';
+
+  @override
+  String get pregExploreWithDocsy => 'Explore with Docsy';
+
+  @override
+  String get pregWhatSHappeningThisWeek => 'WHAT\'S HAPPENING THIS WEEK';
+
+  @override
+  String get pregSetDueDate => 'Set Due Date';
+
+  @override
+  String get pregYourNextAppointment => 'YOUR NEXT APPOINTMENT';
+
+  @override
+  String get pregBuildDoctorSummary => 'Build Doctor Summary';
+
+  @override
+  String get pregAddDoctorQuestion => 'Add Doctor Question';
+
+  @override
+  String get pregAdd => 'Add';
+
+  @override
+  String get pregShareWithPartner => 'Share with Partner';
+
+  @override
+  String get pregMyPregnancyStory => 'MY PREGNANCY STORY';
+
+  @override
+  String get pregAddMoment => '+ Add Moment';
+
+  @override
+  String get pregNoMomentsRecordedYet => 'No Moments Recorded Yet';
+
+  @override
+  String get pregAddFirstMoment => 'Add First Moment';
+
+  @override
+  String get preg30SecondExplainer => '30-SECOND EXPLAINER';
+
+  @override
+  String get pregAdd2 => '+ Add';
+
+  @override
+  String get ttcTodaySBiomarkerLog => 'TODAY\'S BIOMARKER LOG';
+
+  @override
+  String get ttcNaturalCycleToCycleRhythm => 'Natural Cycle-to-Cycle Rhythm';
+
+  @override
+  String get ttcHonestSignalCoverage => 'Honest Signal Coverage';
+
+  @override
+  String get ttcGenerateClinicalReport => 'Generate Clinical Report';
+
+  @override
+  String get ttcLogPeriodDate => 'Log Period Date';
+
+  @override
+  String get ttcPauseFertilityTracking => 'Pause Fertility Tracking';
+
+  @override
+  String get ttcPauseFor1Week => 'Pause for 1 week';
+
+  @override
+  String get ttcPauseUntilNextPeriod => 'Pause until next period';
 }

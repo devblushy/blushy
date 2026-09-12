@@ -12,6 +12,8 @@ import '../doctor_summary_screen.dart';
 import 'stage_shared_components.dart';
 import '../../../../shared/stage_empty_notice.dart';
 import '../../../../shared/user_display_name.dart';
+import '../../widgets/log_symptoms_section.dart';
+import '../../../../l10n/app_localizations.dart';
 
 class PostpartumDashboard extends StatefulWidget {
   final bool isNested;
@@ -319,8 +321,7 @@ class _PostpartumDashboardState extends State<PostpartumDashboard> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'TODAY WITH DOCSY',
+                    Text(AppLocalizations.of(context).ppTodayWithDocsy,
                       style: GoogleFonts.manrope(
                         fontSize: 10.5,
                         fontWeight: FontWeight.w800,
@@ -328,8 +329,7 @@ class _PostpartumDashboardState extends State<PostpartumDashboard> {
                         letterSpacing: 1.1,
                       ),
                     ),
-                    Text(
-                      'Your 4th Trimester Companion',
+                    Text(AppLocalizations.of(context).ppYour4thTrimesterCompanion,
                       style: GoogleFonts.cormorantGaramond(
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
@@ -585,8 +585,7 @@ class _PostpartumDashboardState extends State<PostpartumDashboard> {
                   children: [
                     const Icon(Icons.check_circle, size: 12, color: Color(0xFF2E7D32)),
                     const SizedBox(width: 4),
-                    Text(
-                      'Saved & Synced',
+                    Text(AppLocalizations.of(context).ppSavedSynced,
                       style: GoogleFonts.manrope(
                         fontSize: 10.5,
                         fontWeight: FontWeight.w700,
@@ -751,8 +750,7 @@ class _PostpartumDashboardState extends State<PostpartumDashboard> {
                       children: [
                         const Icon(Icons.chat_bubble_outline, size: 12, color: crimsonPrimary),
                         const SizedBox(width: 4),
-                        Text(
-                          'Talk to Docsy →',
+                        Text(AppLocalizations.of(context).ppTalkToDocsy,
                           style: GoogleFonts.manrope(
                             fontSize: 10.5,
                             fontWeight: FontWeight.w700,
@@ -920,7 +918,7 @@ class _PostpartumDashboardState extends State<PostpartumDashboard> {
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 4),
-          child: Text('TODAY, I\'D PRIORITIZE', style: GoogleFonts.manrope(fontSize: 10.5, fontWeight: FontWeight.w800, color: crimsonPrimary, letterSpacing: 1.1)),
+          child: Text(AppLocalizations.of(context).ppTodayIDPrioritize, style: GoogleFonts.manrope(fontSize: 10.5, fontWeight: FontWeight.w800, color: crimsonPrimary, letterSpacing: 1.1)),
         ),
         const SizedBox(height: 10),
         ...effectivePriorities.map((p) => Container(
@@ -1015,7 +1013,7 @@ class _PostpartumDashboardState extends State<PostpartumDashboard> {
           ),
           const SizedBox(height: 12),
           if (changes.isNotEmpty) ...[
-            Text('NOTICED SHIFTS', style: GoogleFonts.manrope(fontSize: 11, fontWeight: FontWeight.bold, color: textMain)),
+            Text(AppLocalizations.of(context).ppNoticedShifts, style: GoogleFonts.manrope(fontSize: 11, fontWeight: FontWeight.bold, color: textMain)),
             const SizedBox(height: 6),
             ...changes.map((c) => Container(
               margin: const EdgeInsets.only(bottom: 8),
@@ -1046,7 +1044,7 @@ class _PostpartumDashboardState extends State<PostpartumDashboard> {
           ],
           if (steady.isNotEmpty) ...[
             const SizedBox(height: 8),
-            Text('WHAT\'S BEEN STEADY', style: GoogleFonts.manrope(fontSize: 11, fontWeight: FontWeight.bold, color: textMain)),
+            Text(AppLocalizations.of(context).ppWhatSBeenSteady, style: GoogleFonts.manrope(fontSize: 11, fontWeight: FontWeight.bold, color: textMain)),
             const SizedBox(height: 6),
             ...steady.map((s) => Padding(
               padding: const EdgeInsets.only(bottom: 6),
@@ -1076,8 +1074,7 @@ class _PostpartumDashboardState extends State<PostpartumDashboard> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          'Observing Initial Baseline',
+                        Text(AppLocalizations.of(context).ppObservingInitialBaseline,
                           style: GoogleFonts.manrope(fontSize: 12, fontWeight: FontWeight.bold, color: textMain),
                         ),
                         const SizedBox(height: 2),
@@ -1169,7 +1166,7 @@ class _PostpartumDashboardState extends State<PostpartumDashboard> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('I\'M DONE FOR TODAY', style: GoogleFonts.manrope(fontSize: 12, fontWeight: FontWeight.bold, color: textMain)),
+                    Text(AppLocalizations.of(context).ppIMDoneForToday, style: GoogleFonts.manrope(fontSize: 12, fontWeight: FontWeight.bold, color: textMain)),
                     Text('Pause tracking, charts, and recommendations', style: GoogleFonts.manrope(fontSize: 10.5, color: textMuted)),
                   ],
                 ),
@@ -1186,7 +1183,7 @@ class _PostpartumDashboardState extends State<PostpartumDashboard> {
           ),
           const SizedBox(height: 16),
           // Evening "Tonight" checklist
-          Text('TONIGHT WIND-DOWN', style: GoogleFonts.manrope(fontSize: 11, fontWeight: FontWeight.bold, color: textMain)),
+          Text(AppLocalizations.of(context).ppTonightWindDown, style: GoogleFonts.manrope(fontSize: 11, fontWeight: FontWeight.bold, color: textMain)),
           const SizedBox(height: 8),
           _buildChecklistItem('t1', 'Drink a large glass of water & electrolyte'),
           _buildChecklistItem('t2', 'Take prescribed vitamins / medications'),
@@ -1271,7 +1268,7 @@ class _PostpartumDashboardState extends State<PostpartumDashboard> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('Active Nursing Stopwatch', style: GoogleFonts.manrope(fontSize: 12, fontWeight: FontWeight.bold, color: textMain)),
+                    Text(AppLocalizations.of(context).ppActiveNursingStopwatch, style: GoogleFonts.manrope(fontSize: 12, fontWeight: FontWeight.bold, color: textMain)),
                     if (_activeNursingSide != null)
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
@@ -1325,7 +1322,7 @@ class _PostpartumDashboardState extends State<PostpartumDashboard> {
                 child: _buildQuickIncrementCard('Wet Diaper', '💧', () async {
                   await ApiPostpartumService.recordBabyEvent(type: 'diaper', details: {'kind': 'wet'});
                   if (!mounted) return;
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Logged Wet Diaper 💧'), duration: Duration(seconds: 1)));
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context).ppLoggedWetDiaper), duration: const Duration(seconds: 1)));
                   _loadPostpartumData();
                 }),
               ),
@@ -1334,7 +1331,7 @@ class _PostpartumDashboardState extends State<PostpartumDashboard> {
                 child: _buildQuickIncrementCard('Soiled Diaper', '💩', () async {
                   await ApiPostpartumService.recordBabyEvent(type: 'diaper', details: {'kind': 'dirty'});
                   if (!mounted) return;
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Logged Soiled Diaper 💩'), duration: Duration(seconds: 1)));
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context).ppLoggedSoiledDiaper), duration: const Duration(seconds: 1)));
                   _loadPostpartumData();
                 }),
               ),
@@ -1453,7 +1450,7 @@ class _PostpartumDashboardState extends State<PostpartumDashboard> {
             ),
           ),
           const SizedBox(height: 16),
-          Text('DAILY RECOVERY PROGRESSION', style: GoogleFonts.manrope(fontSize: 10.5, fontWeight: FontWeight.w800, color: textMuted, letterSpacing: 1.0)),
+          Text(AppLocalizations.of(context).ppDailyRecoveryProgression, style: GoogleFonts.manrope(fontSize: 10.5, fontWeight: FontWeight.w800, color: textMuted, letterSpacing: 1.0)),
           const SizedBox(height: 8),
           if ((_overview?.recentCheckins ?? []).isNotEmpty) ...[
             ...(_overview!.recentCheckins).take(4).map((c) => Container(
@@ -1565,7 +1562,7 @@ class _PostpartumDashboardState extends State<PostpartumDashboard> {
               ),
               onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const DoctorSummaryScreen())),
               icon: const Icon(Icons.summarize_outlined, size: 18),
-              label: Text('Build Doctor Summary →', style: GoogleFonts.manrope(fontWeight: FontWeight.bold, fontSize: 13)),
+              label: Text(AppLocalizations.of(context).ppBuildDoctorSummary, style: GoogleFonts.manrope(fontWeight: FontWeight.bold, fontSize: 13)),
             ),
           ),
         ],
@@ -1612,11 +1609,11 @@ class _PostpartumDashboardState extends State<PostpartumDashboard> {
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('TIMELINE GUIDELINE', style: GoogleFonts.manrope(fontSize: 10.5, fontWeight: FontWeight.bold, color: crimsonPrimary)),
+                        Text(AppLocalizations.of(context).ppTimelineGuideline, style: GoogleFonts.manrope(fontSize: 10.5, fontWeight: FontWeight.bold, color: crimsonPrimary)),
                         const SizedBox(height: 4),
                         Text(g['timeline']?.toString() ?? '', style: GoogleFonts.manrope(fontSize: 12.5, color: textMain)),
                         const SizedBox(height: 12),
-                        Text('RECOMMENDATION', style: GoogleFonts.manrope(fontSize: 10.5, fontWeight: FontWeight.bold, color: crimsonPrimary)),
+                        Text(AppLocalizations.of(context).ppRecommendation, style: GoogleFonts.manrope(fontSize: 10.5, fontWeight: FontWeight.bold, color: crimsonPrimary)),
                         const SizedBox(height: 4),
                         Text(g['recommendation']?.toString() ?? '', style: GoogleFonts.manrope(fontSize: 12, color: textMuted)),
                       ],
@@ -1627,9 +1624,9 @@ class _PostpartumDashboardState extends State<PostpartumDashboard> {
                           Navigator.pop(ctx);
                           openDocsyWith(context, 'Tell me more about when I can ${g['activity']} based on my recovery.');
                         },
-                        child: Text('Ask Docsy More →', style: GoogleFonts.manrope(fontWeight: FontWeight.bold, color: crimsonPrimary)),
+                        child: Text(AppLocalizations.of(context).ppAskDocsyMore, style: GoogleFonts.manrope(fontWeight: FontWeight.bold, color: crimsonPrimary)),
                       ),
-                      TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Close')),
+                      TextButton(onPressed: () => Navigator.pop(ctx), child: Text(AppLocalizations.of(context).ppClose)),
                     ],
                   ),
                 );
@@ -1695,11 +1692,11 @@ class _PostpartumDashboardState extends State<PostpartumDashboard> {
             children: [
               OutlinedButton(
                 onPressed: () => openDocsyWith(context, 'I am exhausted and just want to rest.'),
-                child: Text('Talk to Docsy', style: GoogleFonts.manrope(color: crimsonPrimary)),
+                child: Text(AppLocalizations.of(context).ppTalkToDocsy2, style: GoogleFonts.manrope(color: crimsonPrimary)),
               ),
               OutlinedButton(
                 onPressed: _openHelpSosDialog,
-                child: Text('Ask for Help', style: GoogleFonts.manrope(color: crimsonPrimary)),
+                child: Text(AppLocalizations.of(context).ppAskForHelp, style: GoogleFonts.manrope(color: crimsonPrimary)),
               ),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF221510)),
@@ -1707,7 +1704,7 @@ class _PostpartumDashboardState extends State<PostpartumDashboard> {
                   setState(() => _isLowEnergyMode = false);
                   await ApiPostpartumService.calibrate(lowEnergyMode: false);
                 },
-                child: Text('Resume Normal Mode', style: GoogleFonts.manrope(color: Colors.white)),
+                child: Text(AppLocalizations.of(context).ppResumeNormalMode, style: GoogleFonts.manrope(color: Colors.white)),
               ),
             ],
           ),
@@ -1864,13 +1861,13 @@ class _PostpartumDashboardState extends State<PostpartumDashboard> {
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (context, setDlgState) => AlertDialog(
-          title: Text('Calibrate Postpartum Path', style: GoogleFonts.cormorantGaramond(fontSize: 22, fontWeight: FontWeight.bold)),
+          title: Text(AppLocalizations.of(context).ppCalibratePostpartumPath, style: GoogleFonts.cormorantGaramond(fontSize: 22, fontWeight: FontWeight.bold)),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('BABY\'S BIRTH DATE', style: GoogleFonts.manrope(fontSize: 10.5, fontWeight: FontWeight.bold, color: crimsonPrimary)),
+                Text(AppLocalizations.of(context).ppBabySBirthDate, style: GoogleFonts.manrope(fontSize: 10.5, fontWeight: FontWeight.bold, color: crimsonPrimary)),
                 const SizedBox(height: 6),
                 OutlinedButton.icon(
                   onPressed: () async {
@@ -1886,19 +1883,19 @@ class _PostpartumDashboardState extends State<PostpartumDashboard> {
                   label: Text('${selectedDate.toLocal()}'.split(' ')[0], style: GoogleFonts.manrope(fontWeight: FontWeight.bold)),
                 ),
                 const SizedBox(height: 16),
-                Text('DELIVERY PATH', style: GoogleFonts.manrope(fontSize: 10.5, fontWeight: FontWeight.bold, color: crimsonPrimary)),
+                Text(AppLocalizations.of(context).ppDeliveryPath, style: GoogleFonts.manrope(fontSize: 10.5, fontWeight: FontWeight.bold, color: crimsonPrimary)),
                 const SizedBox(height: 6),
                 Row(
                   children: [
                     ChoiceChip(
-                      label: const Text('Vaginal Birth'),
+                      label: Text(AppLocalizations.of(context).ppVaginalBirth),
                       selected: deliveryType == 'vaginal',
                       selectedColor: crimsonPrimary,
                       onSelected: (_) => setDlgState(() => deliveryType = 'vaginal'),
                     ),
                     const SizedBox(width: 8),
                     ChoiceChip(
-                      label: const Text('C-Section'),
+                      label: Text(AppLocalizations.of(context).ppCSection),
                       selected: deliveryType == 'cesarean',
                       selectedColor: crimsonPrimary,
                       onSelected: (_) => setDlgState(() => deliveryType = 'cesarean'),
@@ -1906,7 +1903,7 @@ class _PostpartumDashboardState extends State<PostpartumDashboard> {
                   ],
                 ),
                 const SizedBox(height: 16),
-                Text('FEEDING METHOD', style: GoogleFonts.manrope(fontSize: 10.5, fontWeight: FontWeight.bold, color: crimsonPrimary)),
+                Text(AppLocalizations.of(context).ppFeedingMethod, style: GoogleFonts.manrope(fontSize: 10.5, fontWeight: FontWeight.bold, color: crimsonPrimary)),
                 const SizedBox(height: 6),
                 Wrap(
                   spacing: 6,
@@ -1921,7 +1918,7 @@ class _PostpartumDashboardState extends State<PostpartumDashboard> {
             ),
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+            TextButton(onPressed: () => Navigator.pop(ctx), child: Text(AppLocalizations.of(context).ppCancel)),
             ElevatedButton(
               style: ElevatedButton.styleFrom(backgroundColor: crimsonPrimary),
               onPressed: () async {
@@ -1933,7 +1930,7 @@ class _PostpartumDashboardState extends State<PostpartumDashboard> {
                 );
                 _loadPostpartumData();
               },
-              child: const Text('Save & Calibrate', style: TextStyle(color: Colors.white)),
+              child: Text(AppLocalizations.of(context).ppSaveCalibrate, style: TextStyle(color: Colors.white)),
             ),
           ],
         ),
@@ -1947,7 +1944,7 @@ class _PostpartumDashboardState extends State<PostpartumDashboard> {
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (context, setDlgState) => AlertDialog(
-          title: Text('I Need Help Today', style: GoogleFonts.cormorantGaramond(fontSize: 22, fontWeight: FontWeight.bold)),
+          title: Text(AppLocalizations.of(context).ppINeedHelpToday, style: GoogleFonts.cormorantGaramond(fontSize: 22, fontWeight: FontWeight.bold)),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -1984,7 +1981,7 @@ class _PostpartumDashboardState extends State<PostpartumDashboard> {
             ),
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+            TextButton(onPressed: () => Navigator.pop(ctx), child: Text(AppLocalizations.of(context).ppCancel)),
             ElevatedButton.icon(
               style: ElevatedButton.styleFrom(backgroundColor: crimsonPrimary),
               onPressed: () async {
@@ -1998,7 +1995,7 @@ class _PostpartumDashboardState extends State<PostpartumDashboard> {
                 }
               },
               icon: const Icon(Icons.share, size: 16, color: Colors.white),
-              label: const Text('Generate & Share', style: TextStyle(color: Colors.white)),
+              label: Text(AppLocalizations.of(context).ppGenerateShare, style: TextStyle(color: Colors.white)),
             ),
           ],
         ),
@@ -2014,7 +2011,7 @@ class _PostpartumDashboardState extends State<PostpartumDashboard> {
           children: [
             const Icon(Icons.warning_amber_rounded, color: crimsonPrimary),
             const SizedBox(width: 8),
-            Text('Clinical Safety Triage', style: GoogleFonts.cormorantGaramond(fontSize: 22, fontWeight: FontWeight.bold)),
+            Text(AppLocalizations.of(context).ppClinicalSafetyTriage, style: GoogleFonts.cormorantGaramond(fontSize: 22, fontWeight: FontWeight.bold)),
           ],
         ),
         content: Column(
@@ -2043,14 +2040,14 @@ class _PostpartumDashboardState extends State<PostpartumDashboard> {
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(AppLocalizations.of(context).ppCancel)),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: crimsonPrimary),
             onPressed: () {
               Navigator.pop(ctx);
               openDocsyWith(context, 'I am concerned about my postpartum symptoms right now. Please help me evaluate if I need urgent medical care.');
             },
-            child: const Text('Talk to Docsy Now', style: TextStyle(color: Colors.white)),
+            child: Text(AppLocalizations.of(context).ppTalkToDocsyNow, style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -2074,7 +2071,7 @@ class _PostpartumDashboardState extends State<PostpartumDashboard> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('WHAT HAPPENED (EVENT)', style: GoogleFonts.manrope(fontSize: 10.5, fontWeight: FontWeight.bold, color: crimsonPrimary)),
+                Text(AppLocalizations.of(context).ppWhatHappenedEvent, style: GoogleFonts.manrope(fontSize: 10.5, fontWeight: FontWeight.bold, color: crimsonPrimary)),
                 const SizedBox(height: 6),
                 Wrap(
                   spacing: 6,
@@ -2091,7 +2088,7 @@ class _PostpartumDashboardState extends State<PostpartumDashboard> {
                   }).toList(),
                 ),
                 const SizedBox(height: 14),
-                Text('WHAT CHANGED (OBSERVED SHIFT)', style: GoogleFonts.manrope(fontSize: 10.5, fontWeight: FontWeight.bold, color: crimsonPrimary)),
+                Text(AppLocalizations.of(context).ppWhatChangedObservedShift, style: GoogleFonts.manrope(fontSize: 10.5, fontWeight: FontWeight.bold, color: crimsonPrimary)),
                 const SizedBox(height: 6),
                 Wrap(
                   spacing: 6,
@@ -2113,7 +2110,7 @@ class _PostpartumDashboardState extends State<PostpartumDashboard> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx),
-              child: const Text('Cancel'),
+              child: Text(AppLocalizations.of(context).ppCancel),
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(backgroundColor: crimsonPrimary, foregroundColor: Colors.white),
@@ -2122,7 +2119,7 @@ class _PostpartumDashboardState extends State<PostpartumDashboard> {
                 final prompt = 'I noticed a pattern shift in my postpartum recovery: After $selectedEvent, I experienced $selectedChange. What might this mean for my recovery stage, and what gentle adjustments do you suggest?';
                 openDocsyWith(context, prompt);
               },
-              child: Text('Understand with Docsy →', style: GoogleFonts.manrope(fontWeight: FontWeight.bold)),
+              child: Text(AppLocalizations.of(context).ppUnderstandWithDocsy, style: GoogleFonts.manrope(fontWeight: FontWeight.bold)),
             ),
           ],
         ),
@@ -2146,8 +2143,7 @@ class _PostpartumDashboardState extends State<PostpartumDashboard> {
               const Icon(Icons.error, color: crimsonPrimary, size: 24),
               const SizedBox(width: 8),
               Expanded(
-                child: Text(
-                  'CLINICAL SAFETY ALERT',
+                child: Text(AppLocalizations.of(context).ppClinicalSafetyAlert,
                   style: GoogleFonts.manrope(fontSize: 12, fontWeight: FontWeight.w800, color: crimsonPrimary, letterSpacing: 1.0),
                 ),
               ),
@@ -2229,6 +2225,8 @@ class _PostpartumDashboardState extends State<PostpartumDashboard> {
 
                     // 03: TODAY WITH DOCSY (AI Daily Companion Reflection) ⭐
                     _buildTodayWithDocsyCard(),
+                    const SizedBox(height: 22),
+                    const LogSymptomsSection(stageKey: 'postpartum'),
                     const SizedBox(height: 20),
 
                     // 04: WHAT MATTERS TODAY? (Dynamic Priorities)

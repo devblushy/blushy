@@ -6,6 +6,7 @@ import 'api_base_url.dart';
 import 'api_contract_client.dart';
 import 'language_preference.dart';
 import 'auth_storage.dart';
+import 'log_redaction.dart';
 
 /// One night's summary of the user's real conversation with Docsy, generated
 /// server-side from actual chat history.
@@ -160,7 +161,7 @@ class ApiSiaService {
         options: _aiOptions(),
       );
 
-      debugPrint('BlushySia: Chat response: ${response.data}');
+      debugPrint('BlushySia: chat ok (${shapeOf(response.data)})');
 
       if (response.data is Map<String, dynamic>) {
         final data = response.data as Map<String, dynamic>;
@@ -220,7 +221,7 @@ class ApiSiaService {
         options: options,
       );
 
-      debugPrint('BlushySia: File chat response: ${response.data}');
+      debugPrint('BlushySia: file chat ok (${shapeOf(response.data)})');
 
       if (response.data is Map<String, dynamic>) {
         final data = response.data as Map<String, dynamic>;

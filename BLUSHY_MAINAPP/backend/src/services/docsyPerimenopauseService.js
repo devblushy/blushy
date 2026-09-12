@@ -5,13 +5,14 @@
  */
 
 import { env } from '../utils/env.js';
+import { jsonLanguageInstruction } from '../utils/language.js';
 
 export class DocsyPerimenopauseService {
   /**
    * Generates the dynamic daily briefing for the Perimenopause dashboard.
    * Leverages real Grok/OpenRouter AI with short timeout and resilient clinical heuristic fallback.
    */
-  static async generateDailyBrief({ profile = {}, recentCheckins = [], confidence = {}, deltas = {}, connections = [], focus = 'sleep', lifeMode = 'normal' }) {
+  static async generateDailyBrief({ profile = {}, recentCheckins = [], confidence = {}, deltas = {}, connections = [], focus = 'sleep', lifeMode = 'normal', languageCode = 'en' }) {
     const fallback = this.generateHeuristicBrief({ profile, recentCheckins, confidence, deltas, connections, focus, lifeMode });
 
     if (!env.grokApiKey) {
@@ -44,7 +45,7 @@ CRITICAL RULES:
   "recoveryPoint": "Concise 1-sentence actionable comfort, cooling, or lifestyle suggestion she can act on today.",
   "noticePoint": "Concise 1-sentence gentle signal or body pattern to notice today without anxiety.",
   "promptPills": ["4 personalized, specific questions she might want to ask Docsy today"]
-}`;
+}${jsonLanguageInstruction(languageCode)}`;
 
       const res = await fetch(env.grokApiUrl, {
         method: 'POST',

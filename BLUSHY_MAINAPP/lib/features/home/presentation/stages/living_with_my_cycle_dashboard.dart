@@ -17,6 +17,8 @@ import '../../widgets/real_insights_list.dart';
 import '../../../../shared/docsy_avatar.dart';
 import 'stage_shared_components.dart';
 import '../../../../shared/user_display_name.dart';
+import '../../widgets/log_symptoms_section.dart';
+import '../../../../l10n/app_localizations.dart';
 
 /// ════════════════════════════════════════════════════════════════════════════
 /// STAGE 3: LIVING WITH MY CYCLE — THE HUMAN-FIRST AI INTELLIGENCE LAYER
@@ -449,8 +451,7 @@ class _LivingWithMyCycleDashboardState extends State<LivingWithMyCycleDashboard>
                     hasBackground: true,
                   ),
                   const SizedBox(width: 8),
-                  Text(
-                    'TODAY WITH DOCSY',
+                  Text(AppLocalizations.of(context).lwmcTodayWithDocsy,
                     style: GoogleFonts.manrope(
                       fontSize: 10.5,
                       fontWeight: FontWeight.w800,
@@ -580,8 +581,7 @@ class _LivingWithMyCycleDashboardState extends State<LivingWithMyCycleDashboard>
                 children: [
                   const Icon(Icons.chat_bubble_outline_rounded, size: 14, color: Colors.white),
                   const SizedBox(width: 8),
-                  Text(
-                    'Ask Docsy',
+                  Text(AppLocalizations.of(context).lwmcAskDocsy,
                     style: GoogleFonts.manrope(
                       fontSize: 12.5,
                       fontWeight: FontWeight.w700,
@@ -819,8 +819,7 @@ class _LivingWithMyCycleDashboardState extends State<LivingWithMyCycleDashboard>
               ),
             ),
             const SizedBox(height: 2),
-            Text(
-              'No period logged yet',
+            Text(AppLocalizations.of(context).lwmcNoPeriodLoggedYet,
               style: GoogleFonts.cormorantGaramond(
                 fontSize: 22,
                 fontWeight: FontWeight.w600,
@@ -1185,8 +1184,7 @@ class _LivingWithMyCycleDashboardState extends State<LivingWithMyCycleDashboard>
                                   children: [
                                     Icon(Icons.auto_awesome, size: 12, color: color),
                                     const SizedBox(width: 5),
-                                    Text(
-                                      'DOCSY’S SUGGESTION',
+                                    Text(AppLocalizations.of(context).lwmcDocsySSuggestion,
                                       style: GoogleFonts.manrope(
                                         fontSize: 10,
                                         fontWeight: FontWeight.w800,
@@ -1384,8 +1382,7 @@ class _LivingWithMyCycleDashboardState extends State<LivingWithMyCycleDashboard>
                         },
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                          child: Text(
-                            'Ask Docsy →',
+                          child: Text(AppLocalizations.of(context).lwmcAskDocsy2,
                             style: GoogleFonts.manrope(
                               fontSize: 11.5,
                               fontWeight: FontWeight.w800,
@@ -1505,8 +1502,7 @@ class _LivingWithMyCycleDashboardState extends State<LivingWithMyCycleDashboard>
             ),
             Row(
               children: [
-                Text(
-                  'Try →',
+                Text(AppLocalizations.of(context).lwmcTry,
                   style: GoogleFonts.manrope(
                     fontSize: 10,
                     fontWeight: FontWeight.w700,
@@ -1612,8 +1608,7 @@ class _LivingWithMyCycleDashboardState extends State<LivingWithMyCycleDashboard>
                       'I am currently in ${_activeLifeMode!} mode and on Day $_currentCycleDay of my cycle. What should I prioritize right now?',
                     );
                   },
-                  child: Text(
-                    'View Plan →',
+                  child: Text(AppLocalizations.of(context).lwmcViewPlan,
                     style: GoogleFonts.manrope(
                       fontSize: 11.5,
                       fontWeight: FontWeight.w800,
@@ -1752,8 +1747,7 @@ class _LivingWithMyCycleDashboardState extends State<LivingWithMyCycleDashboard>
                     children: [
                       InkWell(
                         onTap: () => showArticleDetailDialog(context, title, summary),
-                        child: Text(
-                          'Read →',
+                        child: Text(AppLocalizations.of(context).lwmcRead,
                           style: GoogleFonts.manrope(
                             fontSize: 11.5,
                             fontWeight: FontWeight.w700,
@@ -1764,8 +1758,7 @@ class _LivingWithMyCycleDashboardState extends State<LivingWithMyCycleDashboard>
                       const SizedBox(width: 16),
                       InkWell(
                         onTap: () => _openDocsyWithPrompt(context, prompt),
-                        child: Text(
-                          'Ask Docsy →',
+                        child: Text(AppLocalizations.of(context).lwmcAskDocsy2,
                           style: GoogleFonts.manrope(
                             fontSize: 11.5,
                             fontWeight: FontWeight.w700,
@@ -1855,8 +1848,7 @@ class _LivingWithMyCycleDashboardState extends State<LivingWithMyCycleDashboard>
                     children: [
                       const Icon(Icons.description_outlined, size: 14, color: Color(0xFF2563EB)),
                       const SizedBox(width: 6),
-                      Text(
-                        'Prepare my visit summary',
+                      Text(AppLocalizations.of(context).lwmcPrepareMyVisitSummary,
                         style: GoogleFonts.manrope(
                           fontSize: 11.5,
                           fontWeight: FontWeight.w700,
@@ -1902,8 +1894,7 @@ class _LivingWithMyCycleDashboardState extends State<LivingWithMyCycleDashboard>
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    'Something Feels Different',
+                  Text(AppLocalizations.of(context).lwmcSomethingFeelsDifferent,
                     style: GoogleFonts.cormorantGaramond(
                       fontSize: 22,
                       fontWeight: FontWeight.w700,
@@ -1957,8 +1948,7 @@ class _LivingWithMyCycleDashboardState extends State<LivingWithMyCycleDashboard>
                       );
                     }
                   },
-                  child: Text(
-                    'Ask Docsy',
+                  child: Text(AppLocalizations.of(context).lwmcAskDocsy,
                     style: GoogleFonts.manrope(fontSize: 13, fontWeight: FontWeight.w700, color: Colors.white),
                   ),
                 ),
@@ -1992,8 +1982,7 @@ class _LivingWithMyCycleDashboardState extends State<LivingWithMyCycleDashboard>
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    'Tell Docsy What Happened',
+                  Text(AppLocalizations.of(context).lwmcTellDocsyWhatHappened,
                     style: GoogleFonts.cormorantGaramond(
                       fontSize: 22,
                       fontWeight: FontWeight.w700,
@@ -2047,8 +2036,7 @@ class _LivingWithMyCycleDashboardState extends State<LivingWithMyCycleDashboard>
                       );
                     }
                   },
-                  child: Text(
-                    'Submit to Docsy',
+                  child: Text(AppLocalizations.of(context).lwmcSubmitToDocsy,
                     style: GoogleFonts.manrope(fontSize: 13, fontWeight: FontWeight.w700, color: Colors.white),
                   ),
                 ),
@@ -2067,8 +2055,7 @@ class _LivingWithMyCycleDashboardState extends State<LivingWithMyCycleDashboard>
       builder: (ctx) => AlertDialog(
         backgroundColor: Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text(
-          'Clinical Visit Summary',
+        title: Text(AppLocalizations.of(context).lwmcClinicalVisitSummary,
           style: GoogleFonts.cormorantGaramond(
             fontSize: 22,
             fontWeight: FontWeight.w700,
@@ -2126,7 +2113,7 @@ class _LivingWithMyCycleDashboardState extends State<LivingWithMyCycleDashboard>
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text('Close', style: GoogleFonts.manrope(color: const Color(0xFF7A6B72), fontWeight: FontWeight.w600)),
+            child: Text(AppLocalizations.of(context).lwmcClose, style: GoogleFonts.manrope(color: const Color(0xFF7A6B72), fontWeight: FontWeight.w600)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -2140,7 +2127,7 @@ class _LivingWithMyCycleDashboardState extends State<LivingWithMyCycleDashboard>
                 'Docsy, generate a complete doctor visit cheat-sheet based on my recent cycle history and logged symptoms.',
               );
             },
-            child: Text('Expand with Docsy', style: GoogleFonts.manrope(color: Colors.white, fontWeight: FontWeight.w700)),
+            child: Text(AppLocalizations.of(context).lwmcExpandWithDocsy, style: GoogleFonts.manrope(color: Colors.white, fontWeight: FontWeight.w700)),
           ),
         ],
       ),
@@ -2170,6 +2157,8 @@ class _LivingWithMyCycleDashboardState extends State<LivingWithMyCycleDashboard>
                 _buildTodayWithDocsyHero(context),
                 const SizedBox(height: 22),
                 _buildCycleTrackerCard(context),
+                const SizedBox(height: 22),
+                const LogSymptomsSection(stageKey: 'livingwithmycycle'),
                 const SizedBox(height: 22),
                 _buildDocsyNoteSection(context),
                 const SizedBox(height: 22),
@@ -2202,6 +2191,8 @@ class _LivingWithMyCycleDashboardState extends State<LivingWithMyCycleDashboard>
                     _buildTodayWithDocsyHero(context),
                     const SizedBox(height: 24),
                     _buildCycleTrackerCard(context),
+                    const SizedBox(height: 22),
+                    const LogSymptomsSection(stageKey: 'livingwithmycycle'),
                     const SizedBox(height: 24),
                     _buildDocsyNoteSection(context),
                     const SizedBox(height: 24),

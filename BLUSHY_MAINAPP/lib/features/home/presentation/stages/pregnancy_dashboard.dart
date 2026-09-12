@@ -11,6 +11,8 @@ import '../doctor_summary_screen.dart';
 import 'stage_shared_components.dart';
 import '../../../../shared/stage_empty_notice.dart';
 import '../../../../shared/user_display_name.dart';
+import '../../widgets/log_symptoms_section.dart';
+import '../../../../l10n/app_localizations.dart';
 
 class PregnancyDashboard extends StatefulWidget {
   final bool isNested;
@@ -275,8 +277,7 @@ class _PregnancyDashboardState extends State<PregnancyDashboard> {
       builder: (ctx) => AlertDialog(
         backgroundColor: cardBg,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text(
-          'Add to Pregnancy Story',
+        title: Text(AppLocalizations.of(context).pregAddToPregnancyStory,
           style: GoogleFonts.cormorantGaramond(fontSize: 22, fontWeight: FontWeight.bold, color: textMain),
         ),
         content: Column(
@@ -296,7 +297,7 @@ class _PregnancyDashboardState extends State<PregnancyDashboard> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text('Cancel', style: GoogleFonts.manrope(color: textMuted)),
+            child: Text(AppLocalizations.of(context).pregCancel, style: GoogleFonts.manrope(color: textMuted)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -318,7 +319,7 @@ class _PregnancyDashboardState extends State<PregnancyDashboard> {
                 await ApiPregnancyService.saveMemory(mem);
               }
             },
-            child: Text('Save Memory', style: GoogleFonts.manrope(fontWeight: FontWeight.w700)),
+            child: Text(AppLocalizations.of(context).pregSaveMemory, style: GoogleFonts.manrope(fontWeight: FontWeight.w700)),
           ),
         ],
       ),
@@ -455,8 +456,7 @@ class _PregnancyDashboardState extends State<PregnancyDashboard> {
               ),
               const SizedBox(width: 10),
               Expanded(
-                child: Text(
-                  "TODAY WITH DOCSY",
+                child: Text(AppLocalizations.of(context).pregTodayWithDocsy,
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.manrope(
                     fontSize: 11,
@@ -503,8 +503,7 @@ class _PregnancyDashboardState extends State<PregnancyDashboard> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'Your Body Today',
+                      Text(AppLocalizations.of(context).pregYourBodyToday,
                         style: GoogleFonts.manrope(fontSize: 12, fontWeight: FontWeight.w800, color: textMain),
                       ),
                       const SizedBox(height: 2),
@@ -537,8 +536,7 @@ class _PregnancyDashboardState extends State<PregnancyDashboard> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'Baby This Week',
+                      Text(AppLocalizations.of(context).pregBabyThisWeek,
                         style: GoogleFonts.manrope(fontSize: 12, fontWeight: FontWeight.w800, color: textMain),
                       ),
                       const SizedBox(height: 2),
@@ -561,8 +559,7 @@ class _PregnancyDashboardState extends State<PregnancyDashboard> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'ONE THING TO KNOW',
+                    Text(AppLocalizations.of(context).pregOneThingToKnow,
                       style: GoogleFonts.manrope(fontSize: 9.5, fontWeight: FontWeight.w800, color: textMuted, letterSpacing: 0.8),
                     ),
                     const SizedBox(height: 2),
@@ -575,8 +572,7 @@ class _PregnancyDashboardState extends State<PregnancyDashboard> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'ONE THING TO DO',
+                    Text(AppLocalizations.of(context).pregOneThingToDo,
                       style: GoogleFonts.manrope(fontSize: 9.5, fontWeight: FontWeight.w800, color: crimsonPrimary, letterSpacing: 0.8),
                     ),
                     const SizedBox(height: 2),
@@ -687,8 +683,7 @@ class _PregnancyDashboardState extends State<PregnancyDashboard> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Expanded(
-                  child: Text(
-                    'YOUR GESTATIONAL TIMELINE',
+                  child: Text(AppLocalizations.of(context).pregYourGestationalTimeline,
                     overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.manrope(
                       fontSize: 10.5,
@@ -704,8 +699,7 @@ class _PregnancyDashboardState extends State<PregnancyDashboard> {
                     color: const Color(0xFFF3EEE9),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: Text(
-                    'Setup Required',
+                  child: Text(AppLocalizations.of(context).pregSetupRequired,
                     style: GoogleFonts.manrope(fontSize: 10, fontWeight: FontWeight.w700, color: textMuted),
                   ),
                 ),
@@ -732,7 +726,7 @@ class _PregnancyDashboardState extends State<PregnancyDashboard> {
               ),
               onPressed: _promptSetDueDate,
               icon: const Icon(Icons.calendar_month, size: 16),
-              label: Text('Set Estimated Due Date', style: GoogleFonts.manrope(fontSize: 12, fontWeight: FontWeight.w700)),
+              label: Text(AppLocalizations.of(context).pregSetEstimatedDueDate, style: GoogleFonts.manrope(fontSize: 12, fontWeight: FontWeight.w700)),
             ),
           ],
         ),
@@ -764,8 +758,7 @@ class _PregnancyDashboardState extends State<PregnancyDashboard> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Expanded(
-                child: Text(
-                  'YOUR GESTATIONAL TIMELINE',
+                child: Text(AppLocalizations.of(context).pregYourGestationalTimeline,
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.manrope(
                     fontSize: 10.5,
@@ -931,8 +924,7 @@ class _PregnancyDashboardState extends State<PregnancyDashboard> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'DAILY MATERNAL CHECK-IN',
+              Text(AppLocalizations.of(context).pregDailyMaternalCheckIn,
                 style: GoogleFonts.manrope(
                   fontSize: 10.5,
                   fontWeight: FontWeight.w800,
@@ -1223,8 +1215,7 @@ class _PregnancyDashboardState extends State<PregnancyDashboard> {
             child: TextButton.icon(
               onPressed: () => openAskSiaChat(context, "Explain my recent pregnancy symptom baseline and shifts."),
               icon: const Icon(Icons.arrow_forward, size: 14, color: crimsonPrimary),
-              label: Text(
-                'Explore with Docsy',
+              label: Text(AppLocalizations.of(context).pregExploreWithDocsy,
                 style: GoogleFonts.manrope(fontSize: 11.5, fontWeight: FontWeight.w800, color: crimsonPrimary),
               ),
             ),
@@ -1248,8 +1239,7 @@ class _PregnancyDashboardState extends State<PregnancyDashboard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              "WHAT'S HAPPENING THIS WEEK",
+            Text(AppLocalizations.of(context).pregWhatSHappeningThisWeek,
               style: GoogleFonts.manrope(
                 fontSize: 10.5,
                 fontWeight: FontWeight.w800,
@@ -1277,7 +1267,7 @@ class _PregnancyDashboardState extends State<PregnancyDashboard> {
               ),
               onPressed: _promptSetDueDate,
               icon: const Icon(Icons.calendar_today_outlined, size: 15),
-              label: Text('Set Due Date', style: GoogleFonts.manrope(fontSize: 11.5, fontWeight: FontWeight.w700)),
+              label: Text(AppLocalizations.of(context).pregSetDueDate, style: GoogleFonts.manrope(fontSize: 11.5, fontWeight: FontWeight.w700)),
             ),
           ],
         ),
@@ -1303,8 +1293,7 @@ class _PregnancyDashboardState extends State<PregnancyDashboard> {
             spacing: 8,
             runSpacing: 8,
             children: [
-              Text(
-                "WHAT'S HAPPENING THIS WEEK",
+              Text(AppLocalizations.of(context).pregWhatSHappeningThisWeek,
                 style: GoogleFonts.manrope(
                   fontSize: 10.5,
                   fontWeight: FontWeight.w800,
@@ -1544,8 +1533,7 @@ class _PregnancyDashboardState extends State<PregnancyDashboard> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Expanded(
-                child: Text(
-                  'YOUR NEXT APPOINTMENT',
+                child: Text(AppLocalizations.of(context).pregYourNextAppointment,
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.manrope(
                     fontSize: 10.5,
@@ -1618,8 +1606,7 @@ class _PregnancyDashboardState extends State<PregnancyDashboard> {
                     MaterialPageRoute(builder: (_) => const DoctorSummaryScreen()),
                   ),
                   icon: const Icon(Icons.description_outlined, size: 16),
-                  label: Text(
-                    'Build Doctor Summary',
+                  label: Text(AppLocalizations.of(context).pregBuildDoctorSummary,
                     style: GoogleFonts.manrope(fontSize: 12, fontWeight: FontWeight.w700),
                   ),
                 ),
@@ -1639,8 +1626,7 @@ class _PregnancyDashboardState extends State<PregnancyDashboard> {
                     builder: (ctx) => AlertDialog(
                       backgroundColor: cardBg,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                      title: Text(
-                        'Add Doctor Question',
+                      title: Text(AppLocalizations.of(context).pregAddDoctorQuestion,
                         style: GoogleFonts.cormorantGaramond(fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                       content: TextField(
@@ -1654,7 +1640,7 @@ class _PregnancyDashboardState extends State<PregnancyDashboard> {
                       actions: [
                         TextButton(
                           onPressed: () => Navigator.pop(ctx),
-                          child: Text('Cancel', style: GoogleFonts.manrope(color: textMuted)),
+                          child: Text(AppLocalizations.of(context).pregCancel, style: GoogleFonts.manrope(color: textMuted)),
                         ),
                         ElevatedButton(
                           style: ElevatedButton.styleFrom(backgroundColor: crimsonPrimary),
@@ -1664,7 +1650,7 @@ class _PregnancyDashboardState extends State<PregnancyDashboard> {
                               Navigator.pop(ctx);
                             }
                           },
-                          child: const Text('Add'),
+                          child: Text(AppLocalizations.of(context).pregAdd),
                         ),
                       ],
                     ),
@@ -1747,8 +1733,7 @@ class _PregnancyDashboardState extends State<PregnancyDashboard> {
                 Share.share(shareText);
               },
               icon: const Icon(Icons.share, size: 14),
-              label: Text(
-                'Share with Partner',
+              label: Text(AppLocalizations.of(context).pregShareWithPartner,
                 style: GoogleFonts.manrope(fontSize: 11, fontWeight: FontWeight.w800),
               ),
             ),
@@ -1808,8 +1793,7 @@ class _PregnancyDashboardState extends State<PregnancyDashboard> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Expanded(
-                child: Text(
-                  'MY PREGNANCY STORY',
+                child: Text(AppLocalizations.of(context).pregMyPregnancyStory,
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.manrope(
                     fontSize: 10.5,
@@ -1825,8 +1809,7 @@ class _PregnancyDashboardState extends State<PregnancyDashboard> {
                 borderRadius: BorderRadius.circular(10),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                  child: Text(
-                    '+ Add Moment',
+                  child: Text(AppLocalizations.of(context).pregAddMoment,
                     style: GoogleFonts.manrope(fontSize: 11.5, fontWeight: FontWeight.w800, color: crimsonPrimary),
                   ),
                 ),
@@ -1853,8 +1836,7 @@ class _PregnancyDashboardState extends State<PregnancyDashboard> {
                 children: [
                   const Icon(Icons.bookmark_border_rounded, color: crimsonPrimary, size: 28),
                   const SizedBox(height: 8),
-                  Text(
-                    'No Moments Recorded Yet',
+                  Text(AppLocalizations.of(context).pregNoMomentsRecordedYet,
                     style: GoogleFonts.manrope(fontSize: 13, fontWeight: FontWeight.w700, color: textMain),
                   ),
                   const SizedBox(height: 4),
@@ -1873,7 +1855,7 @@ class _PregnancyDashboardState extends State<PregnancyDashboard> {
                     ),
                     onPressed: _openAddMemoryDialog,
                     icon: const Icon(Icons.add, size: 16),
-                    label: Text('Add First Moment', style: GoogleFonts.manrope(fontSize: 11.5, fontWeight: FontWeight.w700)),
+                    label: Text(AppLocalizations.of(context).pregAddFirstMoment, style: GoogleFonts.manrope(fontSize: 11.5, fontWeight: FontWeight.w700)),
                   ),
                 ],
               ),
@@ -2080,6 +2062,8 @@ class _PregnancyDashboardState extends State<PregnancyDashboard> {
 
               // 04: How Are You Feeling? (Maternal Emotional & Physical Check-In)
               _buildMaternalEmotionalCheckIn(),
+              const SizedBox(height: 22),
+              const LogSymptomsSection(stageKey: 'pregnancy'),
               const SizedBox(height: 24),
 
               // 05: What Changed? & "My Normal" Baseline
@@ -2161,8 +2145,7 @@ class _TeachMeIn30SecondsSheet extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-            Text(
-              '30-SECOND EXPLAINER',
+            Text(AppLocalizations.of(context).preg30SecondExplainer,
               style: GoogleFonts.manrope(
                 fontSize: 10.5,
                 fontWeight: FontWeight.w800,
@@ -2209,8 +2192,7 @@ class _TeachMeIn30SecondsSheet extends StatelessWidget {
                       onAddToDoctorQuestions(q);
                       Navigator.pop(ctx);
                     },
-                    child: Text(
-                      '+ Add',
+                    child: Text(AppLocalizations.of(context).pregAdd2,
                       style: GoogleFonts.manrope(fontSize: 11, fontWeight: FontWeight.w800, color: const Color(0xFFDD0D22)),
                     ),
                   ),

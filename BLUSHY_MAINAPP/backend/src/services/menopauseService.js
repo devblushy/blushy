@@ -6,6 +6,7 @@
 
 import { MenopauseStateService } from './menopauseStateService.js';
 import { DocsyMenopauseService } from './docsyMenopauseService.js';
+import { resolveUserLanguage } from '../utils/language.js';
 import {
   MENOPAUSE_DOMAINS,
   TEACH_ME_IN_30_SECONDS,
@@ -32,6 +33,7 @@ export class MenopauseService {
     const sectionOrder = MenopauseStateService.determineSectionOrder();
 
     const todayBrief = await DocsyMenopauseService.generateDailyBrief({
+      languageCode: await resolveUserLanguage(userId),
       profile,
       checkins,
       myNormal,
@@ -106,6 +108,7 @@ export class MenopauseService {
     const treatments = MenopauseStateService.getTreatments();
 
     const brief = await DocsyMenopauseService.generateDailyBrief({
+      languageCode: await resolveUserLanguage(userId),
       profile,
       checkins,
       myNormal,
@@ -141,6 +144,7 @@ export class MenopauseService {
     const lifeMode = MenopauseStateService.getLifeMode();
 
     return DocsyMenopauseService.resolveIsThisNormal({
+      languageCode: await resolveUserLanguage(userId),
       userQuery: query,
       checkins,
       myNormal,

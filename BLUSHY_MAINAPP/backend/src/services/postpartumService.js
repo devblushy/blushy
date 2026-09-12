@@ -6,6 +6,7 @@
 import { PostpartumStateService } from './postpartumStateService.js';
 import { PostpartumSafetyService } from './postpartumSafetyService.js';
 import { DocsyPostpartumService } from './docsyPostpartumService.js';
+import { resolveUserLanguage } from '../utils/language.js';
 import {
   POSTPARTUM_PHASES,
   LOCHIA_STAGES,
@@ -13,6 +14,7 @@ import {
   CONTEXTUAL_READS,
   RECOVERY_MILESTONES,
 } from './postpartumData.js';
+import { todayIso } from '../utils/appCalendar.js';
 
 // In-memory data store with disk persistence support
 const store = {
@@ -22,15 +24,6 @@ const store = {
   supportCircle: new Map(), // userId -> [contacts...]
   appointmentNotes: new Map(), // userId -> { before: [], after: [] }
 };
-
-function todayIso() {
-  return new Intl.DateTimeFormat('en-CA', {
-    timeZone: 'Asia/Kolkata',
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  }).format(new Date());
-}
 
 export class PostpartumService {
   /**
@@ -203,6 +196,7 @@ export class PostpartumService {
     const safetyStatus = todayCheckin?.safetyStatus || { severity: 'low', shouldInterrupt: false, flags: [] };
 
     return await DocsyPostpartumService.generateDailyBrief({
+      languageCode: await resolveUserLanguage(userId),
       timing,
       todayCheckin,
       yesterdayCheckin,

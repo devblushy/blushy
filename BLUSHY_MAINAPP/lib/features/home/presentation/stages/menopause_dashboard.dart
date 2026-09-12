@@ -9,6 +9,8 @@ import '../../../../services/api_menopause_service.dart';
 import 'stage_shared_components.dart';
 import '../../../../shared/stage_empty_notice.dart';
 import '../../../../shared/user_display_name.dart';
+import '../../widgets/log_symptoms_section.dart';
+import '../../../../l10n/app_localizations.dart';
 
 /// 🌸 THE MENOPAUSE OPERATING SYSTEM: UNDERSTANDING YOUR NEW CHAPTER
 /// Built strictly in adherence to STAGE1_DESIGN_RULES.md:
@@ -249,8 +251,7 @@ class _MenopauseDashboardState extends State<MenopauseDashboard> {
                     child: const Icon(Icons.auto_awesome, size: 18, color: crimsonPrimary),
                   ),
                   const SizedBox(width: 10),
-                  Text(
-                    'TODAY WITH DOCSY',
+                  Text(AppLocalizations.of(context).menoTodayWithDocsy,
                     style: GoogleFonts.manrope(
                       fontSize: 11,
                       fontWeight: FontWeight.w800,
@@ -389,8 +390,7 @@ class _MenopauseDashboardState extends State<MenopauseDashboard> {
           const Divider(color: dividerColor, height: 1),
           const SizedBox(height: 14),
           // Prompt Pills
-          Text(
-            'ASK DOCSY TODAY',
+          Text(AppLocalizations.of(context).menoAskDocsyToday,
             style: GoogleFonts.manrope(
               fontSize: 10,
               fontWeight: FontWeight.w800,
@@ -488,8 +488,7 @@ class _MenopauseDashboardState extends State<MenopauseDashboard> {
               child: ElevatedButton.icon(
                 onPressed: () => _submitCheckin(isNothingMuch: false),
                 icon: const Icon(Icons.check_rounded, size: 16),
-                label: Text(
-                  'Save Today\'s Log',
+                label: Text(AppLocalizations.of(context).menoSaveTodaySLog,
                   style: GoogleFonts.manrope(fontSize: 12.5, fontWeight: FontWeight.w700),
                 ),
                 style: ElevatedButton.styleFrom(
@@ -512,8 +511,7 @@ class _MenopauseDashboardState extends State<MenopauseDashboard> {
                   padding: const EdgeInsets.symmetric(vertical: 13),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                 ),
-                child: Text(
-                  'Nothing much today',
+                child: Text(AppLocalizations.of(context).menoNothingMuchToday,
                   style: GoogleFonts.manrope(fontSize: 12, fontWeight: FontWeight.w700),
                 ),
               ),
@@ -654,8 +652,7 @@ class _MenopauseDashboardState extends State<MenopauseDashboard> {
                       children: [
                         const Icon(Icons.check_circle_outline_rounded, size: 16, color: emeraldTeal),
                         const SizedBox(width: 6),
-                        Text(
-                          'WHAT\'S STEADY',
+                        Text(AppLocalizations.of(context).menoWhatSSteady,
                           style: GoogleFonts.manrope(
                             fontSize: 10.5,
                             fontWeight: FontWeight.w800,
@@ -839,8 +836,7 @@ class _MenopauseDashboardState extends State<MenopauseDashboard> {
                         children: [
                           GestureDetector(
                             onTap: () => _showDomainDetailSheet(dom),
-                            child: Text(
-                              'Learn guidance →',
+                            child: Text(AppLocalizations.of(context).menoLearnGuidance,
                               style: GoogleFonts.manrope(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w700,
@@ -889,8 +885,7 @@ class _MenopauseDashboardState extends State<MenopauseDashboard> {
                 children: [
                   const Icon(Icons.tune_rounded, size: 18, color: royalPurple),
                   const SizedBox(width: 8),
-                  Text(
-                    'MY NORMAL',
+                  Text(AppLocalizations.of(context).menoMyNormal,
                     style: GoogleFonts.manrope(
                       fontSize: 11,
                       fontWeight: FontWeight.w800,
@@ -982,8 +977,7 @@ class _MenopauseDashboardState extends State<MenopauseDashboard> {
                 children: [
                   const Icon(Icons.medication_rounded, size: 18, color: crimsonPrimary),
                   const SizedBox(width: 8),
-                  Text(
-                    'MY TREATMENT JOURNEY',
+                  Text(AppLocalizations.of(context).menoMyTreatmentJourney,
                     style: GoogleFonts.manrope(
                       fontSize: 11,
                       fontWeight: FontWeight.w800,
@@ -999,8 +993,7 @@ class _MenopauseDashboardState extends State<MenopauseDashboard> {
                   children: [
                     const Icon(Icons.add_circle_outline_rounded, size: 14, color: crimsonPrimary),
                     const SizedBox(width: 4),
-                    Text(
-                      'Add',
+                    Text(AppLocalizations.of(context).menoAdd,
                       style: GoogleFonts.manrope(fontSize: 11.5, fontWeight: FontWeight.w700, color: crimsonPrimary),
                     ),
                   ],
@@ -1051,8 +1044,7 @@ class _MenopauseDashboardState extends State<MenopauseDashboard> {
                       ],
                     ),
                   ),
-                  Text(
-                    'Active',
+                  Text(AppLocalizations.of(context).menoActive,
                     style: GoogleFonts.manrope(fontSize: 10, fontWeight: FontWeight.w700, color: emeraldTeal),
                   ),
                 ],
@@ -1083,8 +1075,7 @@ class _MenopauseDashboardState extends State<MenopauseDashboard> {
                 children: [
                   const Icon(Icons.help_center_rounded, size: 18, color: cobaltBlue),
                   const SizedBox(width: 8),
-                  Text(
-                    'MY QUESTIONS INBOX',
+                  Text(AppLocalizations.of(context).menoMyQuestionsInbox,
                     style: GoogleFonts.manrope(
                       fontSize: 11,
                       fontWeight: FontWeight.w800,
@@ -1100,8 +1091,7 @@ class _MenopauseDashboardState extends State<MenopauseDashboard> {
                   children: [
                     const Icon(Icons.add_rounded, size: 14, color: cobaltBlue),
                     const SizedBox(width: 4),
-                    Text(
-                      'Save Question',
+                    Text(AppLocalizations.of(context).menoSaveQuestion,
                       style: GoogleFonts.manrope(fontSize: 11.5, fontWeight: FontWeight.w700, color: cobaltBlue),
                     ),
                   ],
@@ -1330,8 +1320,7 @@ class _MenopauseDashboardState extends State<MenopauseDashboard> {
                     const SizedBox(height: 12),
                     GestureDetector(
                       onTap: () => _showTeachMeDetailSheet(item),
-                      child: Text(
-                        'Read 30s summary →',
+                      child: Text(AppLocalizations.of(context).menoRead30sSummary,
                         style: GoogleFonts.manrope(
                           fontSize: 11,
                           fontWeight: FontWeight.w700,
@@ -1358,8 +1347,7 @@ class _MenopauseDashboardState extends State<MenopauseDashboard> {
           child: OutlinedButton.icon(
             onPressed: () => _showIsThisNormalSheet(),
             icon: const Icon(Icons.psychology_alt_rounded, size: 15, color: warmAmber),
-            label: Text(
-              'Something feels different',
+            label: Text(AppLocalizations.of(context).menoSomethingFeelsDifferent,
               style: GoogleFonts.manrope(fontSize: 11, fontWeight: FontWeight.w700, color: warmAmber),
             ),
             style: OutlinedButton.styleFrom(
@@ -1436,7 +1424,7 @@ class _MenopauseDashboardState extends State<MenopauseDashboard> {
           ElevatedButton.icon(
             onPressed: _handleShareClinicianBrief,
             icon: const Icon(Icons.calendar_month_rounded, size: 14),
-            label: Text('Prepare Doctor Consultation', style: GoogleFonts.manrope(fontSize: 11.5, fontWeight: FontWeight.w700)),
+            label: Text(AppLocalizations.of(context).menoPrepareDoctorConsultation, style: GoogleFonts.manrope(fontSize: 11.5, fontWeight: FontWeight.w700)),
             style: ElevatedButton.styleFrom(
               backgroundColor: crimsonPrimary,
               foregroundColor: Colors.white,
@@ -1539,7 +1527,7 @@ class _MenopauseDashboardState extends State<MenopauseDashboard> {
                       ),
                       child: parsing
                           ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                          : Text('Understand Note', style: GoogleFonts.manrope(fontSize: 13, fontWeight: FontWeight.w700)),
+                          : Text(AppLocalizations.of(context).menoUnderstandNote, style: GoogleFonts.manrope(fontSize: 13, fontWeight: FontWeight.w700)),
                     ),
                   ),
                 ],
@@ -1557,8 +1545,7 @@ class _MenopauseDashboardState extends State<MenopauseDashboard> {
       builder: (ctx) {
         return AlertDialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          title: Text(
-            'Confirm What You Logged',
+          title: Text(AppLocalizations.of(context).menoConfirmWhatYouLogged,
             style: GoogleFonts.cormorantGaramond(fontSize: 20, fontWeight: FontWeight.w700),
           ),
           content: Column(
@@ -1584,7 +1571,7 @@ class _MenopauseDashboardState extends State<MenopauseDashboard> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx),
-              child: Text('Cancel', style: GoogleFonts.manrope(color: textMuted)),
+              child: Text(AppLocalizations.of(context).menoCancel, style: GoogleFonts.manrope(color: textMuted)),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -1597,7 +1584,7 @@ class _MenopauseDashboardState extends State<MenopauseDashboard> {
                 _loadOverview();
               },
               style: ElevatedButton.styleFrom(backgroundColor: crimsonPrimary, foregroundColor: Colors.white),
-              child: Text('Confirm & Save', style: GoogleFonts.manrope(fontWeight: FontWeight.w700)),
+              child: Text(AppLocalizations.of(context).menoConfirmSave, style: GoogleFonts.manrope(fontWeight: FontWeight.w700)),
             ),
           ],
         );
@@ -1726,7 +1713,7 @@ class _MenopauseDashboardState extends State<MenopauseDashboard> {
                         style: ElevatedButton.styleFrom(backgroundColor: warmAmber, foregroundColor: Colors.white),
                         child: querying
                             ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                            : const Text('Ask Docsy'),
+                            : Text(AppLocalizations.of(context).menoAskDocsy),
                       ),
                     ),
                     if (res != null) ...[
@@ -1781,7 +1768,7 @@ class _MenopauseDashboardState extends State<MenopauseDashboard> {
                   _handleShareClinicianBrief();
                 },
                 style: ElevatedButton.styleFrom(backgroundColor: crimsonPrimary, foregroundColor: Colors.white),
-                child: const Text('Prepare Doctor Summary'),
+                child: Text(AppLocalizations.of(context).menoPrepareDoctorSummary),
               ),
             ],
           ),
@@ -1869,7 +1856,7 @@ class _MenopauseDashboardState extends State<MenopauseDashboard> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildCategoryEyebrow('QUESTIONS INBOX'),
-              Text('Save question for doctor', style: GoogleFonts.cormorantGaramond(fontSize: 20, fontWeight: FontWeight.w700)),
+              Text(AppLocalizations.of(context).menoSaveQuestionForDoctor, style: GoogleFonts.cormorantGaramond(fontSize: 20, fontWeight: FontWeight.w700)),
               const SizedBox(height: 12),
               TextField(
                 controller: controller,
@@ -1892,7 +1879,7 @@ class _MenopauseDashboardState extends State<MenopauseDashboard> {
                     _loadOverview();
                   },
                   style: ElevatedButton.styleFrom(backgroundColor: cobaltBlue, foregroundColor: Colors.white),
-                  child: const Text('Save to Questions Inbox'),
+                  child: Text(AppLocalizations.of(context).menoSaveToQuestionsInbox),
                 ),
               ),
             ],
@@ -1923,7 +1910,7 @@ class _MenopauseDashboardState extends State<MenopauseDashboard> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildCategoryEyebrow('MY TREATMENT'),
-              Text('Add medication or supplement', style: GoogleFonts.cormorantGaramond(fontSize: 20, fontWeight: FontWeight.w700)),
+              Text(AppLocalizations.of(context).menoAddMedicationOrSupplement, style: GoogleFonts.cormorantGaramond(fontSize: 20, fontWeight: FontWeight.w700)),
               const SizedBox(height: 12),
               TextField(
                 controller: nameCtrl,
@@ -1961,7 +1948,7 @@ class _MenopauseDashboardState extends State<MenopauseDashboard> {
                     _loadOverview();
                   },
                   style: ElevatedButton.styleFrom(backgroundColor: crimsonPrimary, foregroundColor: Colors.white),
-                  child: const Text('Save Treatment'),
+                  child: Text(AppLocalizations.of(context).menoSaveTreatment),
                 ),
               ),
             ],
@@ -2139,6 +2126,11 @@ class _MenopauseDashboardState extends State<MenopauseDashboard> {
         _loadOverview();
       },
     ));
+    // Logging sits outside the server's section order on purpose: the order
+    // comes from the API, and one that simply omits a logging key would
+    // leave this stage with no way into the sheet at all.
+    contentList.add(const LogSymptomsSection(stageKey: 'menopause'));
+    contentList.add(const SizedBox(height: 24));
     for (final secKey in sectionOrder) {
       if (moduleMap.containsKey(secKey)) {
         final w = moduleMap[secKey]!;

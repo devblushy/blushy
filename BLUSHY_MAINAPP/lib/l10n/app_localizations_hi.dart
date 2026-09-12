@@ -197,7 +197,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get siaAsk => 'Docsy से पूछें';
 
   @override
-  String get siaThinking => 'Typing....';
+  String get siaThinking => 'टंकण';
 
   @override
   String get siaVoiceTranscribed =>
@@ -596,7 +596,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get oTermsOfService => 'सेवा की शर्तें';
 
   @override
-  String get oMedicalDisclaimer => 'Medical Disclaimer';
+  String get oMedicalDisclaimer => 'चिकित्सा देखभाल अस्वीकरण';
 
   @override
   String get oWhenIsYourBirthday => 'आपका जन्मदिन कब है?';
@@ -910,16 +910,16 @@ class AppLocalizationsHi extends AppLocalizations {
   String get ldTermsConditions => 'नियम और शर्तें';
 
   @override
-  String get ldMedicalDisclaimer => 'Medical Disclaimer';
+  String get ldMedicalDisclaimer => 'चिकित्सा देखभाल अस्वीकरण';
 
   @override
-  String get ldTabPrivacy => 'Privacy';
+  String get ldTabPrivacy => 'गोपनीयता';
 
   @override
-  String get ldTabTerms => 'Terms';
+  String get ldTabTerms => 'शर्तें';
 
   @override
-  String get ldTabDisclaimer => 'Disclaimer';
+  String get ldTabDisclaimer => 'अस्वीकरण';
 
   @override
   String get ldPrivacyPolicy2 => '📜 गोपनीयता नीति';
@@ -1157,348 +1157,350 @@ class AppLocalizationsHi extends AppLocalizations {
       'यह गुमनाम रूप से पोस्ट किया गया था, इसलिए खोलने के लिए कोई प्रोफ़ाइल नहीं है। लिखने वाले ने नाम न बताने का चुनाव किया, और वह उनका चुनाव है।';
 
   @override
-  String get dashFocusTopic => 'FOCUS TOPIC';
+  String get dashFocusTopic => 'फ़ोकस का विषय';
 
   @override
   String get dashScrollDownContinueLearning =>
-      'Scroll down to Continue Learning section';
+      'नीचे स्क्रोल करके लर्निंग जारी रखें सेक्शन पर जाएँ';
 
   @override
   String get dashSmallLessonsDesignedStage =>
-      'Small lessons designed for your stage.';
+      'आपकी क्षमता के अनुरूप तैयार किए गए छोटे-छोटे पाठ।';
 
   @override
-  String get dashDailyDiscovery => 'DAILY DISCOVERY';
+  String get dashDailyDiscovery => 'दैनिक खोज';
 
   @override
   String get dashSweatGlandsBecomeMore =>
-      'Sweat glands become more active during puberty. Drinking plenty of water and washing daily helps keep you fresh, confident, and clean.';
+      'युवावस्था के दौरान पसीने की ग्रंथियां अधिक सक्रिय हो जाती हैं। रोज़ाना भरपूर पानी पीने और धोने से आपको ताज़ा, आत्मविश्वास और साफ़ - सुथरा रहने में मदद मिलती है।';
 
   @override
-  String get dashRead => 'Read';
+  String get dashRead => 'पढ़ें';
 
   @override
-  String get dashLinkCopiedShareFamily => 'Link copied to share with family!';
+  String get dashLinkCopiedShareFamily =>
+      'परिवार के साथ साझा करने के लिए लिंक कॉपी किया गया!';
 
   @override
-  String get dashQuestionsGirlsOftenAsk => 'Questions Girls Often Ask';
+  String get dashQuestionsGirlsOftenAsk =>
+      'लड़कियां अक्सर पूछे जाने वाले प्रश्न';
 
   @override
-  String get dashGirls => 'Girls';
+  String get dashGirls => 'लड़कियां';
 
   @override
-  String get dashGrowingTogether => 'Growing Together';
+  String get dashGrowingTogether => '-<g id=\"1\">एक साथ बढ़ना</g>-&#10;';
 
   @override
-  String get dashSupportiveCommunityPreview => 'Supportive Community Preview';
+  String get dashSupportiveCommunityPreview => 'सहायक समुदाय की झलक';
 
   @override
   String get dashHowDoITrack =>
-      'How do I track if I haven\'t got my period yet?';
+      'अगर मुझे अभी तक मेरा पीरियड नहीं मिला है, तो मैं कैसे ट्रैक करूँ?';
 
   @override
   String get dashCanFocusLearningDischarge =>
-      'You can focus on learning, discharge changes and kits here! Docsy helps guide you.';
+      'आप यहां सीखने, डिस्चार्ज परिवर्तनों और किट पर ध्यान केंद्रित कर सकते हैं! डॉक्सी आपको मार्गदर्शन करने में मदद करता है।';
 
   @override
-  String get dashReadWhatOthersAre => 'Read what others are sharing';
+  String get dashReadWhatOthersAre => 'पढ़ें कि दूसरे क्या शेयर कर रहे हैं';
 
   @override
   String get dashRealConversationsFromCommunity =>
-      'Real conversations from the community, not examples.';
+      'समुदाय से वास्तविक बातचीत, उदाहरण नहीं।';
 
   @override
   String get dashRedirectingCommunitySpace =>
-      'Redirecting to Community Space...';
+      'समुदाय की जगह पर रीडायरेक्ट किया जा रहा है...';
 
   @override
-  String get dashJoinCommunity => 'Join Community';
+  String get dashJoinCommunity => 'खुले समुदाय में शामिल हों';
 
   @override
-  String get dashSharedReading => 'SHARED READING';
+  String get dashSharedReading => 'साझा रीडिंग';
 
   @override
   String get dashShareArticlesAboutGrowing =>
-      'Share articles about growing up with your parent safely.';
+      'अपने माता - पिता के साथ सुरक्षित रूप से बड़े होने के बारे में लेख साझा करें।';
 
   @override
   String get dashArticleSharedParentAccount =>
-      'Article shared with Parent account!';
+      'माता - पिता के अकाउंट के साथ शेयर किया गया लेख!';
 
   @override
-  String get dashSendParent => 'Send to Parent';
+  String get dashSendParent => 'माता - पिता को भेजें';
 
   @override
-  String get dashOpeningSharedLibrary => 'Opening Shared Library...';
+  String get dashOpeningSharedLibrary => 'शेयर्ड लाइब्रेरी खोली जा रही है...';
 
   @override
-  String get dashSharedLibrary => 'Shared Library';
+  String get dashSharedLibrary => 'साझा लाइब्रेरी';
 
   @override
-  String get dashLetSTalkWeekly => 'LET\'S TALK • WEEKLY PROMPT';
+  String get dashLetSTalkWeekly => 'चलिए बात करते हैं • साप्ताहिक प्रॉम्प्ट';
 
   @override
-  String get dashFirstPeriodKitChecklist => 'FIRST PERIOD KIT CHECKLIST';
+  String get dashFirstPeriodKitChecklist => 'फर्स्ट पीरियड किट चेकलिस्ट';
 
   @override
-  String get dashSharedJourney => 'SHARED JOURNEY';
+  String get dashSharedJourney => 'साझा सफ़र';
 
   @override
   String get dashDisplayLearningProgressCompleted =>
-      'Display learning progress completed together. The child decides what is visible.';
+      'सीखने की प्रगति एक साथ पूरी की गई प्रदर्शित करें। बच्चा तय करता है कि क्या दिखाई दे रहा है।';
 
   @override
-  String get dashLearningCycleCompanion => 'Your learning cycle companion.';
+  String get dashLearningCycleCompanion => 'आपका लर्निंग साइकिल साथी।';
 
   @override
-  String get dashPastDays => 'PAST 30 DAYS';
+  String get dashPastDays => 'पिछले 30 दिन';
 
   @override
   String get dashSCompletelyNormalFirst =>
-      'It\'s completely normal for your first few cycles to be irregular. Your body is gently finding its own natural rhythm.';
+      'शुरुआती कुछ मासिक धर्म चक्रों का अनियमित होना बिल्कुल सामान्य है। आपका शरीर धीरे-धीरे अपनी प्राकृतिक लय प्राप्त कर रहा है।';
 
   @override
-  String get dashVoiceNote => 'Voice Note';
+  String get dashVoiceNote => 'वॉइस नोट';
 
   @override
   String get dashMStudio => 'M Studio';
 
   @override
-  String get dashCommunityDiscussionsStories =>
-      'Community Discussions & Stories';
+  String get dashCommunityDiscussionsStories => 'सामुदायिक चर्चाएँ और कहानियाँ';
 
   @override
-  String get dashQuestionsPeopleAreAsking => 'Questions people are asking';
+  String get dashQuestionsPeopleAreAsking => 'लोग सवाल पूछ रहे हैं';
 
   @override
   String get dashOpenCommunityReadReply =>
-      'Open the community to read and reply.';
+      'पढ़ने और जवाब देने के लिए समुदाय को खोलें।';
 
   @override
-  String get dashTipsPeopleAreSharing => 'Tips people are sharing';
+  String get dashTipsPeopleAreSharing => 'सुझाव जो लोग शेयर कर रहे हैं';
 
   @override
-  String get dashOpenDiscussions => 'Open Discussions';
+  String get dashOpenDiscussions => 'खुली चर्चाएँ';
 
   @override
   String get dashSharedReadingParentResources =>
-      'SHARED READING & PARENT RESOURCES';
+      'साझा रीडिंग और माता - पिता संसाधन';
 
   @override
   String get dashSendCycleArticlesParent =>
-      'Send cycle articles to parent or consult conversation guides.';
+      'माता - पिता को साइकिल लेख भेजें या बातचीत गाइड से परामर्श करें।';
 
   @override
-  String get dashArticleSharedParent => 'Article shared with Parent!';
+  String get dashArticleSharedParent => 'माता - पिता के साथ साझा किया गया लेख!';
 
   @override
-  String get dashShare => 'Share';
+  String get dashShare => 'साझा करें';
 
   @override
   String get dashOpeningParentResourceLibrary =>
-      'Opening Parent Resource library...';
+      'पैरेंट रिसोर्स लाइब्रेरी खोली जा रही है...';
 
   @override
-  String get dashGuides => 'Guides';
+  String get dashGuides => 'मार्गदर्शक';
 
   @override
-  String get dashConversationPrompt => 'CONVERSATION PROMPT';
+  String get dashConversationPrompt => 'बातचीत का प्रॉम्प्ट';
 
   @override
-  String get dashFirstPeriodKitStatus => 'FIRST PERIOD KIT STATUS';
+  String get dashFirstPeriodKitStatus => 'पहली अवधि की किट की स्थिति';
 
   @override
   String get dashDocsySafetyParentNever =>
-      ' Docsy Safety: Your parent never has access to your private chat logs, notes, or moods.';
+      'Docsy सुरक्षा: आपके माता - पिता के पास कभी भी आपके निजी चैट लॉग, नोट या मूड का ऐक्सेस नहीं होता है।';
 
   @override
-  String get dashTodaySLoggedSignals => 'TODAY\'S LOGGED SIGNALS';
+  String get dashTodaySLoggedSignals => 'आजके लॉग किए गए सिग्नल';
 
   @override
-  String get dashLogEditPeriod => 'Log / Edit Period';
+  String get dashLogEditPeriod => 'लॉग / एडिट अवधि';
 
   @override
   String get dashConfirmCorrectPeriodStart =>
-      'Confirm or correct your period start and end dates below.';
+      'नीचे अपने पीरियड के शुरू और खत्म होने की तारीखों को कन्फ़र्म या सही करें।';
 
   @override
-  String get dashPeriodStartDate => 'PERIOD START DATE';
+  String get dashPeriodStartDate => 'अवधि शुरू होने की तारीख';
 
   @override
-  String get dashPeriodEndDateOptional => 'PERIOD END DATE (OPTIONAL)';
+  String get dashPeriodEndDateOptional =>
+      'अवधि खत्म होने की तारीख (ज़रूरी नहीं)';
 
   @override
-  String get dashCancel => 'Cancel';
+  String get dashCancel => 'रद्द करें';
 
   @override
-  String get dashSave => 'Save';
+  String get dashSave => 'सहेजें';
 
   @override
-  String get dashExplainInsight => 'Explain Insight';
+  String get dashExplainInsight => 'इनसाइट के बारे में बताएँ';
 
   @override
-  String get dashDocsySReflection => 'DOCSY\'S REFLECTION';
+  String get dashDocsySReflection => 'डॉक्सीका प्रतिबिंब';
 
   @override
-  String get dashHormonalRhythmTracker => 'Hormonal Rhythm Tracker';
+  String get dashHormonalRhythmTracker => 'हार्मोनल रिदम ट्रैकर';
 
   @override
-  String get dashRecentCycleHistory => 'RECENT CYCLE HISTORY';
+  String get dashRecentCycleHistory => 'हाल के चक्र का इतिहास';
 
   @override
   String get dashNextPeriodMayArrive =>
-      'Your next period may arrive within the next few weeks. Because your cycles vary, this is only an estimate.';
+      'आपकी अगली अवधि अगले कुछ हफ़्तों में आ सकती है। चूँकि आपके चक्र अलग - अलग होते हैं, इसलिए यह केवल एक अनुमान है।';
 
   @override
-  String get dashWeightOptional => 'WEIGHT (OPTIONAL)';
+  String get dashWeightOptional => 'वजन (ज़रूरी नहीं)';
 
   @override
-  String get dashFromLogs => 'FROM YOUR LOGS';
+  String get dashFromLogs => 'आपके लॉग से';
 
   @override
   String get dashBlushyCanPullTogether =>
-      'Blushy can pull together what you have logged over a date range you choose. You decide what stays in before you share it.';
+      'Blushy आपके द्वारा चुनी गई तारीख सीमा पर लॉग इन की गई चीज़ों को एक साथ खींच सकता है। शेयर करने से पहले आप तय करते हैं कि कौन सी जगह में ठहरना है।';
 
   @override
   String get dashRecordWhatReportedWhat =>
-      'A record of what you reported and what the app noticed. Not a diagnosis.';
+      'आपने क्या रिपोर्ट किया और ऐप ने क्या देखा, इसका रिकॉर्ड। निदान नहीं।';
 
   @override
   String get dashAiGeneratedTrendsAcross =>
-      'AI-generated trends across multiple cycle logs';
+      'कई साइकिल लॉग में AI - जनरेट किए गए रुझान';
 
   @override
-  String get dashAskDocsy => 'Ask Docsy';
+  String get dashAskDocsy => 'Docsy से पूछें';
 
   @override
-  String get dashWhyMatters => 'Why This Matters';
+  String get dashWhyMatters => 'यह क्यों महत्वपूर्ण है:';
 
   @override
-  String get dashPriority => 'Priority';
+  String get dashPriority => 'प्राथमिकता';
 
   @override
-  String get dashReviewedGuidance => 'Reviewed guidance';
+  String get dashReviewedGuidance => 'गाइडेंस की समीक्षा की गई';
 
   @override
-  String get dashDerived => 'Derived';
+  String get dashDerived => 'निकाली गई';
 
   @override
-  String get dashFertilityJourney => 'Your Fertility Journey';
+  String get dashFertilityJourney => 'आपकी प्रजनन यात्रा';
 
   @override
   String get dashOvulationLoggedSuccessfully =>
-      'Ovulation logged successfully!';
+      'ओव्यूलेशन सफलतापूर्वक लॉग किया गया!';
 
   @override
-  String get dashLogOvulation => 'Log Ovulation';
+  String get dashLogOvulation => 'लॉग ओव्यूलेशन';
 
   @override
-  String get dashBasalBodyTemperatureBbt => 'BASAL BODY TEMPERATURE (BBT)';
+  String get dashBasalBodyTemperatureBbt => 'शरीर का मूल तापमान (बीबीटी)';
 
   @override
-  String get dashNotesMStudio => 'NOTES & M STUDIO';
+  String get dashNotesMStudio => 'नोट्स एंड एम स्टूडियो';
 
   @override
-  String get dashTtcMStudioEntry => 'TTC M Studio Entry';
+  String get dashTtcMStudioEntry => 'टीटीसी एम स्टूडियो एंट्री';
 
   @override
-  String get dashSharedTimelineReminders => 'Shared Timeline & Reminders';
+  String get dashSharedTimelineReminders => 'शेयर्ड टाइमलाइन और रिमाइंडर';
 
   @override
-  String get dashEncouragingMessage => 'Encouraging Message:';
+  String get dashEncouragingMessage => 'मैसेज को प्रोत्साहित करना:';
 
   @override
   String get dashPartnerTasksConversationStarters =>
-      'PARTNER TASKS & CONVERSATION STARTERS';
+      'पार्टनर टास्क और बातचीत शुरू करने वाले';
 
   @override
-  String get dashLearnMore => 'Learn More';
+  String get dashLearnMore => 'और जानें';
 
   @override
-  String get dashKickCountDaily => 'KICK COUNT (DAILY)';
+  String get dashKickCountDaily => 'किक काउंट (दैनिक)';
 
   @override
-  String get dashOptionalHealthData => 'OPTIONAL HEALTH DATA';
+  String get dashOptionalHealthData => 'वैकल्पिक स्वास्थ्य डेटा';
 
   @override
-  String get dashLogBloodPressure => 'Log Blood Pressure';
+  String get dashLogBloodPressure => 'रक्तचाप';
 
   @override
-  String get dashBloodPressure => 'Blood Pressure';
+  String get dashBloodPressure => 'रक्तचाप';
 
   @override
-  String get dashLogBloodSugar => 'Log Blood Sugar';
+  String get dashLogBloodSugar => 'रक्त ग्लूकोज';
 
   @override
-  String get dashBloodSugar => 'Blood Sugar';
+  String get dashBloodSugar => 'ब्लड शुगर (Blood Sugar)';
 
   @override
-  String get dashPregnancyMStudioEntry => 'Pregnancy M Studio Entry';
+  String get dashPregnancyMStudioEntry => 'गर्भावस्था एम स्टूडियो एंट्री';
 
   @override
-  String get dashPregnancyPrepLists => 'Pregnancy Prep & Lists';
+  String get dashPregnancyPrepLists => 'गर्भावस्था की तैयारी और सूचियाँ';
 
   @override
-  String get dashSharedPregnancyTimeline => 'Shared Pregnancy Timeline';
+  String get dashSharedPregnancyTimeline => 'शेयर्ड प्रेगनेंसी टाइमलाइन';
 
   @override
-  String get dashCoordinatedChecklistsTasks =>
-      'Coordinated Checklists & Tasks:';
+  String get dashCoordinatedChecklistsTasks => 'समन्वित चेकलिस्ट और कार्य:';
 
   @override
-  String get dashPostpartumMStudioEntry => 'Postpartum M Studio Entry';
+  String get dashPostpartumMStudioEntry => 'प्रसवोत्तर एम स्टूडियो एंट्री';
 
   @override
-  String get dashMotherBabyCoordinatedTasks => 'Mother-Baby Coordinated Tasks';
+  String get dashMotherBabyCoordinatedTasks => 'माँ - बच्चे के समन्वित कार्य';
 
   @override
-  String get dashTransitionTrackingHistory => 'Transition Tracking & History';
+  String get dashTransitionTrackingHistory => 'ट्रांज़िशन ट्रैकिंग और इतिहास';
 
   @override
-  String get dashViewFullHistory => 'View Full History';
+  String get dashViewFullHistory => 'पूरा इतिहास देखें';
 
   @override
-  String get dashMStudioReflection => 'M Studio Reflection';
+  String get dashMStudioReflection => 'एम स्टूडियो प्रतिबिंब';
 
   @override
-  String get dashLongTermWellnessOverview => 'Long-Term Wellness Overview';
+  String get dashLongTermWellnessOverview => 'दीर्घकालिक स्वास्थ्य का अवलोकन';
 
   @override
-  String get dashTodaySCheck => 'Today\'s Check-In';
+  String get dashTodaySCheck => 'आज के लक्षणों को लॉग करें';
 
   @override
-  String get dashViewHealthHistory => 'View Health History';
+  String get dashViewHealthHistory => '<g id=\"1\">स्वास्थ्य इतिहास</g>';
 
   @override
-  String get dashBloodPressureOptional => 'BLOOD PRESSURE (OPTIONAL)';
+  String get dashBloodPressureOptional => 'रक्तचाप (वैकल्पिक)';
 
   @override
   String get dashEmpoweredPostMenopauseWellness =>
-      'EMPOWERED POST-MENOPAUSE WELLNESS CARDS';
+      'रजोनिवृत्ति के बाद वेलनेस कार्ड को सशक्त बनाना';
 
   @override
   String get dashWhyMattersEncouragesSustainable =>
-      'Why This Matters: Encourages sustainable heart, joint and bone vitalities.';
+      'यह क्यों मायने रखता है: स्थायी हृदय, जोड़ों और हड्डियों की जीवन शक्ति को प्रोत्साहित करता है।';
 
   @override
-  String get dashDailyLifestyleOverview => 'Daily Lifestyle Overview';
+  String get dashDailyLifestyleOverview => 'दैनिक जीवन शैली की झलक';
 
   @override
-  String get dashCycleOverview => 'CYCLE OVERVIEW';
+  String get dashCycleOverview => 'साइकिल की झलक';
 
   @override
-  String get dashViewWellnessHistory => 'View Wellness History';
+  String get dashViewWellnessHistory => 'वेलनेस हिस्ट्री देखें';
 
   @override
   String get dashRecordCurrentWeightKg =>
-      'Record your current weight in kg to track trends over time.';
+      'समय के साथ रुझानों को ट्रैक करने के लिए अपने वर्तमान वजन को किलोग्राम में रिकॉर्ड करें।';
 
   @override
-  String get dashAiGeneratedHabitInsights => 'AI-Generated Habit Insights';
+  String get dashAiGeneratedHabitInsights =>
+      'एआई - जनरेट की गई आदत से जुड़ी जानकारी';
 
   @override
   String get dashWhyMattersSupportsOverall =>
-      'Why This Matters: Supports overall physical health and emotional vitality.';
+      'यह क्यों मायने रखता है: समग्र शारीरिक स्वास्थ्य और भावनात्मक जीवन शक्ति का समर्थन करता है।';
 
   @override
   String get languageChoiceTitle => 'अपनी भाषा चुनें';
@@ -1512,4 +1514,604 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get dashLogTodayCheckIn => 'आज का चेक-इन दर्ज करें';
+
+  @override
+  String get lwmcTodayWithDocsy => 'आज DOCSY के साथ';
+
+  @override
+  String get lwmcAskDocsy => 'Docsy से पूछें';
+
+  @override
+  String get lwmcNoPeriodLoggedYet => 'अभी तक कोई अवधि लॉग नहीं हुई है';
+
+  @override
+  String get lwmcDocsySSuggestion => 'डॉक्सीका सुझाव';
+
+  @override
+  String get lwmcAskDocsy2 => 'Docsy से पूछें →';
+
+  @override
+  String get lwmcTry => 'कोशिश करें';
+
+  @override
+  String get lwmcViewPlan => 'योजना देखें →';
+
+  @override
+  String get lwmcRead => 'पढ़ें';
+
+  @override
+  String get lwmcPrepareMyVisitSummary => 'मेरी विज़िट का सारांश तैयार करें';
+
+  @override
+  String get lwmcSomethingFeelsDifferent => 'कुछ अलग महसूस होता है';
+
+  @override
+  String get lwmcTellDocsyWhatHappened => 'डॉक्सी को बताएं कि क्या हुआ';
+
+  @override
+  String get lwmcSubmitToDocsy => 'Docsy में सबमिट करें';
+
+  @override
+  String get lwmcClinicalVisitSummary => 'नैदानिक विज़िट सारांश';
+
+  @override
+  String get lwmcClose => 'बंद करें';
+
+  @override
+  String get lwmcExpandWithDocsy => 'Docsy के साथ विस्तार करें';
+
+  @override
+  String get fpnsChange => 'बदलें';
+
+  @override
+  String get fpnsFirstPeriodKit => 'पहला पीरियड';
+
+  @override
+  String get fpnsSaveDone => 'सेव करें और हो गया';
+
+  @override
+  String get fpnsLogAPeriodStart => 'पीरियड शुरू होने पर लॉग इन करें';
+
+  @override
+  String get fpnsYourBodyLately => 'आपका शरीर, हाल ही में';
+
+  @override
+  String get fpnsMilestones => 'उपलब्धियाँ';
+
+  @override
+  String get fpnsFirstPeriodKit2 => 'पहला पीरियड';
+
+  @override
+  String get fpnsIfItHappensToday => 'अगर ऐसा आज होता है';
+
+  @override
+  String get fpnsSeeFull5StepGuide => '5 चरणों वाली पूरी गाइड देखें';
+
+  @override
+  String get fpnsTalk => 'बातचीत';
+
+  @override
+  String get fpnsShareWithMom => 'इनके साथ शेयर करें';
+
+  @override
+  String get fpnsNextQuestion => 'अगला सवाल।';
+
+  @override
+  String get fpnsKeepExploring => 'एक्सप्लोर करना जारी रखें';
+
+  @override
+  String get fpnsUpdatedDaily => 'प्रतिदिन अपडेट किया जाता है';
+
+  @override
+  String get fpnsReadArticle => 'आलेख पढ़ें';
+
+  @override
+  String get fpsNoPeriodLoggedYet => 'अभी तक कोई अवधि लॉग नहीं हुई है';
+
+  @override
+  String get fpsInsightsForYourPhase => 'आपके चरण के लिए जानकारी';
+
+  @override
+  String get fpsQuickGuides => 'झटपट गाइड';
+
+  @override
+  String get fpsCrampRescue => 'ऐंठन से बचाव →';
+
+  @override
+  String get fpsSchoolTips => 'स्कूल के सुझाव';
+
+  @override
+  String get fpsMySchoolBagKit => 'मेरा स्कूल बैग किट';
+
+  @override
+  String get fpsThingsIMNoticingLately =>
+      'हाल ही में मैं जिन चीज़ों पर गौर कर रहा हूँ';
+
+  @override
+  String get fpsUnderstandWithDocsy => 'डॉक्सी के साथ समझें →';
+
+  @override
+  String get fpsCrampRescue2 => 'ऐंठन से बचाव';
+
+  @override
+  String get fpsIFeelBetter => 'मैं बेहतर महसूस कर रहा हूँ';
+
+  @override
+  String get fpsShareWithMom => 'माँ के साथ शेयर करें →';
+
+  @override
+  String get hhLogPeriodDate => 'लॉग अवधि की तारीख';
+
+  @override
+  String get hhFlowIntensity => 'प्रवाह की तीव्रता';
+
+  @override
+  String get hhSavePeriodDate => 'अवधि की तारीख सेव करें';
+
+  @override
+  String get hhTodayWithDocsy => 'आज DOCSY के साथ';
+
+  @override
+  String get hhExploreWithDocsy => 'Docsy के साथ जायज़ा लें';
+
+  @override
+  String get hhYourCycle => 'आपका चक्र';
+
+  @override
+  String get hhNoPeriodLoggedYet => 'अभी तक कोई अवधि लॉग नहीं हुई है';
+
+  @override
+  String get hhFlareComfortModeActive => 'फ़्लेयर कम्फ़र्ट मोड ऐक्टिव है';
+
+  @override
+  String get hhExitFlareMode => 'फ्लेयर मोड से बाहर निकलें';
+
+  @override
+  String get hhDailySignals => 'दैनिक संकेत';
+
+  @override
+  String get hhVoiceNotes => 'वॉयस / नोट्स';
+
+  @override
+  String get hhAnalyzeWithDocsy => 'Docsy के साथ विश्लेषण करें';
+
+  @override
+  String get hhPatternMemoryBuilding => 'पैटर्न मेमोरी बिल्डिंग';
+
+  @override
+  String get hhAskDocsy => 'Docsy से पूछें';
+
+  @override
+  String get hhNoTreatmentsRecordedYet =>
+      'अभी तक कोई उपचार दर्ज नहीं किया गया है';
+
+  @override
+  String get hhAddTreatmentProtocol => 'उपचार / प्रोटोकॉल जोड़ें';
+
+  @override
+  String get hhSaveTreatment => 'इलाज सेव करें';
+
+  @override
+  String get hhAskDocsy2 => 'Docsy से पूछें ›';
+
+  @override
+  String get hhUploadAnotherRecord => 'एक और रिकॉर्ड अपलोड करें';
+
+  @override
+  String get hhSaveRecord => 'रिकॉर्ड सहेजें';
+
+  @override
+  String get hhDoctorVisitBrief => 'डॉक्टर से मुलाक़ात की संक्षिप्त जानकारी';
+
+  @override
+  String get hhCreateDoctorSummary => 'डॉक्टर का सारांश बनाएँ';
+
+  @override
+  String get hhClinicalBrief => 'क्लिनिकल ब्रीफ़';
+
+  @override
+  String get hhClose => 'बंद करें';
+
+  @override
+  String get hhUpdate => 'अपडेट करें';
+
+  @override
+  String get hhAddTrustedContact => 'भरोसेमंद संपर्क जोड़ें';
+
+  @override
+  String get hhAddSupportContact => 'सहायता संपर्क जोड़ें';
+
+  @override
+  String get hhSaveContact => 'संपर्क सेव करें';
+
+  @override
+  String get hhCheckWithDocsy => 'Docsy से जाँचें';
+
+  @override
+  String get menoTodayWithDocsy => 'आज DOCSY के साथ';
+
+  @override
+  String get menoAskDocsyToday => 'आज ही डॉक्सी से पूछें';
+
+  @override
+  String get menoSaveTodaySLog => 'आज का लॉग सेव करें';
+
+  @override
+  String get menoNothingMuchToday => 'आज ज़्यादा कुछ नहीं';
+
+  @override
+  String get menoWhatSSteady => 'क्या स्थिर है';
+
+  @override
+  String get menoLearnGuidance => 'मार्गदर्शन जानें →';
+
+  @override
+  String get menoMyNormal => 'मेरा सामान्य';
+
+  @override
+  String get menoMyTreatmentJourney => 'मेरी उपचार यात्रा';
+
+  @override
+  String get menoAdd => 'जोड़ें';
+
+  @override
+  String get menoActive => 'ऐक्टिव';
+
+  @override
+  String get menoMyQuestionsInbox => 'मेरे प्रश्न इनबॉक्स';
+
+  @override
+  String get menoSaveQuestion => 'सवाल सेव करें';
+
+  @override
+  String get menoRead30sSummary => '30 सेकंड का सारांश पढ़ें →';
+
+  @override
+  String get menoSomethingFeelsDifferent => 'कुछ अलग महसूस होता है';
+
+  @override
+  String get menoPrepareDoctorConsultation => 'डॉक्टर से परामर्श तैयार करें';
+
+  @override
+  String get menoUnderstandNote => 'नोट को समझें';
+
+  @override
+  String get menoConfirmWhatYouLogged =>
+      'आपने जो लॉग इन किया है उसकी पुष्टि करें';
+
+  @override
+  String get menoCancel => 'रद्द करें';
+
+  @override
+  String get menoConfirmSave => 'सहेजने की पुष्टि करें';
+
+  @override
+  String get menoAskDocsy => 'Docsy से पूछें';
+
+  @override
+  String get menoPrepareDoctorSummary => 'डॉक्टर का सारांश तैयार करें';
+
+  @override
+  String get menoSaveQuestionForDoctor => 'डॉक्टर के लिए प्रश्न सेव करें';
+
+  @override
+  String get menoSaveToQuestionsInbox => 'सवालों के इनबॉक्स में सेव करें';
+
+  @override
+  String get menoAddMedicationOrSupplement => 'दवा या पूरक जोड़ें';
+
+  @override
+  String get menoSaveTreatment => 'इलाज सेव करें';
+
+  @override
+  String get periTodayWithDocsy => 'आज DOCSY के साथ';
+
+  @override
+  String get periMidlifeCompanionIntelligence => 'मिडलाइफ कम्पेनियन इंटेलिजेंस';
+
+  @override
+  String get periMyChangingCycle => 'मेरा बदलता चक्र';
+
+  @override
+  String get periNonPredictiveMidlifeRhythm =>
+      'नॉन - प्रिडिक्टिव मिडलाइफ़ रिदम';
+
+  @override
+  String get periLogPeriod => 'लॉग अवधि';
+
+  @override
+  String get periStatus => 'स्थिति';
+
+  @override
+  String get periRecentCycleIntervals => 'हाल के चक्र अंतराल';
+
+  @override
+  String get periWhatYouVeBeenNoticing => 'आप क्या देख रहे हैं';
+
+  @override
+  String get periLogCheckIn => 'चेक-इन';
+
+  @override
+  String get periWhatChangedConnections => 'क्या बदला और कनेक्शन';
+
+  @override
+  String get periWeeklyShift => 'साप्ताहिक शिफ़्ट';
+
+  @override
+  String get periDiscoveredConnections => 'खोजे गए कनेक्शन';
+
+  @override
+  String get periYourCurrentFocus => 'आपका मौजूदा फ़ोकस';
+
+  @override
+  String get periAdd => '+ जोड़ें';
+
+  @override
+  String get periTell => 'Tell';
+
+  @override
+  String get periYour1PageAppointmentBrief =>
+      'आपका 1 - पेज का अपॉइंटमेंट ब्रीफ़';
+
+  @override
+  String get periViewBrief => 'संक्षिप्त जानकारी देखें';
+
+  @override
+  String get periCopyForDoctor => 'डॉक्टर के लिए कॉपी';
+
+  @override
+  String get periIntimateSexualHealth => 'अंतरंग और यौन स्वास्थ्य';
+
+  @override
+  String get periMyStoryTimeline => 'मेरी कहानी · टाइमलाइन';
+
+  @override
+  String get periKeepExploring => 'एक्सप्लोर करना जारी रखें';
+
+  @override
+  String get periLogPeriodStartDate => 'लॉग अवधि शुरू होने की तारीख';
+
+  @override
+  String get periSaveObservation => 'अवलोकन सहेजें';
+
+  @override
+  String get periDailyTransitionCheckIn => 'डेली ट्रांज़िशन चेक - इन';
+
+  @override
+  String get periCompleteCheckIn => 'चेक इन पूरा करें';
+
+  @override
+  String get periAddTreatmentSupport => 'उपचार / सहायता जोड़ें';
+
+  @override
+  String get periCancel => 'रद्द करें';
+
+  @override
+  String get periSave => 'सहेजें';
+
+  @override
+  String get periClinicianBriefPreview => 'चिकित्सक संक्षिप्त पूर्वावलोकन';
+
+  @override
+  String get periClose => 'बंद करें';
+
+  @override
+  String get periCopy => 'नाम पर्ची';
+
+  @override
+  String get ppTodayWithDocsy => 'आज DOCSY के साथ';
+
+  @override
+  String get ppYour4thTrimesterCompanion => 'आपका चौथा तिमाही साथी';
+
+  @override
+  String get ppSavedSynced => 'सेव और सिंक किया गया';
+
+  @override
+  String get ppTalkToDocsy => 'Docsy से बात करें →';
+
+  @override
+  String get ppTodayIDPrioritize => 'आज, मैं प्राथमिकता दूँगा';
+
+  @override
+  String get ppNoticedShifts => 'नोट की गई शिफ़्ट';
+
+  @override
+  String get ppWhatSBeenSteady => 'क्या स्थिर रहा है';
+
+  @override
+  String get ppObservingInitialBaseline => 'प्रारंभिक आधार रेखा का अवलोकन करना';
+
+  @override
+  String get ppIMDoneForToday => 'मैं आज के लिए तैयार हूँ';
+
+  @override
+  String get ppTonightWindDown => 'आज रात पवन - डाउन';
+
+  @override
+  String get ppActiveNursingStopwatch => 'एक्टिव नर्सिंग स्टॉपवॉच';
+
+  @override
+  String get ppLoggedWetDiaper => 'लॉग किए गए गीले डायपर 💧';
+
+  @override
+  String get ppLoggedSoiledDiaper => 'लॉग किए गए गंदे डायपर 💩';
+
+  @override
+  String get ppDailyRecoveryProgression => 'दैनिक रिकवरी प्रगति';
+
+  @override
+  String get ppBuildDoctorSummary => 'डॉक्टर का सारांश बनाएँ →';
+
+  @override
+  String get ppTimelineGuideline => 'टाइमलाइन दिशानिर्देश';
+
+  @override
+  String get ppRecommendation => 'सिफ़ारिश';
+
+  @override
+  String get ppAskDocsyMore => 'डॉक्सी से और पूछें →';
+
+  @override
+  String get ppClose => 'बंद करें';
+
+  @override
+  String get ppTalkToDocsy2 => 'Docsy से बात करें';
+
+  @override
+  String get ppAskForHelp => 'मदद मांगें';
+
+  @override
+  String get ppResumeNormalMode => 'सामान्य मोड फिर से शुरू करें';
+
+  @override
+  String get ppCalibratePostpartumPath => 'प्रसवोत्तर पथ को कैलिब्रेट करें';
+
+  @override
+  String get ppBabySBirthDate => 'बच्चेकी जन्मतिथि';
+
+  @override
+  String get ppDeliveryPath => 'डिलीवरी का रास्ता';
+
+  @override
+  String get ppVaginalBirth => 'योनि में जन्म';
+
+  @override
+  String get ppCSection => 'सी - सेक्शन';
+
+  @override
+  String get ppFeedingMethod => 'दूध पिलाने का तरीका';
+
+  @override
+  String get ppCancel => 'रद्द करें';
+
+  @override
+  String get ppSaveCalibrate => 'सेव करें और कैलिब्रेट करें';
+
+  @override
+  String get ppINeedHelpToday => 'मुझे आज मदद चाहिए';
+
+  @override
+  String get ppGenerateShare => 'जनरेट करें और शेयर करें';
+
+  @override
+  String get ppClinicalSafetyTriage => 'नैदानिक सुरक्षा ट्राइज';
+
+  @override
+  String get ppTalkToDocsyNow => 'Docsy से अभी बात करें';
+
+  @override
+  String get ppWhatHappenedEvent => 'क्या हुआ (इवेंट)';
+
+  @override
+  String get ppWhatChangedObservedShift => 'क्या बदल गया (देखी गई शिफ़्ट)';
+
+  @override
+  String get ppUnderstandWithDocsy => 'डॉक्सी के साथ समझें →';
+
+  @override
+  String get ppClinicalSafetyAlert => 'क्लिनिकल सुरक्षा अलर्ट';
+
+  @override
+  String get pregAddToPregnancyStory => 'गर्भावस्था की कहानी में जोड़ें';
+
+  @override
+  String get pregCancel => 'रद्द करें';
+
+  @override
+  String get pregSaveMemory => 'मेमोरी सेव करें';
+
+  @override
+  String get pregTodayWithDocsy => 'आज DOCSY के साथ';
+
+  @override
+  String get pregYourBodyToday => 'आज आपका शरीर';
+
+  @override
+  String get pregBabyThisWeek => 'बेबी इस हफ़्ते';
+
+  @override
+  String get pregOneThingToKnow => 'एक बात जानना ज़रूरी है';
+
+  @override
+  String get pregOneThingToDo => 'बात करना';
+
+  @override
+  String get pregYourGestationalTimeline => 'आपकी गर्भकालीन समयरेखा';
+
+  @override
+  String get pregSetupRequired => 'सेटअप ज़रूरी है';
+
+  @override
+  String get pregSetEstimatedDueDate => 'अनुमानित देय तिथि सेट करें';
+
+  @override
+  String get pregDailyMaternalCheckIn => 'दैनिक मातृ चेक - इन';
+
+  @override
+  String get pregExploreWithDocsy => 'Docsy के साथ जायज़ा लें';
+
+  @override
+  String get pregWhatSHappeningThisWeek => 'इस हफ़्ते क्या हो रहा है';
+
+  @override
+  String get pregSetDueDate => 'नियत दिनांक सेट';
+
+  @override
+  String get pregYourNextAppointment => 'आपकी अगली अपॉइंटमेंट';
+
+  @override
+  String get pregBuildDoctorSummary => 'डॉक्टर का सारांश बनाएँ';
+
+  @override
+  String get pregAddDoctorQuestion => 'डॉक्टर का सवाल जोड़ें';
+
+  @override
+  String get pregAdd => 'जोड़ें';
+
+  @override
+  String get pregShareWithPartner => 'पार्टनर के साथ शेयर करें';
+
+  @override
+  String get pregMyPregnancyStory => 'मेरी गर्भावस्था की कहानी';
+
+  @override
+  String get pregAddMoment => '+ पल जोड़ें';
+
+  @override
+  String get pregNoMomentsRecordedYet =>
+      'अभी तक कोई क्षण रिकॉर्ड नहीं किया गया है';
+
+  @override
+  String get pregAddFirstMoment => 'पहला पल जोड़ें';
+
+  @override
+  String get preg30SecondExplainer => '30 - सेकंड का एक्सप्लेनर';
+
+  @override
+  String get pregAdd2 => '+ जोड़ें';
+
+  @override
+  String get ttcTodaySBiomarkerLog => 'आजका बायोमार्कर लॉग';
+
+  @override
+  String get ttcNaturalCycleToCycleRhythm => 'प्राकृतिक चक्र - से - चक्र लय';
+
+  @override
+  String get ttcHonestSignalCoverage => 'ईमानदार सिग्नल कवरेज';
+
+  @override
+  String get ttcGenerateClinicalReport => 'क्लीनिकल रिपोर्ट जनरेट करें';
+
+  @override
+  String get ttcLogPeriodDate => 'लॉग अवधि की तारीख';
+
+  @override
+  String get ttcPauseFertilityTracking => 'प्रजनन ट्रैकिंग रोकें';
+
+  @override
+  String get ttcPauseFor1Week => '1 हफ़्ते के लिए रोकें';
+
+  @override
+  String get ttcPauseUntilNextPeriod => 'अगली अवधि तक रोकें';
 }

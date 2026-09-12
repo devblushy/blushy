@@ -2,6 +2,7 @@ import { env } from '../utils/env.js';
 import { aiFetch } from '../utils/aiRequest.js';
 import { createHttpError } from '../utils/httpError.js';
 import { normalizeRole as normalizeRoleValue } from '../utils/role.js';
+import { languageLabelForCode } from '../utils/language.js';
 
 const MAX_MESSAGES = 12;
 
@@ -518,21 +519,6 @@ function buildSystemPrompt({ role, user, languageCode, aiContext }) {
   ];
 
   return prompts.filter(Boolean).join('\n');
-}
-
-function languageLabelForCode(languageCode) {
-  const normalized = typeof languageCode === 'string' ? languageCode.trim().toLowerCase() : 'en';
-  const labels = {
-    en: 'English',
-    hi: 'Hindi',
-    bn: 'Bengali',
-    ta: 'Tamil',
-    te: 'Telugu',
-    mr: 'Marathi',
-    kn: 'Kannada',
-  };
-
-  return labels[normalized] ?? 'English';
 }
 
 function extractReplyText(payload) {

@@ -12,6 +12,8 @@ import '../../widgets/blushy_period_tracker_card.dart';
 import 'stage_shared_components.dart';
 import '../../../../shared/stage_empty_notice.dart';
 import '../../../../shared/user_display_name.dart';
+import '../../widgets/log_symptoms_section.dart';
+import '../../../../l10n/app_localizations.dart';
 
 /// 🌗 THE PERIMENOPAUSE COMMAND CENTER: MY TRANSITION
 /// Built strictly in adherence to STAGE1_DESIGN_RULES.md:
@@ -359,6 +361,11 @@ class _PerimenopauseDashboardState extends State<PerimenopauseDashboard> {
                   'Log a check-in to start building your baseline.',
               onRetry: () => _loadAllData(),
             ),
+            // Outside sectionOrder for the same reason as menopause: the
+            // order is server-supplied and need not mention logging.
+            const SizedBox(height: 20),
+            const LogSymptomsSection(stageKey: 'perimenopause'),
+            const SizedBox(height: 20),
             for (final section in sectionOrder) ...[
               _buildSectionByName(section, userName),
               const SizedBox(height: 20),
@@ -522,8 +529,7 @@ class _PerimenopauseDashboardState extends State<PerimenopauseDashboard> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'TODAY WITH DOCSY',
+                      Text(AppLocalizations.of(context).periTodayWithDocsy,
                         style: GoogleFonts.manrope(
                           fontSize: 10.5,
                           fontWeight: FontWeight.w800,
@@ -531,8 +537,7 @@ class _PerimenopauseDashboardState extends State<PerimenopauseDashboard> {
                           color: crimsonPrimary,
                         ),
                       ),
-                      Text(
-                        'Midlife Companion Intelligence',
+                      Text(AppLocalizations.of(context).periMidlifeCompanionIntelligence,
                         style: GoogleFonts.manrope(
                           fontSize: 11,
                           color: textMuted,
@@ -871,8 +876,7 @@ class _PerimenopauseDashboardState extends State<PerimenopauseDashboard> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'MY CHANGING CYCLE',
+                      Text(AppLocalizations.of(context).periMyChangingCycle,
                         style: GoogleFonts.manrope(
                           fontSize: 10.5,
                           fontWeight: FontWeight.w800,
@@ -880,8 +884,7 @@ class _PerimenopauseDashboardState extends State<PerimenopauseDashboard> {
                           color: crimsonPrimary,
                         ),
                       ),
-                      Text(
-                        'Non-Predictive Midlife Rhythm',
+                      Text(AppLocalizations.of(context).periNonPredictiveMidlifeRhythm,
                         style: GoogleFonts.manrope(
                           fontSize: 11,
                           color: textMuted,
@@ -902,8 +905,7 @@ class _PerimenopauseDashboardState extends State<PerimenopauseDashboard> {
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                 ),
                 icon: const Icon(Icons.edit_calendar_rounded, size: 13),
-                label: Text(
-                  'Log Period',
+                label: Text(AppLocalizations.of(context).periLogPeriod,
                   style: GoogleFonts.manrope(fontSize: 11, fontWeight: FontWeight.w700),
                 ),
               ),
@@ -972,8 +974,7 @@ class _PerimenopauseDashboardState extends State<PerimenopauseDashboard> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      Text(
-                        'Status',
+                      Text(AppLocalizations.of(context).periStatus,
                         style: GoogleFonts.manrope(fontSize: 9.5, color: textMuted, fontWeight: FontWeight.w600),
                       ),
                       Text(
@@ -991,8 +992,7 @@ class _PerimenopauseDashboardState extends State<PerimenopauseDashboard> {
           const SizedBox(height: 14),
 
           // Interval Variation Visualizer (Real data only, graceful empty state)
-          Text(
-            'Recent Cycle Intervals',
+          Text(AppLocalizations.of(context).periRecentCycleIntervals,
             style: GoogleFonts.cormorantGaramond(
               fontSize: 16.5,
               fontWeight: FontWeight.w700,
@@ -1134,8 +1134,7 @@ class _PerimenopauseDashboardState extends State<PerimenopauseDashboard> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              'WHAT YOU\'VE BEEN NOTICING',
+            Text(AppLocalizations.of(context).periWhatYouVeBeenNoticing,
               style: GoogleFonts.manrope(
                 fontSize: 10.5,
                 fontWeight: FontWeight.w800,
@@ -1152,8 +1151,7 @@ class _PerimenopauseDashboardState extends State<PerimenopauseDashboard> {
                   children: [
                     const Icon(Icons.add_circle_outline_rounded, size: 14, color: crimsonPrimary),
                     const SizedBox(width: 4),
-                    Text(
-                      'Log Check-In',
+                    Text(AppLocalizations.of(context).periLogCheckIn,
                       style: GoogleFonts.manrope(
                         fontSize: 11,
                         fontWeight: FontWeight.w700,
@@ -1342,8 +1340,7 @@ class _PerimenopauseDashboardState extends State<PerimenopauseDashboard> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'WHAT CHANGED & CONNECTIONS',
+              Text(AppLocalizations.of(context).periWhatChangedConnections,
                 style: GoogleFonts.manrope(
                   fontSize: 10.5,
                   fontWeight: FontWeight.w800,
@@ -1357,8 +1354,7 @@ class _PerimenopauseDashboardState extends State<PerimenopauseDashboard> {
                   color: cobaltBlueTint,
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Text(
-                  'Weekly Shift',
+                child: Text(AppLocalizations.of(context).periWeeklyShift,
                   style: GoogleFonts.manrope(
                     fontSize: 10,
                     fontWeight: FontWeight.w700,
@@ -1412,8 +1408,7 @@ class _PerimenopauseDashboardState extends State<PerimenopauseDashboard> {
           const SizedBox(height: 12),
 
           // Symptom-Trigger Connections
-          Text(
-            'Discovered Connections',
+          Text(AppLocalizations.of(context).periDiscoveredConnections,
             style: GoogleFonts.cormorantGaramond(
               fontSize: 17,
               fontWeight: FontWeight.w700,
@@ -1669,8 +1664,7 @@ class _PerimenopauseDashboardState extends State<PerimenopauseDashboard> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'YOUR CURRENT FOCUS',
+        Text(AppLocalizations.of(context).periYourCurrentFocus,
           style: GoogleFonts.manrope(
             fontSize: 10.5,
             fontWeight: FontWeight.w800,
@@ -1848,8 +1842,7 @@ class _PerimenopauseDashboardState extends State<PerimenopauseDashboard> {
               ),
               InkWell(
                 onTap: () => _openAddTreatmentDialog(),
-                child: Text(
-                  '+ Add',
+                child: Text(AppLocalizations.of(context).periAdd,
                   style: GoogleFonts.manrope(fontSize: 11, fontWeight: FontWeight.w700, color: crimsonPrimary),
                 ),
               ),
@@ -1969,8 +1962,7 @@ class _PerimenopauseDashboardState extends State<PerimenopauseDashboard> {
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
             ),
-            child: Text(
-              'Tell',
+            child: Text(AppLocalizations.of(context).periTell,
               style: GoogleFonts.manrope(fontSize: 11.5, fontWeight: FontWeight.w700),
             ),
           ),
@@ -2010,8 +2002,7 @@ class _PerimenopauseDashboardState extends State<PerimenopauseDashboard> {
             ],
           ),
           const SizedBox(height: 10),
-          Text(
-            'Your 1-Page Appointment Brief',
+          Text(AppLocalizations.of(context).periYour1PageAppointmentBrief,
             style: GoogleFonts.cormorantGaramond(
               fontSize: 19,
               fontWeight: FontWeight.w700,
@@ -2036,7 +2027,7 @@ class _PerimenopauseDashboardState extends State<PerimenopauseDashboard> {
                     padding: const EdgeInsets.symmetric(vertical: 10),
                   ),
                   icon: const Icon(Icons.visibility_outlined, size: 14),
-                  label: Text('View Brief', style: GoogleFonts.manrope(fontSize: 11.5, fontWeight: FontWeight.w700)),
+                  label: Text(AppLocalizations.of(context).periViewBrief, style: GoogleFonts.manrope(fontSize: 11.5, fontWeight: FontWeight.w700)),
                 ),
               ),
               const SizedBox(width: 10),
@@ -2051,7 +2042,7 @@ class _PerimenopauseDashboardState extends State<PerimenopauseDashboard> {
                     padding: const EdgeInsets.symmetric(vertical: 10),
                   ),
                   icon: const Icon(Icons.copy_rounded, size: 14),
-                  label: Text('Copy for Doctor', style: GoogleFonts.manrope(fontSize: 11.5, fontWeight: FontWeight.w700)),
+                  label: Text(AppLocalizations.of(context).periCopyForDoctor, style: GoogleFonts.manrope(fontSize: 11.5, fontWeight: FontWeight.w700)),
                 ),
               ),
             ],
@@ -2079,8 +2070,7 @@ class _PerimenopauseDashboardState extends State<PerimenopauseDashboard> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'INTIMATE & SEXUAL HEALTH',
+              Text(AppLocalizations.of(context).periIntimateSexualHealth,
                 style: GoogleFonts.manrope(
                   fontSize: 10.5,
                   fontWeight: FontWeight.w800,
@@ -2161,8 +2151,7 @@ class _PerimenopauseDashboardState extends State<PerimenopauseDashboard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'MY STORY · TIMELINE',
+          Text(AppLocalizations.of(context).periMyStoryTimeline,
             style: GoogleFonts.manrope(
               fontSize: 10.5,
               fontWeight: FontWeight.w800,
@@ -2243,8 +2232,7 @@ class _PerimenopauseDashboardState extends State<PerimenopauseDashboard> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'KEEP EXPLORING',
+        Text(AppLocalizations.of(context).periKeepExploring,
           style: GoogleFonts.manrope(
             fontSize: 10.5,
             fontWeight: FontWeight.w800,
@@ -2415,8 +2403,7 @@ class _PerimenopauseDashboardState extends State<PerimenopauseDashboard> {
                     ),
                   ),
                   const SizedBox(height: 18),
-                  Text(
-                    'Log Period Start Date',
+                  Text(AppLocalizations.of(context).periLogPeriodStartDate,
                     style: GoogleFonts.cormorantGaramond(
                       fontSize: 26,
                       fontWeight: FontWeight.w700,
@@ -2616,7 +2603,7 @@ class _PerimenopauseDashboardState extends State<PerimenopauseDashboard> {
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                       ),
-                      child: Text('Save Observation', style: GoogleFonts.manrope(fontWeight: FontWeight.w700)),
+                      child: Text(AppLocalizations.of(context).periSaveObservation, style: GoogleFonts.manrope(fontWeight: FontWeight.w700)),
                     ),
                   ),
                 ],
@@ -2650,8 +2637,7 @@ class _PerimenopauseDashboardState extends State<PerimenopauseDashboard> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        'Daily Transition Check-In',
+                      Text(AppLocalizations.of(context).periDailyTransitionCheckIn,
                         style: GoogleFonts.cormorantGaramond(fontSize: 22, fontWeight: FontWeight.w700, color: textMain),
                       ),
                       IconButton(
@@ -2714,7 +2700,7 @@ class _PerimenopauseDashboardState extends State<PerimenopauseDashboard> {
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                       ),
-                      child: Text('Complete Check-In', style: GoogleFonts.manrope(fontWeight: FontWeight.w700)),
+                      child: Text(AppLocalizations.of(context).periCompleteCheckIn, style: GoogleFonts.manrope(fontWeight: FontWeight.w700)),
                     ),
                   ),
                 ],
@@ -2840,7 +2826,7 @@ class _PerimenopauseDashboardState extends State<PerimenopauseDashboard> {
             return AlertDialog(
               backgroundColor: Colors.white,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-              title: Text('Add Treatment / Support', style: GoogleFonts.cormorantGaramond(fontSize: 20, fontWeight: FontWeight.w700)),
+              title: Text(AppLocalizations.of(context).periAddTreatmentSupport, style: GoogleFonts.cormorantGaramond(fontSize: 20, fontWeight: FontWeight.w700)),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -2864,7 +2850,7 @@ class _PerimenopauseDashboardState extends State<PerimenopauseDashboard> {
                 ],
               ),
               actions: [
-                TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+                TextButton(onPressed: () => Navigator.pop(ctx), child: Text(AppLocalizations.of(context).periCancel)),
                 ElevatedButton(
                   onPressed: () async {
                     if (nameCtrl.text.trim().isEmpty) return;
@@ -2878,7 +2864,7 @@ class _PerimenopauseDashboardState extends State<PerimenopauseDashboard> {
                     await _loadAllData(silent: true);
                   },
                   style: ElevatedButton.styleFrom(backgroundColor: crimsonPrimary, foregroundColor: Colors.white),
-                  child: const Text('Save'),
+                  child: Text(AppLocalizations.of(context).periSave),
                 ),
               ],
             );
@@ -2913,8 +2899,7 @@ class _PerimenopauseDashboardState extends State<PerimenopauseDashboard> {
         return AlertDialog(
           backgroundColor: Colors.white,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          title: Text(
-            'Clinician Brief Preview',
+          title: Text(AppLocalizations.of(context).periClinicianBriefPreview,
             style: GoogleFonts.cormorantGaramond(fontSize: 22, fontWeight: FontWeight.w700, color: textMain),
           ),
           content: SingleChildScrollView(
@@ -2933,7 +2918,7 @@ class _PerimenopauseDashboardState extends State<PerimenopauseDashboard> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx),
-              child: const Text('Close'),
+              child: Text(AppLocalizations.of(context).periClose),
             ),
             ElevatedButton.icon(
               onPressed: () {
@@ -2944,7 +2929,7 @@ class _PerimenopauseDashboardState extends State<PerimenopauseDashboard> {
                 );
               },
               icon: const Icon(Icons.copy_rounded, size: 14),
-              label: const Text('Copy'),
+              label: Text(AppLocalizations.of(context).periCopy),
               style: ElevatedButton.styleFrom(backgroundColor: crimsonPrimary, foregroundColor: Colors.white),
             ),
           ],

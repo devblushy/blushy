@@ -5,6 +5,7 @@ import '../features/auth/presentation/auth_service.dart';
 import 'api_base_url.dart';
 import 'auth_storage.dart';
 import 'offline_event_queue.dart';
+import 'log_redaction.dart';
 
 class ApiAuthService implements AuthService {
   late final Dio _dio;
@@ -22,7 +23,6 @@ class ApiAuthService implements AuthService {
   }
 
   static String? lastDispatchedCode;
-
   @override
   Future<bool> signUpWithEmail(
     String email,
@@ -43,7 +43,7 @@ class ApiAuthService implements AuthService {
         if (phoneNumber != null && phoneNumber.isNotEmpty) 'phoneNumber': phoneNumber,
       });
 
-      debugPrint('BlushyAuth: signUpWithEmail response: ${response.data}');
+      debugPrint('BlushyAuth: signUpWithEmail ok (${shapeOf(response.data)})');
       if (response.data is Map) {
         final code = response.data['code'] ?? response.data['otp'];
         if (code != null) {
@@ -334,7 +334,7 @@ class ApiAuthService implements AuthService {
         data: {'answers': sanitized},
         options: Options(headers: {'Authorization': 'Bearer $token'}),
       );
-      debugPrint('BlushyBackend: Onboarding saved successfully: ${response.data}');
+      debugPrint('BlushyBackend: Onboarding saved (${shapeOf(response.data)})');
       return response.data is Map<String, dynamic> ? response.data : {'status': 'ok'};
     } on DioException catch (e) {
       debugPrint('BlushyBackend: Error saving onboarding to backend: ${_extractErrorMessage(e)}');

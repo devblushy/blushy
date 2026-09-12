@@ -2799,7 +2799,7 @@ abstract class AppLocalizations {
   /// No description provided for @dashTodaySCheck.
   ///
   /// In en, this message translates to:
-  /// **'Today\'s Check-In'**
+  /// **'Log Today\'s Symptoms'**
   String get dashTodaySCheck;
 
   /// No description provided for @dashViewHealthHistory.
@@ -2885,6 +2885,1194 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Log today\'s check-in'**
   String get dashLogTodayCheckIn;
+
+  /// Interface chrome on the lwmc dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'TODAY WITH DOCSY'**
+  String get lwmcTodayWithDocsy;
+
+  /// Interface chrome on the lwmc dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask Docsy'**
+  String get lwmcAskDocsy;
+
+  /// Interface chrome on the lwmc dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'No period logged yet'**
+  String get lwmcNoPeriodLoggedYet;
+
+  /// Interface chrome on the lwmc dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'DOCSY’S SUGGESTION'**
+  String get lwmcDocsySSuggestion;
+
+  /// Interface chrome on the lwmc dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask Docsy →'**
+  String get lwmcAskDocsy2;
+
+  /// Interface chrome on the lwmc dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Try →'**
+  String get lwmcTry;
+
+  /// Interface chrome on the lwmc dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'View Plan →'**
+  String get lwmcViewPlan;
+
+  /// Interface chrome on the lwmc dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Read →'**
+  String get lwmcRead;
+
+  /// Interface chrome on the lwmc dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Prepare my visit summary'**
+  String get lwmcPrepareMyVisitSummary;
+
+  /// Interface chrome on the lwmc dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Something Feels Different'**
+  String get lwmcSomethingFeelsDifferent;
+
+  /// Interface chrome on the lwmc dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Tell Docsy What Happened'**
+  String get lwmcTellDocsyWhatHappened;
+
+  /// Interface chrome on the lwmc dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit to Docsy'**
+  String get lwmcSubmitToDocsy;
+
+  /// Interface chrome on the lwmc dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Clinical Visit Summary'**
+  String get lwmcClinicalVisitSummary;
+
+  /// Interface chrome on the lwmc dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get lwmcClose;
+
+  /// Interface chrome on the lwmc dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Expand with Docsy'**
+  String get lwmcExpandWithDocsy;
+
+  /// Interface chrome on the fpns dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Change'**
+  String get fpnsChange;
+
+  /// Interface chrome on the fpns dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'First-Period Kit'**
+  String get fpnsFirstPeriodKit;
+
+  /// Interface chrome on the fpns dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Save & Done'**
+  String get fpnsSaveDone;
+
+  /// Interface chrome on the fpns dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Log a period start'**
+  String get fpnsLogAPeriodStart;
+
+  /// Interface chrome on the fpns dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Your body, lately'**
+  String get fpnsYourBodyLately;
+
+  /// Interface chrome on the fpns dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Milestones'**
+  String get fpnsMilestones;
+
+  /// Interface chrome on the fpns dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'First-period kit'**
+  String get fpnsFirstPeriodKit2;
+
+  /// Interface chrome on the fpns dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'If it happens today'**
+  String get fpnsIfItHappensToday;
+
+  /// Interface chrome on the fpns dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'See full 5-step guide'**
+  String get fpnsSeeFull5StepGuide;
+
+  /// Interface chrome on the fpns dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Talk →'**
+  String get fpnsTalk;
+
+  /// Interface chrome on the fpns dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Share with Mom'**
+  String get fpnsShareWithMom;
+
+  /// Interface chrome on the fpns dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Next question'**
+  String get fpnsNextQuestion;
+
+  /// Interface chrome on the fpns dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep exploring'**
+  String get fpnsKeepExploring;
+
+  /// Interface chrome on the fpns dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Updated Daily'**
+  String get fpnsUpdatedDaily;
+
+  /// Interface chrome on the fpns dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Read article'**
+  String get fpnsReadArticle;
+
+  /// Interface chrome on the fps dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'No period logged yet'**
+  String get fpsNoPeriodLoggedYet;
+
+  /// Interface chrome on the fps dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Insights for your phase'**
+  String get fpsInsightsForYourPhase;
+
+  /// Interface chrome on the fps dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick Guides'**
+  String get fpsQuickGuides;
+
+  /// Interface chrome on the fps dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Cramp Rescue →'**
+  String get fpsCrampRescue;
+
+  /// Interface chrome on the fps dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'School Tips'**
+  String get fpsSchoolTips;
+
+  /// Interface chrome on the fps dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'My School Bag Kit'**
+  String get fpsMySchoolBagKit;
+
+  /// Interface chrome on the fps dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Things I’m noticing lately'**
+  String get fpsThingsIMNoticingLately;
+
+  /// Interface chrome on the fps dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Understand with Docsy →'**
+  String get fpsUnderstandWithDocsy;
+
+  /// Interface chrome on the fps dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Cramp Rescue'**
+  String get fpsCrampRescue2;
+
+  /// Interface chrome on the fps dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'I feel better'**
+  String get fpsIFeelBetter;
+
+  /// Interface chrome on the fps dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Share with Mom →'**
+  String get fpsShareWithMom;
+
+  /// Interface chrome on the hh dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Log Period Date'**
+  String get hhLogPeriodDate;
+
+  /// Interface chrome on the hh dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Flow Intensity'**
+  String get hhFlowIntensity;
+
+  /// Interface chrome on the hh dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Period Date'**
+  String get hhSavePeriodDate;
+
+  /// Interface chrome on the hh dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'TODAY WITH DOCSY'**
+  String get hhTodayWithDocsy;
+
+  /// Interface chrome on the hh dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Explore with Docsy'**
+  String get hhExploreWithDocsy;
+
+  /// Interface chrome on the hh dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'YOUR CYCLE'**
+  String get hhYourCycle;
+
+  /// Interface chrome on the hh dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'No period logged yet'**
+  String get hhNoPeriodLoggedYet;
+
+  /// Interface chrome on the hh dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'FLARE COMFORT MODE ACTIVE'**
+  String get hhFlareComfortModeActive;
+
+  /// Interface chrome on the hh dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Exit Flare Mode'**
+  String get hhExitFlareMode;
+
+  /// Interface chrome on the hh dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'DAILY SIGNALS'**
+  String get hhDailySignals;
+
+  /// Interface chrome on the hh dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Voice / Notes'**
+  String get hhVoiceNotes;
+
+  /// Interface chrome on the hh dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Analyze with Docsy'**
+  String get hhAnalyzeWithDocsy;
+
+  /// Interface chrome on the hh dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Pattern Memory Building'**
+  String get hhPatternMemoryBuilding;
+
+  /// Interface chrome on the hh dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask Docsy'**
+  String get hhAskDocsy;
+
+  /// Interface chrome on the hh dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'No treatments recorded yet'**
+  String get hhNoTreatmentsRecordedYet;
+
+  /// Interface chrome on the hh dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Treatment / Protocol'**
+  String get hhAddTreatmentProtocol;
+
+  /// Interface chrome on the hh dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Treatment'**
+  String get hhSaveTreatment;
+
+  /// Interface chrome on the hh dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask Docsy ›'**
+  String get hhAskDocsy2;
+
+  /// Interface chrome on the hh dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload another record'**
+  String get hhUploadAnotherRecord;
+
+  /// Interface chrome on the hh dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Record'**
+  String get hhSaveRecord;
+
+  /// Interface chrome on the hh dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'DOCTOR VISIT BRIEF'**
+  String get hhDoctorVisitBrief;
+
+  /// Interface chrome on the hh dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Create doctor summary'**
+  String get hhCreateDoctorSummary;
+
+  /// Interface chrome on the hh dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Clinical Brief'**
+  String get hhClinicalBrief;
+
+  /// Interface chrome on the hh dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get hhClose;
+
+  /// Interface chrome on the hh dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Update'**
+  String get hhUpdate;
+
+  /// Interface chrome on the hh dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Add trusted contact'**
+  String get hhAddTrustedContact;
+
+  /// Interface chrome on the hh dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Support Contact'**
+  String get hhAddSupportContact;
+
+  /// Interface chrome on the hh dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Contact'**
+  String get hhSaveContact;
+
+  /// Interface chrome on the hh dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Check with Docsy'**
+  String get hhCheckWithDocsy;
+
+  /// Interface chrome on the meno dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'TODAY WITH DOCSY'**
+  String get menoTodayWithDocsy;
+
+  /// Interface chrome on the meno dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'ASK DOCSY TODAY'**
+  String get menoAskDocsyToday;
+
+  /// Interface chrome on the meno dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Today\'s Log'**
+  String get menoSaveTodaySLog;
+
+  /// Interface chrome on the meno dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing much today'**
+  String get menoNothingMuchToday;
+
+  /// Interface chrome on the meno dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'WHAT\'S STEADY'**
+  String get menoWhatSSteady;
+
+  /// Interface chrome on the meno dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Learn guidance →'**
+  String get menoLearnGuidance;
+
+  /// Interface chrome on the meno dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'MY NORMAL'**
+  String get menoMyNormal;
+
+  /// Interface chrome on the meno dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'MY TREATMENT JOURNEY'**
+  String get menoMyTreatmentJourney;
+
+  /// Interface chrome on the meno dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Add'**
+  String get menoAdd;
+
+  /// Interface chrome on the meno dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get menoActive;
+
+  /// Interface chrome on the meno dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'MY QUESTIONS INBOX'**
+  String get menoMyQuestionsInbox;
+
+  /// Interface chrome on the meno dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Question'**
+  String get menoSaveQuestion;
+
+  /// Interface chrome on the meno dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Read 30s summary →'**
+  String get menoRead30sSummary;
+
+  /// Interface chrome on the meno dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Something feels different'**
+  String get menoSomethingFeelsDifferent;
+
+  /// Interface chrome on the meno dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Prepare Doctor Consultation'**
+  String get menoPrepareDoctorConsultation;
+
+  /// Interface chrome on the meno dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Understand Note'**
+  String get menoUnderstandNote;
+
+  /// Interface chrome on the meno dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm What You Logged'**
+  String get menoConfirmWhatYouLogged;
+
+  /// Interface chrome on the meno dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get menoCancel;
+
+  /// Interface chrome on the meno dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm & Save'**
+  String get menoConfirmSave;
+
+  /// Interface chrome on the meno dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask Docsy'**
+  String get menoAskDocsy;
+
+  /// Interface chrome on the meno dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Prepare Doctor Summary'**
+  String get menoPrepareDoctorSummary;
+
+  /// Interface chrome on the meno dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Save question for doctor'**
+  String get menoSaveQuestionForDoctor;
+
+  /// Interface chrome on the meno dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Save to Questions Inbox'**
+  String get menoSaveToQuestionsInbox;
+
+  /// Interface chrome on the meno dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Add medication or supplement'**
+  String get menoAddMedicationOrSupplement;
+
+  /// Interface chrome on the meno dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Treatment'**
+  String get menoSaveTreatment;
+
+  /// Interface chrome on the peri dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'TODAY WITH DOCSY'**
+  String get periTodayWithDocsy;
+
+  /// Interface chrome on the peri dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Midlife Companion Intelligence'**
+  String get periMidlifeCompanionIntelligence;
+
+  /// Interface chrome on the peri dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'MY CHANGING CYCLE'**
+  String get periMyChangingCycle;
+
+  /// Interface chrome on the peri dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Non-Predictive Midlife Rhythm'**
+  String get periNonPredictiveMidlifeRhythm;
+
+  /// Interface chrome on the peri dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Log Period'**
+  String get periLogPeriod;
+
+  /// Interface chrome on the peri dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get periStatus;
+
+  /// Interface chrome on the peri dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent Cycle Intervals'**
+  String get periRecentCycleIntervals;
+
+  /// Interface chrome on the peri dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'WHAT YOU\'VE BEEN NOTICING'**
+  String get periWhatYouVeBeenNoticing;
+
+  /// Interface chrome on the peri dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Log Check-In'**
+  String get periLogCheckIn;
+
+  /// Interface chrome on the peri dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'WHAT CHANGED & CONNECTIONS'**
+  String get periWhatChangedConnections;
+
+  /// Interface chrome on the peri dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly Shift'**
+  String get periWeeklyShift;
+
+  /// Interface chrome on the peri dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Discovered Connections'**
+  String get periDiscoveredConnections;
+
+  /// Interface chrome on the peri dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'YOUR CURRENT FOCUS'**
+  String get periYourCurrentFocus;
+
+  /// Interface chrome on the peri dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'+ Add'**
+  String get periAdd;
+
+  /// Interface chrome on the peri dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Tell'**
+  String get periTell;
+
+  /// Interface chrome on the peri dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Your 1-Page Appointment Brief'**
+  String get periYour1PageAppointmentBrief;
+
+  /// Interface chrome on the peri dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'View Brief'**
+  String get periViewBrief;
+
+  /// Interface chrome on the peri dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy for Doctor'**
+  String get periCopyForDoctor;
+
+  /// Interface chrome on the peri dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'INTIMATE & SEXUAL HEALTH'**
+  String get periIntimateSexualHealth;
+
+  /// Interface chrome on the peri dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'MY STORY · TIMELINE'**
+  String get periMyStoryTimeline;
+
+  /// Interface chrome on the peri dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'KEEP EXPLORING'**
+  String get periKeepExploring;
+
+  /// Interface chrome on the peri dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Log Period Start Date'**
+  String get periLogPeriodStartDate;
+
+  /// Interface chrome on the peri dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Observation'**
+  String get periSaveObservation;
+
+  /// Interface chrome on the peri dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Transition Check-In'**
+  String get periDailyTransitionCheckIn;
+
+  /// Interface chrome on the peri dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete Check-In'**
+  String get periCompleteCheckIn;
+
+  /// Interface chrome on the peri dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Treatment / Support'**
+  String get periAddTreatmentSupport;
+
+  /// Interface chrome on the peri dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get periCancel;
+
+  /// Interface chrome on the peri dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get periSave;
+
+  /// Interface chrome on the peri dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Clinician Brief Preview'**
+  String get periClinicianBriefPreview;
+
+  /// Interface chrome on the peri dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get periClose;
+
+  /// Interface chrome on the peri dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy'**
+  String get periCopy;
+
+  /// Interface chrome on the pp dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'TODAY WITH DOCSY'**
+  String get ppTodayWithDocsy;
+
+  /// Interface chrome on the pp dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Your 4th Trimester Companion'**
+  String get ppYour4thTrimesterCompanion;
+
+  /// Interface chrome on the pp dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved & Synced'**
+  String get ppSavedSynced;
+
+  /// Interface chrome on the pp dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Talk to Docsy →'**
+  String get ppTalkToDocsy;
+
+  /// Interface chrome on the pp dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'TODAY, I\'D PRIORITIZE'**
+  String get ppTodayIDPrioritize;
+
+  /// Interface chrome on the pp dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'NOTICED SHIFTS'**
+  String get ppNoticedShifts;
+
+  /// Interface chrome on the pp dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'WHAT\'S BEEN STEADY'**
+  String get ppWhatSBeenSteady;
+
+  /// Interface chrome on the pp dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Observing Initial Baseline'**
+  String get ppObservingInitialBaseline;
+
+  /// Interface chrome on the pp dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'I\'M DONE FOR TODAY'**
+  String get ppIMDoneForToday;
+
+  /// Interface chrome on the pp dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'TONIGHT WIND-DOWN'**
+  String get ppTonightWindDown;
+
+  /// Interface chrome on the pp dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Active Nursing Stopwatch'**
+  String get ppActiveNursingStopwatch;
+
+  /// Interface chrome on the pp dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Logged Wet Diaper 💧'**
+  String get ppLoggedWetDiaper;
+
+  /// Interface chrome on the pp dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Logged Soiled Diaper 💩'**
+  String get ppLoggedSoiledDiaper;
+
+  /// Interface chrome on the pp dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'DAILY RECOVERY PROGRESSION'**
+  String get ppDailyRecoveryProgression;
+
+  /// Interface chrome on the pp dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Build Doctor Summary →'**
+  String get ppBuildDoctorSummary;
+
+  /// Interface chrome on the pp dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'TIMELINE GUIDELINE'**
+  String get ppTimelineGuideline;
+
+  /// Interface chrome on the pp dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'RECOMMENDATION'**
+  String get ppRecommendation;
+
+  /// Interface chrome on the pp dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask Docsy More →'**
+  String get ppAskDocsyMore;
+
+  /// Interface chrome on the pp dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get ppClose;
+
+  /// Interface chrome on the pp dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Talk to Docsy'**
+  String get ppTalkToDocsy2;
+
+  /// Interface chrome on the pp dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask for Help'**
+  String get ppAskForHelp;
+
+  /// Interface chrome on the pp dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Resume Normal Mode'**
+  String get ppResumeNormalMode;
+
+  /// Interface chrome on the pp dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Calibrate Postpartum Path'**
+  String get ppCalibratePostpartumPath;
+
+  /// Interface chrome on the pp dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'BABY\'S BIRTH DATE'**
+  String get ppBabySBirthDate;
+
+  /// Interface chrome on the pp dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'DELIVERY PATH'**
+  String get ppDeliveryPath;
+
+  /// Interface chrome on the pp dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Vaginal Birth'**
+  String get ppVaginalBirth;
+
+  /// Interface chrome on the pp dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'C-Section'**
+  String get ppCSection;
+
+  /// Interface chrome on the pp dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'FEEDING METHOD'**
+  String get ppFeedingMethod;
+
+  /// Interface chrome on the pp dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get ppCancel;
+
+  /// Interface chrome on the pp dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Save & Calibrate'**
+  String get ppSaveCalibrate;
+
+  /// Interface chrome on the pp dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'I Need Help Today'**
+  String get ppINeedHelpToday;
+
+  /// Interface chrome on the pp dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate & Share'**
+  String get ppGenerateShare;
+
+  /// Interface chrome on the pp dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Clinical Safety Triage'**
+  String get ppClinicalSafetyTriage;
+
+  /// Interface chrome on the pp dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Talk to Docsy Now'**
+  String get ppTalkToDocsyNow;
+
+  /// Interface chrome on the pp dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'WHAT HAPPENED (EVENT)'**
+  String get ppWhatHappenedEvent;
+
+  /// Interface chrome on the pp dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'WHAT CHANGED (OBSERVED SHIFT)'**
+  String get ppWhatChangedObservedShift;
+
+  /// Interface chrome on the pp dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Understand with Docsy →'**
+  String get ppUnderstandWithDocsy;
+
+  /// Interface chrome on the pp dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'CLINICAL SAFETY ALERT'**
+  String get ppClinicalSafetyAlert;
+
+  /// Interface chrome on the preg dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to Pregnancy Story'**
+  String get pregAddToPregnancyStory;
+
+  /// Interface chrome on the preg dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get pregCancel;
+
+  /// Interface chrome on the preg dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Memory'**
+  String get pregSaveMemory;
+
+  /// Interface chrome on the preg dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'TODAY WITH DOCSY'**
+  String get pregTodayWithDocsy;
+
+  /// Interface chrome on the preg dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Body Today'**
+  String get pregYourBodyToday;
+
+  /// Interface chrome on the preg dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Baby This Week'**
+  String get pregBabyThisWeek;
+
+  /// Interface chrome on the preg dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'ONE THING TO KNOW'**
+  String get pregOneThingToKnow;
+
+  /// Interface chrome on the preg dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'ONE THING TO DO'**
+  String get pregOneThingToDo;
+
+  /// Interface chrome on the preg dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'YOUR GESTATIONAL TIMELINE'**
+  String get pregYourGestationalTimeline;
+
+  /// Interface chrome on the preg dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Setup Required'**
+  String get pregSetupRequired;
+
+  /// Interface chrome on the preg dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Set Estimated Due Date'**
+  String get pregSetEstimatedDueDate;
+
+  /// Interface chrome on the preg dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'DAILY MATERNAL CHECK-IN'**
+  String get pregDailyMaternalCheckIn;
+
+  /// Interface chrome on the preg dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Explore with Docsy'**
+  String get pregExploreWithDocsy;
+
+  /// Interface chrome on the preg dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'WHAT\'S HAPPENING THIS WEEK'**
+  String get pregWhatSHappeningThisWeek;
+
+  /// Interface chrome on the preg dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Set Due Date'**
+  String get pregSetDueDate;
+
+  /// Interface chrome on the preg dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'YOUR NEXT APPOINTMENT'**
+  String get pregYourNextAppointment;
+
+  /// Interface chrome on the preg dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Build Doctor Summary'**
+  String get pregBuildDoctorSummary;
+
+  /// Interface chrome on the preg dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Doctor Question'**
+  String get pregAddDoctorQuestion;
+
+  /// Interface chrome on the preg dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Add'**
+  String get pregAdd;
+
+  /// Interface chrome on the preg dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Share with Partner'**
+  String get pregShareWithPartner;
+
+  /// Interface chrome on the preg dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'MY PREGNANCY STORY'**
+  String get pregMyPregnancyStory;
+
+  /// Interface chrome on the preg dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'+ Add Moment'**
+  String get pregAddMoment;
+
+  /// Interface chrome on the preg dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'No Moments Recorded Yet'**
+  String get pregNoMomentsRecordedYet;
+
+  /// Interface chrome on the preg dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Add First Moment'**
+  String get pregAddFirstMoment;
+
+  /// Interface chrome on the preg dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'30-SECOND EXPLAINER'**
+  String get preg30SecondExplainer;
+
+  /// Interface chrome on the preg dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'+ Add'**
+  String get pregAdd2;
+
+  /// Interface chrome on the ttc dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'TODAY\'S BIOMARKER LOG'**
+  String get ttcTodaySBiomarkerLog;
+
+  /// Interface chrome on the ttc dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Natural Cycle-to-Cycle Rhythm'**
+  String get ttcNaturalCycleToCycleRhythm;
+
+  /// Interface chrome on the ttc dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Honest Signal Coverage'**
+  String get ttcHonestSignalCoverage;
+
+  /// Interface chrome on the ttc dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate Clinical Report'**
+  String get ttcGenerateClinicalReport;
+
+  /// Interface chrome on the ttc dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Log Period Date'**
+  String get ttcLogPeriodDate;
+
+  /// Interface chrome on the ttc dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Pause Fertility Tracking'**
+  String get ttcPauseFertilityTracking;
+
+  /// Interface chrome on the ttc dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Pause for 1 week'**
+  String get ttcPauseFor1Week;
+
+  /// Interface chrome on the ttc dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Pause until next period'**
+  String get ttcPauseUntilNextPeriod;
 }
 
 class _AppLocalizationsDelegate

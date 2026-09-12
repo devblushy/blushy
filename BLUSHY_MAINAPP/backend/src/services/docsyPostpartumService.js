@@ -5,13 +5,14 @@
  */
 
 import { env } from '../utils/env.js';
+import { jsonLanguageInstruction } from '../utils/language.js';
 
 export class DocsyPostpartumService {
   /**
    * Generates the dynamic daily briefing for the postpartum dashboard.
    * Leverages real Grok/OpenRouter AI with short timeout and robust clinical fallback.
    */
-  static async generateDailyBrief({ timing, todayCheckin, yesterdayCheckin, priorities = [], safetyStatus }) {
+  static async generateDailyBrief({ timing, todayCheckin, yesterdayCheckin, priorities = [], safetyStatus, languageCode = 'en' }) {
     const fallback = this.generateHeuristicBrief({ timing, todayCheckin, yesterdayCheckin, priorities, safetyStatus });
 
     if (!env.grokApiKey) {
@@ -50,7 +51,7 @@ Return ONLY a JSON object with this EXACT structure (no markdown, no other keys)
   "babyPoint": "Concise 1-sentence newborn rhythm or feeding support.",
   "noticePoint": "Concise 1-sentence physical sensation or signal to gently observe today.",
   "promptPills": ["4 personalized questions she might want to ask Docsy today"]
-}`;
+}${jsonLanguageInstruction(languageCode)}`;
 
       const res = await fetch(env.grokApiUrl, {
         method: 'POST',

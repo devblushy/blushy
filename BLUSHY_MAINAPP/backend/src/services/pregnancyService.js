@@ -1,5 +1,6 @@
 import { db } from '../utils/db.js';
 import { getGestationalDataForWeek } from './pregnancyData.js';
+import { todayIso } from '../utils/appCalendar.js';
 
 // In-memory fallback cache for preview/offline environments
 const memoryStore = {
@@ -7,15 +8,6 @@ const memoryStore = {
   memories: new Map(),
   questions: new Map(),
 };
-
-function todayIso() {
-  return new Intl.DateTimeFormat('en-CA', {
-    timeZone: 'Asia/Kolkata',
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  }).format(new Date());
-}
 
 export class PregnancyService {
   calculateGestationalAge(dueDateInput) {

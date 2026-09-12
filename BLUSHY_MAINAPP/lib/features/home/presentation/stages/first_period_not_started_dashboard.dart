@@ -15,6 +15,8 @@ import '../../../sia/sia_screen.dart';
 import '../../../../shared/user_display_name.dart';
 import '../../../../services/api_contract_client.dart';
 import '../../../../shared/stage_empty_notice.dart';
+import '../../widgets/log_symptoms_section.dart';
+import '../../../../l10n/app_localizations.dart';
 
 class FirstPeriodNotStartedDashboard extends StatefulWidget {
   final bool isNested;
@@ -468,7 +470,7 @@ class _FirstPeriodNotStartedDashboardState extends State<FirstPeriodNotStartedDa
                               foregroundColor: blushyPrimary,
                               textStyle: GoogleFonts.manrope(fontSize: 13, fontWeight: FontWeight.w700),
                             ),
-                            child: const Text('Change'),
+                            child: Text(AppLocalizations.of(context).fpnsChange),
                           ),
                         ],
                       ),
@@ -577,8 +579,7 @@ class _FirstPeriodNotStartedDashboardState extends State<FirstPeriodNotStartedDa
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                'First-Period Kit',
+                              Text(AppLocalizations.of(context).fpnsFirstPeriodKit,
                                 style: GoogleFonts.cormorantGaramond(
                                   fontSize: 24,
                                   fontWeight: FontWeight.w700,
@@ -672,8 +673,7 @@ class _FirstPeriodNotStartedDashboardState extends State<FirstPeriodNotStartedDa
                           elevation: 0,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         ),
-                        child: Text(
-                          'Save & Done',
+                        child: Text(AppLocalizations.of(context).fpnsSaveDone,
                           style: GoogleFonts.manrope(fontSize: 13, fontWeight: FontWeight.w700),
                         ),
                       ),
@@ -957,8 +957,7 @@ class _FirstPeriodNotStartedDashboardState extends State<FirstPeriodNotStartedDa
               ElevatedButton.icon(
                 onPressed: () => _showTransitionToStartedDialog(context),
                 icon: const Icon(Icons.calendar_today_rounded, size: 14, color: Colors.white),
-                label: Text(
-                  'Log a period start',
+                label: Text(AppLocalizations.of(context).fpnsLogAPeriodStart,
                   style: GoogleFonts.manrope(fontSize: 12.5, fontWeight: FontWeight.w700),
                 ),
                 style: ElevatedButton.styleFrom(
@@ -1135,16 +1134,14 @@ class _FirstPeriodNotStartedDashboardState extends State<FirstPeriodNotStartedDa
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              'Your body, lately',
+            Text(AppLocalizations.of(context).fpnsYourBodyLately,
               style: GoogleFonts.cormorantGaramond(
                 fontSize: 22,
                 fontWeight: FontWeight.w700,
                 color: const Color(0xFF221510),
               ),
             ),
-            Text(
-              'Milestones',
+            Text(AppLocalizations.of(context).fpnsMilestones,
               style: GoogleFonts.manrope(
                 fontSize: 11,
                 fontWeight: FontWeight.w600,
@@ -1245,8 +1242,7 @@ class _FirstPeriodNotStartedDashboardState extends State<FirstPeriodNotStartedDa
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'First-period kit',
+              Text(AppLocalizations.of(context).fpnsFirstPeriodKit2,
                 style: GoogleFonts.manrope(
                   fontSize: 14,
                   fontWeight: FontWeight.w700,
@@ -1323,8 +1319,7 @@ class _FirstPeriodNotStartedDashboardState extends State<FirstPeriodNotStartedDa
             children: [
               const Icon(Icons.shield_outlined, color: blushyPrimary, size: 16),
               const SizedBox(width: 6),
-              Text(
-                'If it happens today',
+              Text(AppLocalizations.of(context).fpnsIfItHappensToday,
                 style: GoogleFonts.manrope(
                   fontSize: 14,
                   fontWeight: FontWeight.w700,
@@ -1356,8 +1351,7 @@ class _FirstPeriodNotStartedDashboardState extends State<FirstPeriodNotStartedDa
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  'See full 5-step guide',
+                Text(AppLocalizations.of(context).fpnsSeeFull5StepGuide,
                   style: GoogleFonts.manrope(
                     fontSize: 11.5,
                     fontWeight: FontWeight.w700,
@@ -1550,8 +1544,7 @@ class _FirstPeriodNotStartedDashboardState extends State<FirstPeriodNotStartedDa
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                   ),
-                  child: Text(
-                    'Talk →',
+                  child: Text(AppLocalizations.of(context).fpnsTalk,
                     style: GoogleFonts.manrope(fontSize: 11.5, fontWeight: FontWeight.w700),
                   ),
                 ),
@@ -1658,8 +1651,7 @@ class _FirstPeriodNotStartedDashboardState extends State<FirstPeriodNotStartedDa
                       }
                     },
                     icon: const Icon(Icons.favorite_outline, size: 13, color: Colors.white),
-                    label: Text(
-                      'Share with Mom',
+                    label: Text(AppLocalizations.of(context).fpnsShareWithMom,
                       style: GoogleFonts.manrope(fontSize: 11.5, fontWeight: FontWeight.w700),
                     ),
                     style: ElevatedButton.styleFrom(
@@ -1678,8 +1670,7 @@ class _FirstPeriodNotStartedDashboardState extends State<FirstPeriodNotStartedDa
                       });
                     },
                     icon: const Icon(Icons.refresh_rounded, size: 14, color: Color(0xFF7A6B72)),
-                    label: Text(
-                      'Next question',
+                    label: Text(AppLocalizations.of(context).fpnsNextQuestion,
                       style: GoogleFonts.manrope(
                         fontSize: 11,
                         fontWeight: FontWeight.w600,
@@ -1713,16 +1704,14 @@ class _FirstPeriodNotStartedDashboardState extends State<FirstPeriodNotStartedDa
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              'Keep exploring',
+            Text(AppLocalizations.of(context).fpnsKeepExploring,
               style: GoogleFonts.cormorantGaramond(
                 fontSize: 22,
                 fontWeight: FontWeight.w700,
                 color: const Color(0xFF221510),
               ),
             ),
-            Text(
-              'Updated Daily',
+            Text(AppLocalizations.of(context).fpnsUpdatedDaily,
               style: GoogleFonts.manrope(
                 fontSize: 11,
                 color: const Color(0xFF7A6B72),
@@ -1807,8 +1796,7 @@ class _FirstPeriodNotStartedDashboardState extends State<FirstPeriodNotStartedDa
                         const Spacer(),
                         Row(
                           children: [
-                            Text(
-                              'Read article',
+                            Text(AppLocalizations.of(context).fpnsReadArticle,
                               style: GoogleFonts.manrope(
                                 fontSize: 10.5,
                                 fontWeight: FontWeight.w700,
@@ -1861,6 +1849,8 @@ class _FirstPeriodNotStartedDashboardState extends State<FirstPeriodNotStartedDa
                     onRetry: _fetchDynamicAiInsights,
                   ),
                   _buildYourJourneyCard(context),
+                  const SizedBox(height: 22),
+                  const LogSymptomsSection(stageKey: 'firstperiodnotstarted'),
                   const SizedBox(height: 18),
                   _buildTodayAiMoment(context),
                   const SizedBox(height: 18),
@@ -1899,6 +1889,8 @@ class _FirstPeriodNotStartedDashboardState extends State<FirstPeriodNotStartedDa
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 _buildYourJourneyCard(context),
+                                const SizedBox(height: 22),
+                                const LogSymptomsSection(stageKey: 'firstperiodnotstarted'),
                                 const SizedBox(height: 18),
                                 _buildTodayAiMoment(context),
                                 const SizedBox(height: 18),

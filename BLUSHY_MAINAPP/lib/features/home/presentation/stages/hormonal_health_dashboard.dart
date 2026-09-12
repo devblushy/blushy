@@ -19,6 +19,8 @@ import 'stage_shared_components.dart';
 import '../../../../shared/user_display_name.dart';
 import '../../../../services/api_contract_client.dart';
 import '../../../../shared/stage_empty_notice.dart';
+import '../../widgets/log_symptoms_section.dart';
+import '../../../../l10n/app_localizations.dart';
 
 /// ════════════════════════════════════════════════════════════════════════════
 /// STAGE 4: UNDERSTANDING MY BODY — HEALTH INTELLIGENCE & PATTERN SYNTHESIS
@@ -285,7 +287,7 @@ class _HormonalHealthDashboardState extends State<HormonalHealthDashboard> {
                 children: [
                   Center(child: Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.grey.shade300, borderRadius: BorderRadius.circular(2)))),
                   const SizedBox(height: 18),
-                  Text('Log Period Date', style: GoogleFonts.cormorantGaramond(fontSize: 26, fontWeight: FontWeight.w700, color: textMain)),
+                  Text(AppLocalizations.of(context).hhLogPeriodDate, style: GoogleFonts.cormorantGaramond(fontSize: 26, fontWeight: FontWeight.w700, color: textMain)),
                   const SizedBox(height: 18),
                   CalendarDatePicker(
                     initialDate: selectedDate,
@@ -294,7 +296,7 @@ class _HormonalHealthDashboardState extends State<HormonalHealthDashboard> {
                     onDateChanged: (val) => setModalState(() => selectedDate = val),
                   ),
                   const SizedBox(height: 12),
-                  Text('Flow Intensity', style: GoogleFonts.manrope(fontSize: 13, fontWeight: FontWeight.w700, color: textMain)),
+                  Text(AppLocalizations.of(context).hhFlowIntensity, style: GoogleFonts.manrope(fontSize: 13, fontWeight: FontWeight.w700, color: textMain)),
                   const SizedBox(height: 8),
                   Row(
                     children: ['light', 'medium', 'heavy'].map((f) {
@@ -350,7 +352,7 @@ class _HormonalHealthDashboardState extends State<HormonalHealthDashboard> {
                         backgroundColor: blushyPrimary,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                       ),
-                      child: Text('Save Period Date', style: GoogleFonts.manrope(fontSize: 14, fontWeight: FontWeight.w700, color: Colors.white)),
+                      child: Text(AppLocalizations.of(context).hhSavePeriodDate, style: GoogleFonts.manrope(fontSize: 14, fontWeight: FontWeight.w700, color: Colors.white)),
                     ),
                   ),
                 ],
@@ -490,8 +492,7 @@ class _HormonalHealthDashboardState extends State<HormonalHealthDashboard> {
                     hasBackground: true,
                   ),
                   const SizedBox(width: 8),
-                  Text(
-                    'TODAY WITH DOCSY',
+                  Text(AppLocalizations.of(context).hhTodayWithDocsy,
                     style: GoogleFonts.manrope(
                       fontSize: 10.5,
                       fontWeight: FontWeight.w800,
@@ -622,8 +623,7 @@ class _HormonalHealthDashboardState extends State<HormonalHealthDashboard> {
                 children: [
                   const Icon(Icons.chat_bubble_outline_rounded, size: 15, color: Colors.white),
                   const SizedBox(width: 8),
-                  Text(
-                    'Explore with Docsy',
+                  Text(AppLocalizations.of(context).hhExploreWithDocsy,
                     style: GoogleFonts.manrope(
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
@@ -682,8 +682,7 @@ class _HormonalHealthDashboardState extends State<HormonalHealthDashboard> {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  Text(
-                    'YOUR CYCLE',
+                  Text(AppLocalizations.of(context).hhYourCycle,
                     style: GoogleFonts.manrope(
                       fontSize: 11,
                       fontWeight: FontWeight.w800,
@@ -823,8 +822,7 @@ class _HormonalHealthDashboardState extends State<HormonalHealthDashboard> {
               ),
             ),
             const SizedBox(height: 2),
-            Text(
-              'No period logged yet',
+            Text(AppLocalizations.of(context).hhNoPeriodLoggedYet,
               style: GoogleFonts.cormorantGaramond(
                 fontSize: 22,
                 fontWeight: FontWeight.w600,
@@ -951,8 +949,7 @@ class _HormonalHealthDashboardState extends State<HormonalHealthDashboard> {
                       ),
                       const SizedBox(width: 10),
                       Flexible(
-                        child: Text(
-                          'FLARE COMFORT MODE ACTIVE',
+                        child: Text(AppLocalizations.of(context).hhFlareComfortModeActive,
                           style: GoogleFonts.manrope(
                             fontSize: 10.5,
                             fontWeight: FontWeight.w800,
@@ -978,8 +975,7 @@ class _HormonalHealthDashboardState extends State<HormonalHealthDashboard> {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(
-                          'Exit Flare Mode',
+                        Text(AppLocalizations.of(context).hhExitFlareMode,
                           style: GoogleFonts.manrope(fontSize: 10.5, fontWeight: FontWeight.w700, color: blushyPrimary),
                         ),
                         const SizedBox(width: 4),
@@ -1223,8 +1219,7 @@ class _HormonalHealthDashboardState extends State<HormonalHealthDashboard> {
                     child: const Icon(Icons.favorite_outline_rounded, size: 15, color: blushyPrimary),
                   ),
                   const SizedBox(width: 8),
-                  Text(
-                    'DAILY SIGNALS',
+                  Text(AppLocalizations.of(context).hhDailySignals,
                     style: GoogleFonts.manrope(
                       fontSize: 11,
                       fontWeight: FontWeight.w800,
@@ -1247,8 +1242,7 @@ class _HormonalHealthDashboardState extends State<HormonalHealthDashboard> {
                     children: [
                       const Icon(Icons.mic_none_rounded, size: 13, color: blushyPrimary),
                       const SizedBox(width: 4),
-                      Text(
-                        'Voice / Notes',
+                      Text(AppLocalizations.of(context).hhVoiceNotes,
                         style: GoogleFonts.manrope(
                           fontSize: 10.5,
                           fontWeight: FontWeight.w700,
@@ -1396,7 +1390,7 @@ class _HormonalHealthDashboardState extends State<HormonalHealthDashboard> {
                     backgroundColor: blushyPrimary,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                   ),
-                  child: Text('Analyze with Docsy', style: GoogleFonts.manrope(fontSize: 13.5, fontWeight: FontWeight.w700, color: Colors.white)),
+                  child: Text(AppLocalizations.of(context).hhAnalyzeWithDocsy, style: GoogleFonts.manrope(fontSize: 13.5, fontWeight: FontWeight.w700, color: Colors.white)),
                 ),
               ),
             ],
@@ -1447,8 +1441,7 @@ class _HormonalHealthDashboardState extends State<HormonalHealthDashboard> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            'Pattern Memory Building',
+                          Text(AppLocalizations.of(context).hhPatternMemoryBuilding,
                             style: GoogleFonts.manrope(fontSize: 12.5, fontWeight: FontWeight.w700, color: textMain),
                           ),
                           Text(
@@ -1618,8 +1611,7 @@ class _HormonalHealthDashboardState extends State<HormonalHealthDashboard> {
                 ),
               ),
               const SizedBox(width: 4),
-              Text(
-                'Ask Docsy',
+              Text(AppLocalizations.of(context).hhAskDocsy,
                 style: GoogleFonts.manrope(fontSize: 9.5, fontWeight: FontWeight.w700, color: blushyPrimary),
               ),
               const Icon(Icons.arrow_forward_ios_rounded, size: 8, color: blushyPrimary),
@@ -1674,8 +1666,7 @@ class _HormonalHealthDashboardState extends State<HormonalHealthDashboard> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            'No treatments recorded yet',
+                          Text(AppLocalizations.of(context).hhNoTreatmentsRecordedYet,
                             style: GoogleFonts.manrope(fontSize: 12.5, fontWeight: FontWeight.w700, color: textMain),
                           ),
                           Text(
@@ -1781,7 +1772,7 @@ class _HormonalHealthDashboardState extends State<HormonalHealthDashboard> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('Add Treatment / Protocol', style: GoogleFonts.cormorantGaramond(fontSize: 24, fontWeight: FontWeight.w700, color: textMain)),
+              Text(AppLocalizations.of(context).hhAddTreatmentProtocol, style: GoogleFonts.cormorantGaramond(fontSize: 24, fontWeight: FontWeight.w700, color: textMain)),
               const SizedBox(height: 12),
               TextField(controller: nameCtrl, decoration: const InputDecoration(labelText: 'Treatment Name (e.g. Inositol, Magnesium, Progesterone)')),
               TextField(controller: doseCtrl, decoration: const InputDecoration(labelText: 'Dosage / Timing (e.g. 2000mg with breakfast)')),
@@ -1806,7 +1797,7 @@ class _HormonalHealthDashboardState extends State<HormonalHealthDashboard> {
                     Navigator.pop(ctx);
                   },
                   style: ElevatedButton.styleFrom(backgroundColor: blushyPrimary),
-                  child: const Text('Save Treatment', style: TextStyle(color: Colors.white)),
+                  child: Text(AppLocalizations.of(context).hhSaveTreatment, style: TextStyle(color: Colors.white)),
                 ),
               ),
             ],
@@ -1932,8 +1923,7 @@ class _HormonalHealthDashboardState extends State<HormonalHealthDashboard> {
                   ),
                   InkWell(
                     onTap: () => _openDocsyWithPrompt(context, 'Explain results for: ${rec['title']}'),
-                    child: Text(
-                      'Ask Docsy ›',
+                    child: Text(AppLocalizations.of(context).hhAskDocsy2,
                       style: GoogleFonts.manrope(fontSize: 11, fontWeight: FontWeight.w700, color: blushyPrimary),
                     ),
                   ),
@@ -1958,8 +1948,7 @@ class _HormonalHealthDashboardState extends State<HormonalHealthDashboard> {
                 children: [
                   const Icon(Icons.add_circle_outline_rounded, size: 14, color: blushyPrimary),
                   const SizedBox(width: 6),
-                  Text(
-                    'Upload another record',
+                  Text(AppLocalizations.of(context).hhUploadAnotherRecord,
                     style: GoogleFonts.manrope(fontSize: 11.5, fontWeight: FontWeight.w700, color: blushyPrimary),
                   ),
                 ],
@@ -2011,7 +2000,7 @@ class _HormonalHealthDashboardState extends State<HormonalHealthDashboard> {
                     Navigator.pop(ctx);
                   },
                   style: ElevatedButton.styleFrom(backgroundColor: blushyPrimary),
-                  child: const Text('Save Record', style: TextStyle(color: Colors.white)),
+                  child: Text(AppLocalizations.of(context).hhSaveRecord, style: TextStyle(color: Colors.white)),
                 ),
               ),
             ],
@@ -2048,8 +2037,7 @@ class _HormonalHealthDashboardState extends State<HormonalHealthDashboard> {
                 child: const Icon(Icons.medical_services_outlined, size: 17, color: Color(0xFF2563EB)),
               ),
               const SizedBox(width: 10),
-              Text(
-                'DOCTOR VISIT BRIEF',
+              Text(AppLocalizations.of(context).hhDoctorVisitBrief,
                 style: GoogleFonts.manrope(
                   fontSize: 10.5,
                   fontWeight: FontWeight.w800,
@@ -2083,7 +2071,7 @@ class _HormonalHealthDashboardState extends State<HormonalHealthDashboard> {
                 children: [
                   const Icon(Icons.assignment_outlined, size: 15, color: Colors.white),
                   const SizedBox(width: 8),
-                  Text('Create doctor summary', style: GoogleFonts.manrope(fontSize: 12.5, fontWeight: FontWeight.w700, color: Colors.white)),
+                  Text(AppLocalizations.of(context).hhCreateDoctorSummary, style: GoogleFonts.manrope(fontSize: 12.5, fontWeight: FontWeight.w700, color: Colors.white)),
                 ],
               ),
             ),
@@ -2106,7 +2094,7 @@ class _HormonalHealthDashboardState extends State<HormonalHealthDashboard> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Clinical Brief', style: GoogleFonts.cormorantGaramond(fontSize: 24, fontWeight: FontWeight.w700, color: textMain)),
+              Text(AppLocalizations.of(context).hhClinicalBrief, style: GoogleFonts.cormorantGaramond(fontSize: 24, fontWeight: FontWeight.w700, color: textMain)),
               const SizedBox(height: 12),
               Expanded(
                 child: ListView(
@@ -2133,7 +2121,7 @@ class _HormonalHealthDashboardState extends State<HormonalHealthDashboard> {
               ),
               ElevatedButton(
                 onPressed: () => Navigator.pop(ctx),
-                child: const Text('Close'),
+                child: Text(AppLocalizations.of(context).hhClose),
               ),
             ],
           ),
@@ -2233,7 +2221,7 @@ class _HormonalHealthDashboardState extends State<HormonalHealthDashboard> {
                                   borderRadius: BorderRadius.circular(8),
                                   border: Border.all(color: const Color(0xFFEDE4DC)),
                                 ),
-                                child: Text('Update', style: GoogleFonts.manrope(fontSize: 10, fontWeight: FontWeight.w700, color: blushyPrimary)),
+                                child: Text(AppLocalizations.of(context).hhUpdate, style: GoogleFonts.manrope(fontSize: 10, fontWeight: FontWeight.w700, color: blushyPrimary)),
                               ),
                             ),
                             const SizedBox(width: 6),
@@ -2258,8 +2246,7 @@ class _HormonalHealthDashboardState extends State<HormonalHealthDashboard> {
                   children: [
                     const Icon(Icons.add_circle_outline_rounded, size: 14, color: blushyPrimary),
                     const SizedBox(width: 6),
-                    Text(
-                      'Add trusted contact',
+                    Text(AppLocalizations.of(context).hhAddTrustedContact,
                       style: GoogleFonts.manrope(fontSize: 11.5, fontWeight: FontWeight.w700, color: blushyPrimary),
                     ),
                   ],
@@ -2288,7 +2275,7 @@ class _HormonalHealthDashboardState extends State<HormonalHealthDashboard> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('Add Support Contact', style: GoogleFonts.cormorantGaramond(fontSize: 24, fontWeight: FontWeight.w700, color: textMain)),
+              Text(AppLocalizations.of(context).hhAddSupportContact, style: GoogleFonts.cormorantGaramond(fontSize: 24, fontWeight: FontWeight.w700, color: textMain)),
               const SizedBox(height: 12),
               TextField(controller: nameCtrl, decoration: const InputDecoration(labelText: 'Contact Name')),
               TextField(controller: roleCtrl, decoration: const InputDecoration(labelText: 'Role (e.g. Doctor, Partner, Mom)')),
@@ -2311,7 +2298,7 @@ class _HormonalHealthDashboardState extends State<HormonalHealthDashboard> {
                     Navigator.pop(ctx);
                   },
                   style: ElevatedButton.styleFrom(backgroundColor: blushyPrimary),
-                  child: const Text('Save Contact', style: TextStyle(color: Colors.white)),
+                  child: Text(AppLocalizations.of(context).hhSaveContact, style: TextStyle(color: Colors.white)),
                 ),
               ),
             ],
@@ -2426,7 +2413,7 @@ class _HormonalHealthDashboardState extends State<HormonalHealthDashboard> {
                   }
                 },
                 style: ElevatedButton.styleFrom(backgroundColor: blushyPrimary),
-                child: const Text('Check with Docsy', style: TextStyle(color: Colors.white)),
+                child: Text(AppLocalizations.of(context).hhCheckWithDocsy, style: TextStyle(color: Colors.white)),
               ),
             ],
           ),
@@ -2459,6 +2446,8 @@ class _HormonalHealthDashboardState extends State<HormonalHealthDashboard> {
           _buildTodayWithDocsyHero(context),
           const SizedBox(height: 14),
           _buildCycleTrackerCard(context),
+          const SizedBox(height: 22),
+          const LogSymptomsSection(stageKey: 'hormonalhealth'),
           const SizedBox(height: 14),
           _buildFlareModeBanner(context),
           const SizedBox(height: 16),

@@ -516,7 +516,7 @@
   "dashViewFullHistory": "View Full History",
   "dashMStudioReflection": "M Studio Reflection",
   "dashLongTermWellnessOverview": "Long-Term Wellness Overview",
-  "dashTodaySCheck": "Today's Check-In",
+  "dashTodaySCheck": "Log Today's Symptoms",
   "dashViewHealthHistory": "View Health History",
   "dashBloodPressureOptional": "BLOOD PRESSURE (OPTIONAL)",
   "dashEmpoweredPostMenopauseWellness": "EMPOWERED POST-MENOPAUSE WELLNESS CARDS",
@@ -542,5 +542,797 @@
   "dashLogTodayCheckIn": "Log today's check-in",
   "@dashLogTodayCheckIn": {
     "description": "Action on an insight that needs more days of data, where the user has already logged at least once."
+  },
+  "lwmcTodayWithDocsy": "TODAY WITH DOCSY",
+  "@lwmcTodayWithDocsy": {
+    "description": "Interface chrome on the lwmc dashboard."
+  },
+  "lwmcAskDocsy": "Ask Docsy",
+  "@lwmcAskDocsy": {
+    "description": "Interface chrome on the lwmc dashboard."
+  },
+  "lwmcNoPeriodLoggedYet": "No period logged yet",
+  "@lwmcNoPeriodLoggedYet": {
+    "description": "Interface chrome on the lwmc dashboard."
+  },
+  "lwmcDocsySSuggestion": "DOCSY\u2019S SUGGESTION",
+  "@lwmcDocsySSuggestion": {
+    "description": "Interface chrome on the lwmc dashboard."
+  },
+  "lwmcAskDocsy2": "Ask Docsy \u2192",
+  "@lwmcAskDocsy2": {
+    "description": "Interface chrome on the lwmc dashboard."
+  },
+  "lwmcTry": "Try \u2192",
+  "@lwmcTry": {
+    "description": "Interface chrome on the lwmc dashboard."
+  },
+  "lwmcViewPlan": "View Plan \u2192",
+  "@lwmcViewPlan": {
+    "description": "Interface chrome on the lwmc dashboard."
+  },
+  "lwmcRead": "Read \u2192",
+  "@lwmcRead": {
+    "description": "Interface chrome on the lwmc dashboard."
+  },
+  "lwmcPrepareMyVisitSummary": "Prepare my visit summary",
+  "@lwmcPrepareMyVisitSummary": {
+    "description": "Interface chrome on the lwmc dashboard."
+  },
+  "lwmcSomethingFeelsDifferent": "Something Feels Different",
+  "@lwmcSomethingFeelsDifferent": {
+    "description": "Interface chrome on the lwmc dashboard."
+  },
+  "lwmcTellDocsyWhatHappened": "Tell Docsy What Happened",
+  "@lwmcTellDocsyWhatHappened": {
+    "description": "Interface chrome on the lwmc dashboard."
+  },
+  "lwmcSubmitToDocsy": "Submit to Docsy",
+  "@lwmcSubmitToDocsy": {
+    "description": "Interface chrome on the lwmc dashboard."
+  },
+  "lwmcClinicalVisitSummary": "Clinical Visit Summary",
+  "@lwmcClinicalVisitSummary": {
+    "description": "Interface chrome on the lwmc dashboard."
+  },
+  "lwmcClose": "Close",
+  "@lwmcClose": {
+    "description": "Interface chrome on the lwmc dashboard."
+  },
+  "lwmcExpandWithDocsy": "Expand with Docsy",
+  "@lwmcExpandWithDocsy": {
+    "description": "Interface chrome on the lwmc dashboard."
+  },
+  "fpnsChange": "Change",
+  "@fpnsChange": {
+    "description": "Interface chrome on the fpns dashboard."
+  },
+  "fpnsFirstPeriodKit": "First-Period Kit",
+  "@fpnsFirstPeriodKit": {
+    "description": "Interface chrome on the fpns dashboard."
+  },
+  "fpnsSaveDone": "Save & Done",
+  "@fpnsSaveDone": {
+    "description": "Interface chrome on the fpns dashboard."
+  },
+  "fpnsLogAPeriodStart": "Log a period start",
+  "@fpnsLogAPeriodStart": {
+    "description": "Interface chrome on the fpns dashboard."
+  },
+  "fpnsYourBodyLately": "Your body, lately",
+  "@fpnsYourBodyLately": {
+    "description": "Interface chrome on the fpns dashboard."
+  },
+  "fpnsMilestones": "Milestones",
+  "@fpnsMilestones": {
+    "description": "Interface chrome on the fpns dashboard."
+  },
+  "fpnsFirstPeriodKit2": "First-period kit",
+  "@fpnsFirstPeriodKit2": {
+    "description": "Interface chrome on the fpns dashboard."
+  },
+  "fpnsIfItHappensToday": "If it happens today",
+  "@fpnsIfItHappensToday": {
+    "description": "Interface chrome on the fpns dashboard."
+  },
+  "fpnsSeeFull5StepGuide": "See full 5-step guide",
+  "@fpnsSeeFull5StepGuide": {
+    "description": "Interface chrome on the fpns dashboard."
+  },
+  "fpnsTalk": "Talk \u2192",
+  "@fpnsTalk": {
+    "description": "Interface chrome on the fpns dashboard."
+  },
+  "fpnsShareWithMom": "Share with Mom",
+  "@fpnsShareWithMom": {
+    "description": "Interface chrome on the fpns dashboard."
+  },
+  "fpnsNextQuestion": "Next question",
+  "@fpnsNextQuestion": {
+    "description": "Interface chrome on the fpns dashboard."
+  },
+  "fpnsKeepExploring": "Keep exploring",
+  "@fpnsKeepExploring": {
+    "description": "Interface chrome on the fpns dashboard."
+  },
+  "fpnsUpdatedDaily": "Updated Daily",
+  "@fpnsUpdatedDaily": {
+    "description": "Interface chrome on the fpns dashboard."
+  },
+  "fpnsReadArticle": "Read article",
+  "@fpnsReadArticle": {
+    "description": "Interface chrome on the fpns dashboard."
+  },
+  "fpsNoPeriodLoggedYet": "No period logged yet",
+  "@fpsNoPeriodLoggedYet": {
+    "description": "Interface chrome on the fps dashboard."
+  },
+  "fpsInsightsForYourPhase": "Insights for your phase",
+  "@fpsInsightsForYourPhase": {
+    "description": "Interface chrome on the fps dashboard."
+  },
+  "fpsQuickGuides": "Quick Guides",
+  "@fpsQuickGuides": {
+    "description": "Interface chrome on the fps dashboard."
+  },
+  "fpsCrampRescue": "Cramp Rescue \u2192",
+  "@fpsCrampRescue": {
+    "description": "Interface chrome on the fps dashboard."
+  },
+  "fpsSchoolTips": "School Tips",
+  "@fpsSchoolTips": {
+    "description": "Interface chrome on the fps dashboard."
+  },
+  "fpsMySchoolBagKit": "My School Bag Kit",
+  "@fpsMySchoolBagKit": {
+    "description": "Interface chrome on the fps dashboard."
+  },
+  "fpsThingsIMNoticingLately": "Things I\u2019m noticing lately",
+  "@fpsThingsIMNoticingLately": {
+    "description": "Interface chrome on the fps dashboard."
+  },
+  "fpsUnderstandWithDocsy": "Understand with Docsy \u2192",
+  "@fpsUnderstandWithDocsy": {
+    "description": "Interface chrome on the fps dashboard."
+  },
+  "fpsCrampRescue2": "Cramp Rescue",
+  "@fpsCrampRescue2": {
+    "description": "Interface chrome on the fps dashboard."
+  },
+  "fpsIFeelBetter": "I feel better",
+  "@fpsIFeelBetter": {
+    "description": "Interface chrome on the fps dashboard."
+  },
+  "fpsShareWithMom": "Share with Mom \u2192",
+  "@fpsShareWithMom": {
+    "description": "Interface chrome on the fps dashboard."
+  },
+  "hhLogPeriodDate": "Log Period Date",
+  "@hhLogPeriodDate": {
+    "description": "Interface chrome on the hh dashboard."
+  },
+  "hhFlowIntensity": "Flow Intensity",
+  "@hhFlowIntensity": {
+    "description": "Interface chrome on the hh dashboard."
+  },
+  "hhSavePeriodDate": "Save Period Date",
+  "@hhSavePeriodDate": {
+    "description": "Interface chrome on the hh dashboard."
+  },
+  "hhTodayWithDocsy": "TODAY WITH DOCSY",
+  "@hhTodayWithDocsy": {
+    "description": "Interface chrome on the hh dashboard."
+  },
+  "hhExploreWithDocsy": "Explore with Docsy",
+  "@hhExploreWithDocsy": {
+    "description": "Interface chrome on the hh dashboard."
+  },
+  "hhYourCycle": "YOUR CYCLE",
+  "@hhYourCycle": {
+    "description": "Interface chrome on the hh dashboard."
+  },
+  "hhNoPeriodLoggedYet": "No period logged yet",
+  "@hhNoPeriodLoggedYet": {
+    "description": "Interface chrome on the hh dashboard."
+  },
+  "hhFlareComfortModeActive": "FLARE COMFORT MODE ACTIVE",
+  "@hhFlareComfortModeActive": {
+    "description": "Interface chrome on the hh dashboard."
+  },
+  "hhExitFlareMode": "Exit Flare Mode",
+  "@hhExitFlareMode": {
+    "description": "Interface chrome on the hh dashboard."
+  },
+  "hhDailySignals": "DAILY SIGNALS",
+  "@hhDailySignals": {
+    "description": "Interface chrome on the hh dashboard."
+  },
+  "hhVoiceNotes": "Voice / Notes",
+  "@hhVoiceNotes": {
+    "description": "Interface chrome on the hh dashboard."
+  },
+  "hhAnalyzeWithDocsy": "Analyze with Docsy",
+  "@hhAnalyzeWithDocsy": {
+    "description": "Interface chrome on the hh dashboard."
+  },
+  "hhPatternMemoryBuilding": "Pattern Memory Building",
+  "@hhPatternMemoryBuilding": {
+    "description": "Interface chrome on the hh dashboard."
+  },
+  "hhAskDocsy": "Ask Docsy",
+  "@hhAskDocsy": {
+    "description": "Interface chrome on the hh dashboard."
+  },
+  "hhNoTreatmentsRecordedYet": "No treatments recorded yet",
+  "@hhNoTreatmentsRecordedYet": {
+    "description": "Interface chrome on the hh dashboard."
+  },
+  "hhAddTreatmentProtocol": "Add Treatment / Protocol",
+  "@hhAddTreatmentProtocol": {
+    "description": "Interface chrome on the hh dashboard."
+  },
+  "hhSaveTreatment": "Save Treatment",
+  "@hhSaveTreatment": {
+    "description": "Interface chrome on the hh dashboard."
+  },
+  "hhAskDocsy2": "Ask Docsy \u203a",
+  "@hhAskDocsy2": {
+    "description": "Interface chrome on the hh dashboard."
+  },
+  "hhUploadAnotherRecord": "Upload another record",
+  "@hhUploadAnotherRecord": {
+    "description": "Interface chrome on the hh dashboard."
+  },
+  "hhSaveRecord": "Save Record",
+  "@hhSaveRecord": {
+    "description": "Interface chrome on the hh dashboard."
+  },
+  "hhDoctorVisitBrief": "DOCTOR VISIT BRIEF",
+  "@hhDoctorVisitBrief": {
+    "description": "Interface chrome on the hh dashboard."
+  },
+  "hhCreateDoctorSummary": "Create doctor summary",
+  "@hhCreateDoctorSummary": {
+    "description": "Interface chrome on the hh dashboard."
+  },
+  "hhClinicalBrief": "Clinical Brief",
+  "@hhClinicalBrief": {
+    "description": "Interface chrome on the hh dashboard."
+  },
+  "hhClose": "Close",
+  "@hhClose": {
+    "description": "Interface chrome on the hh dashboard."
+  },
+  "hhUpdate": "Update",
+  "@hhUpdate": {
+    "description": "Interface chrome on the hh dashboard."
+  },
+  "hhAddTrustedContact": "Add trusted contact",
+  "@hhAddTrustedContact": {
+    "description": "Interface chrome on the hh dashboard."
+  },
+  "hhAddSupportContact": "Add Support Contact",
+  "@hhAddSupportContact": {
+    "description": "Interface chrome on the hh dashboard."
+  },
+  "hhSaveContact": "Save Contact",
+  "@hhSaveContact": {
+    "description": "Interface chrome on the hh dashboard."
+  },
+  "hhCheckWithDocsy": "Check with Docsy",
+  "@hhCheckWithDocsy": {
+    "description": "Interface chrome on the hh dashboard."
+  },
+  "menoTodayWithDocsy": "TODAY WITH DOCSY",
+  "@menoTodayWithDocsy": {
+    "description": "Interface chrome on the meno dashboard."
+  },
+  "menoAskDocsyToday": "ASK DOCSY TODAY",
+  "@menoAskDocsyToday": {
+    "description": "Interface chrome on the meno dashboard."
+  },
+  "menoSaveTodaySLog": "Save Today's Log",
+  "@menoSaveTodaySLog": {
+    "description": "Interface chrome on the meno dashboard."
+  },
+  "menoNothingMuchToday": "Nothing much today",
+  "@menoNothingMuchToday": {
+    "description": "Interface chrome on the meno dashboard."
+  },
+  "menoWhatSSteady": "WHAT'S STEADY",
+  "@menoWhatSSteady": {
+    "description": "Interface chrome on the meno dashboard."
+  },
+  "menoLearnGuidance": "Learn guidance \u2192",
+  "@menoLearnGuidance": {
+    "description": "Interface chrome on the meno dashboard."
+  },
+  "menoMyNormal": "MY NORMAL",
+  "@menoMyNormal": {
+    "description": "Interface chrome on the meno dashboard."
+  },
+  "menoMyTreatmentJourney": "MY TREATMENT JOURNEY",
+  "@menoMyTreatmentJourney": {
+    "description": "Interface chrome on the meno dashboard."
+  },
+  "menoAdd": "Add",
+  "@menoAdd": {
+    "description": "Interface chrome on the meno dashboard."
+  },
+  "menoActive": "Active",
+  "@menoActive": {
+    "description": "Interface chrome on the meno dashboard."
+  },
+  "menoMyQuestionsInbox": "MY QUESTIONS INBOX",
+  "@menoMyQuestionsInbox": {
+    "description": "Interface chrome on the meno dashboard."
+  },
+  "menoSaveQuestion": "Save Question",
+  "@menoSaveQuestion": {
+    "description": "Interface chrome on the meno dashboard."
+  },
+  "menoRead30sSummary": "Read 30s summary \u2192",
+  "@menoRead30sSummary": {
+    "description": "Interface chrome on the meno dashboard."
+  },
+  "menoSomethingFeelsDifferent": "Something feels different",
+  "@menoSomethingFeelsDifferent": {
+    "description": "Interface chrome on the meno dashboard."
+  },
+  "menoPrepareDoctorConsultation": "Prepare Doctor Consultation",
+  "@menoPrepareDoctorConsultation": {
+    "description": "Interface chrome on the meno dashboard."
+  },
+  "menoUnderstandNote": "Understand Note",
+  "@menoUnderstandNote": {
+    "description": "Interface chrome on the meno dashboard."
+  },
+  "menoConfirmWhatYouLogged": "Confirm What You Logged",
+  "@menoConfirmWhatYouLogged": {
+    "description": "Interface chrome on the meno dashboard."
+  },
+  "menoCancel": "Cancel",
+  "@menoCancel": {
+    "description": "Interface chrome on the meno dashboard."
+  },
+  "menoConfirmSave": "Confirm & Save",
+  "@menoConfirmSave": {
+    "description": "Interface chrome on the meno dashboard."
+  },
+  "menoAskDocsy": "Ask Docsy",
+  "@menoAskDocsy": {
+    "description": "Interface chrome on the meno dashboard."
+  },
+  "menoPrepareDoctorSummary": "Prepare Doctor Summary",
+  "@menoPrepareDoctorSummary": {
+    "description": "Interface chrome on the meno dashboard."
+  },
+  "menoSaveQuestionForDoctor": "Save question for doctor",
+  "@menoSaveQuestionForDoctor": {
+    "description": "Interface chrome on the meno dashboard."
+  },
+  "menoSaveToQuestionsInbox": "Save to Questions Inbox",
+  "@menoSaveToQuestionsInbox": {
+    "description": "Interface chrome on the meno dashboard."
+  },
+  "menoAddMedicationOrSupplement": "Add medication or supplement",
+  "@menoAddMedicationOrSupplement": {
+    "description": "Interface chrome on the meno dashboard."
+  },
+  "menoSaveTreatment": "Save Treatment",
+  "@menoSaveTreatment": {
+    "description": "Interface chrome on the meno dashboard."
+  },
+  "periTodayWithDocsy": "TODAY WITH DOCSY",
+  "@periTodayWithDocsy": {
+    "description": "Interface chrome on the peri dashboard."
+  },
+  "periMidlifeCompanionIntelligence": "Midlife Companion Intelligence",
+  "@periMidlifeCompanionIntelligence": {
+    "description": "Interface chrome on the peri dashboard."
+  },
+  "periMyChangingCycle": "MY CHANGING CYCLE",
+  "@periMyChangingCycle": {
+    "description": "Interface chrome on the peri dashboard."
+  },
+  "periNonPredictiveMidlifeRhythm": "Non-Predictive Midlife Rhythm",
+  "@periNonPredictiveMidlifeRhythm": {
+    "description": "Interface chrome on the peri dashboard."
+  },
+  "periLogPeriod": "Log Period",
+  "@periLogPeriod": {
+    "description": "Interface chrome on the peri dashboard."
+  },
+  "periStatus": "Status",
+  "@periStatus": {
+    "description": "Interface chrome on the peri dashboard."
+  },
+  "periRecentCycleIntervals": "Recent Cycle Intervals",
+  "@periRecentCycleIntervals": {
+    "description": "Interface chrome on the peri dashboard."
+  },
+  "periWhatYouVeBeenNoticing": "WHAT YOU'VE BEEN NOTICING",
+  "@periWhatYouVeBeenNoticing": {
+    "description": "Interface chrome on the peri dashboard."
+  },
+  "periLogCheckIn": "Log Check-In",
+  "@periLogCheckIn": {
+    "description": "Interface chrome on the peri dashboard."
+  },
+  "periWhatChangedConnections": "WHAT CHANGED & CONNECTIONS",
+  "@periWhatChangedConnections": {
+    "description": "Interface chrome on the peri dashboard."
+  },
+  "periWeeklyShift": "Weekly Shift",
+  "@periWeeklyShift": {
+    "description": "Interface chrome on the peri dashboard."
+  },
+  "periDiscoveredConnections": "Discovered Connections",
+  "@periDiscoveredConnections": {
+    "description": "Interface chrome on the peri dashboard."
+  },
+  "periYourCurrentFocus": "YOUR CURRENT FOCUS",
+  "@periYourCurrentFocus": {
+    "description": "Interface chrome on the peri dashboard."
+  },
+  "periAdd": "+ Add",
+  "@periAdd": {
+    "description": "Interface chrome on the peri dashboard."
+  },
+  "periTell": "Tell",
+  "@periTell": {
+    "description": "Interface chrome on the peri dashboard."
+  },
+  "periYour1PageAppointmentBrief": "Your 1-Page Appointment Brief",
+  "@periYour1PageAppointmentBrief": {
+    "description": "Interface chrome on the peri dashboard."
+  },
+  "periViewBrief": "View Brief",
+  "@periViewBrief": {
+    "description": "Interface chrome on the peri dashboard."
+  },
+  "periCopyForDoctor": "Copy for Doctor",
+  "@periCopyForDoctor": {
+    "description": "Interface chrome on the peri dashboard."
+  },
+  "periIntimateSexualHealth": "INTIMATE & SEXUAL HEALTH",
+  "@periIntimateSexualHealth": {
+    "description": "Interface chrome on the peri dashboard."
+  },
+  "periMyStoryTimeline": "MY STORY \u00b7 TIMELINE",
+  "@periMyStoryTimeline": {
+    "description": "Interface chrome on the peri dashboard."
+  },
+  "periKeepExploring": "KEEP EXPLORING",
+  "@periKeepExploring": {
+    "description": "Interface chrome on the peri dashboard."
+  },
+  "periLogPeriodStartDate": "Log Period Start Date",
+  "@periLogPeriodStartDate": {
+    "description": "Interface chrome on the peri dashboard."
+  },
+  "periSaveObservation": "Save Observation",
+  "@periSaveObservation": {
+    "description": "Interface chrome on the peri dashboard."
+  },
+  "periDailyTransitionCheckIn": "Daily Transition Check-In",
+  "@periDailyTransitionCheckIn": {
+    "description": "Interface chrome on the peri dashboard."
+  },
+  "periCompleteCheckIn": "Complete Check-In",
+  "@periCompleteCheckIn": {
+    "description": "Interface chrome on the peri dashboard."
+  },
+  "periAddTreatmentSupport": "Add Treatment / Support",
+  "@periAddTreatmentSupport": {
+    "description": "Interface chrome on the peri dashboard."
+  },
+  "periCancel": "Cancel",
+  "@periCancel": {
+    "description": "Interface chrome on the peri dashboard."
+  },
+  "periSave": "Save",
+  "@periSave": {
+    "description": "Interface chrome on the peri dashboard."
+  },
+  "periClinicianBriefPreview": "Clinician Brief Preview",
+  "@periClinicianBriefPreview": {
+    "description": "Interface chrome on the peri dashboard."
+  },
+  "periClose": "Close",
+  "@periClose": {
+    "description": "Interface chrome on the peri dashboard."
+  },
+  "periCopy": "Copy",
+  "@periCopy": {
+    "description": "Interface chrome on the peri dashboard."
+  },
+  "ppTodayWithDocsy": "TODAY WITH DOCSY",
+  "@ppTodayWithDocsy": {
+    "description": "Interface chrome on the pp dashboard."
+  },
+  "ppYour4thTrimesterCompanion": "Your 4th Trimester Companion",
+  "@ppYour4thTrimesterCompanion": {
+    "description": "Interface chrome on the pp dashboard."
+  },
+  "ppSavedSynced": "Saved & Synced",
+  "@ppSavedSynced": {
+    "description": "Interface chrome on the pp dashboard."
+  },
+  "ppTalkToDocsy": "Talk to Docsy \u2192",
+  "@ppTalkToDocsy": {
+    "description": "Interface chrome on the pp dashboard."
+  },
+  "ppTodayIDPrioritize": "TODAY, I'D PRIORITIZE",
+  "@ppTodayIDPrioritize": {
+    "description": "Interface chrome on the pp dashboard."
+  },
+  "ppNoticedShifts": "NOTICED SHIFTS",
+  "@ppNoticedShifts": {
+    "description": "Interface chrome on the pp dashboard."
+  },
+  "ppWhatSBeenSteady": "WHAT'S BEEN STEADY",
+  "@ppWhatSBeenSteady": {
+    "description": "Interface chrome on the pp dashboard."
+  },
+  "ppObservingInitialBaseline": "Observing Initial Baseline",
+  "@ppObservingInitialBaseline": {
+    "description": "Interface chrome on the pp dashboard."
+  },
+  "ppIMDoneForToday": "I'M DONE FOR TODAY",
+  "@ppIMDoneForToday": {
+    "description": "Interface chrome on the pp dashboard."
+  },
+  "ppTonightWindDown": "TONIGHT WIND-DOWN",
+  "@ppTonightWindDown": {
+    "description": "Interface chrome on the pp dashboard."
+  },
+  "ppActiveNursingStopwatch": "Active Nursing Stopwatch",
+  "@ppActiveNursingStopwatch": {
+    "description": "Interface chrome on the pp dashboard."
+  },
+  "ppLoggedWetDiaper": "Logged Wet Diaper \ud83d\udca7",
+  "@ppLoggedWetDiaper": {
+    "description": "Interface chrome on the pp dashboard."
+  },
+  "ppLoggedSoiledDiaper": "Logged Soiled Diaper \ud83d\udca9",
+  "@ppLoggedSoiledDiaper": {
+    "description": "Interface chrome on the pp dashboard."
+  },
+  "ppDailyRecoveryProgression": "DAILY RECOVERY PROGRESSION",
+  "@ppDailyRecoveryProgression": {
+    "description": "Interface chrome on the pp dashboard."
+  },
+  "ppBuildDoctorSummary": "Build Doctor Summary \u2192",
+  "@ppBuildDoctorSummary": {
+    "description": "Interface chrome on the pp dashboard."
+  },
+  "ppTimelineGuideline": "TIMELINE GUIDELINE",
+  "@ppTimelineGuideline": {
+    "description": "Interface chrome on the pp dashboard."
+  },
+  "ppRecommendation": "RECOMMENDATION",
+  "@ppRecommendation": {
+    "description": "Interface chrome on the pp dashboard."
+  },
+  "ppAskDocsyMore": "Ask Docsy More \u2192",
+  "@ppAskDocsyMore": {
+    "description": "Interface chrome on the pp dashboard."
+  },
+  "ppClose": "Close",
+  "@ppClose": {
+    "description": "Interface chrome on the pp dashboard."
+  },
+  "ppTalkToDocsy2": "Talk to Docsy",
+  "@ppTalkToDocsy2": {
+    "description": "Interface chrome on the pp dashboard."
+  },
+  "ppAskForHelp": "Ask for Help",
+  "@ppAskForHelp": {
+    "description": "Interface chrome on the pp dashboard."
+  },
+  "ppResumeNormalMode": "Resume Normal Mode",
+  "@ppResumeNormalMode": {
+    "description": "Interface chrome on the pp dashboard."
+  },
+  "ppCalibratePostpartumPath": "Calibrate Postpartum Path",
+  "@ppCalibratePostpartumPath": {
+    "description": "Interface chrome on the pp dashboard."
+  },
+  "ppBabySBirthDate": "BABY'S BIRTH DATE",
+  "@ppBabySBirthDate": {
+    "description": "Interface chrome on the pp dashboard."
+  },
+  "ppDeliveryPath": "DELIVERY PATH",
+  "@ppDeliveryPath": {
+    "description": "Interface chrome on the pp dashboard."
+  },
+  "ppVaginalBirth": "Vaginal Birth",
+  "@ppVaginalBirth": {
+    "description": "Interface chrome on the pp dashboard."
+  },
+  "ppCSection": "C-Section",
+  "@ppCSection": {
+    "description": "Interface chrome on the pp dashboard."
+  },
+  "ppFeedingMethod": "FEEDING METHOD",
+  "@ppFeedingMethod": {
+    "description": "Interface chrome on the pp dashboard."
+  },
+  "ppCancel": "Cancel",
+  "@ppCancel": {
+    "description": "Interface chrome on the pp dashboard."
+  },
+  "ppSaveCalibrate": "Save & Calibrate",
+  "@ppSaveCalibrate": {
+    "description": "Interface chrome on the pp dashboard."
+  },
+  "ppINeedHelpToday": "I Need Help Today",
+  "@ppINeedHelpToday": {
+    "description": "Interface chrome on the pp dashboard."
+  },
+  "ppGenerateShare": "Generate & Share",
+  "@ppGenerateShare": {
+    "description": "Interface chrome on the pp dashboard."
+  },
+  "ppClinicalSafetyTriage": "Clinical Safety Triage",
+  "@ppClinicalSafetyTriage": {
+    "description": "Interface chrome on the pp dashboard."
+  },
+  "ppTalkToDocsyNow": "Talk to Docsy Now",
+  "@ppTalkToDocsyNow": {
+    "description": "Interface chrome on the pp dashboard."
+  },
+  "ppWhatHappenedEvent": "WHAT HAPPENED (EVENT)",
+  "@ppWhatHappenedEvent": {
+    "description": "Interface chrome on the pp dashboard."
+  },
+  "ppWhatChangedObservedShift": "WHAT CHANGED (OBSERVED SHIFT)",
+  "@ppWhatChangedObservedShift": {
+    "description": "Interface chrome on the pp dashboard."
+  },
+  "ppUnderstandWithDocsy": "Understand with Docsy \u2192",
+  "@ppUnderstandWithDocsy": {
+    "description": "Interface chrome on the pp dashboard."
+  },
+  "ppClinicalSafetyAlert": "CLINICAL SAFETY ALERT",
+  "@ppClinicalSafetyAlert": {
+    "description": "Interface chrome on the pp dashboard."
+  },
+  "pregAddToPregnancyStory": "Add to Pregnancy Story",
+  "@pregAddToPregnancyStory": {
+    "description": "Interface chrome on the preg dashboard."
+  },
+  "pregCancel": "Cancel",
+  "@pregCancel": {
+    "description": "Interface chrome on the preg dashboard."
+  },
+  "pregSaveMemory": "Save Memory",
+  "@pregSaveMemory": {
+    "description": "Interface chrome on the preg dashboard."
+  },
+  "pregTodayWithDocsy": "TODAY WITH DOCSY",
+  "@pregTodayWithDocsy": {
+    "description": "Interface chrome on the preg dashboard."
+  },
+  "pregYourBodyToday": "Your Body Today",
+  "@pregYourBodyToday": {
+    "description": "Interface chrome on the preg dashboard."
+  },
+  "pregBabyThisWeek": "Baby This Week",
+  "@pregBabyThisWeek": {
+    "description": "Interface chrome on the preg dashboard."
+  },
+  "pregOneThingToKnow": "ONE THING TO KNOW",
+  "@pregOneThingToKnow": {
+    "description": "Interface chrome on the preg dashboard."
+  },
+  "pregOneThingToDo": "ONE THING TO DO",
+  "@pregOneThingToDo": {
+    "description": "Interface chrome on the preg dashboard."
+  },
+  "pregYourGestationalTimeline": "YOUR GESTATIONAL TIMELINE",
+  "@pregYourGestationalTimeline": {
+    "description": "Interface chrome on the preg dashboard."
+  },
+  "pregSetupRequired": "Setup Required",
+  "@pregSetupRequired": {
+    "description": "Interface chrome on the preg dashboard."
+  },
+  "pregSetEstimatedDueDate": "Set Estimated Due Date",
+  "@pregSetEstimatedDueDate": {
+    "description": "Interface chrome on the preg dashboard."
+  },
+  "pregDailyMaternalCheckIn": "DAILY MATERNAL CHECK-IN",
+  "@pregDailyMaternalCheckIn": {
+    "description": "Interface chrome on the preg dashboard."
+  },
+  "pregExploreWithDocsy": "Explore with Docsy",
+  "@pregExploreWithDocsy": {
+    "description": "Interface chrome on the preg dashboard."
+  },
+  "pregWhatSHappeningThisWeek": "WHAT'S HAPPENING THIS WEEK",
+  "@pregWhatSHappeningThisWeek": {
+    "description": "Interface chrome on the preg dashboard."
+  },
+  "pregSetDueDate": "Set Due Date",
+  "@pregSetDueDate": {
+    "description": "Interface chrome on the preg dashboard."
+  },
+  "pregYourNextAppointment": "YOUR NEXT APPOINTMENT",
+  "@pregYourNextAppointment": {
+    "description": "Interface chrome on the preg dashboard."
+  },
+  "pregBuildDoctorSummary": "Build Doctor Summary",
+  "@pregBuildDoctorSummary": {
+    "description": "Interface chrome on the preg dashboard."
+  },
+  "pregAddDoctorQuestion": "Add Doctor Question",
+  "@pregAddDoctorQuestion": {
+    "description": "Interface chrome on the preg dashboard."
+  },
+  "pregAdd": "Add",
+  "@pregAdd": {
+    "description": "Interface chrome on the preg dashboard."
+  },
+  "pregShareWithPartner": "Share with Partner",
+  "@pregShareWithPartner": {
+    "description": "Interface chrome on the preg dashboard."
+  },
+  "pregMyPregnancyStory": "MY PREGNANCY STORY",
+  "@pregMyPregnancyStory": {
+    "description": "Interface chrome on the preg dashboard."
+  },
+  "pregAddMoment": "+ Add Moment",
+  "@pregAddMoment": {
+    "description": "Interface chrome on the preg dashboard."
+  },
+  "pregNoMomentsRecordedYet": "No Moments Recorded Yet",
+  "@pregNoMomentsRecordedYet": {
+    "description": "Interface chrome on the preg dashboard."
+  },
+  "pregAddFirstMoment": "Add First Moment",
+  "@pregAddFirstMoment": {
+    "description": "Interface chrome on the preg dashboard."
+  },
+  "preg30SecondExplainer": "30-SECOND EXPLAINER",
+  "@preg30SecondExplainer": {
+    "description": "Interface chrome on the preg dashboard."
+  },
+  "pregAdd2": "+ Add",
+  "@pregAdd2": {
+    "description": "Interface chrome on the preg dashboard."
+  },
+  "ttcTodaySBiomarkerLog": "TODAY'S BIOMARKER LOG",
+  "@ttcTodaySBiomarkerLog": {
+    "description": "Interface chrome on the ttc dashboard."
+  },
+  "ttcNaturalCycleToCycleRhythm": "Natural Cycle-to-Cycle Rhythm",
+  "@ttcNaturalCycleToCycleRhythm": {
+    "description": "Interface chrome on the ttc dashboard."
+  },
+  "ttcHonestSignalCoverage": "Honest Signal Coverage",
+  "@ttcHonestSignalCoverage": {
+    "description": "Interface chrome on the ttc dashboard."
+  },
+  "ttcGenerateClinicalReport": "Generate Clinical Report",
+  "@ttcGenerateClinicalReport": {
+    "description": "Interface chrome on the ttc dashboard."
+  },
+  "ttcLogPeriodDate": "Log Period Date",
+  "@ttcLogPeriodDate": {
+    "description": "Interface chrome on the ttc dashboard."
+  },
+  "ttcPauseFertilityTracking": "Pause Fertility Tracking",
+  "@ttcPauseFertilityTracking": {
+    "description": "Interface chrome on the ttc dashboard."
+  },
+  "ttcPauseFor1Week": "Pause for 1 week",
+  "@ttcPauseFor1Week": {
+    "description": "Interface chrome on the ttc dashboard."
+  },
+  "ttcPauseUntilNextPeriod": "Pause until next period",
+  "@ttcPauseUntilNextPeriod": {
+    "description": "Interface chrome on the ttc dashboard."
   }
 }

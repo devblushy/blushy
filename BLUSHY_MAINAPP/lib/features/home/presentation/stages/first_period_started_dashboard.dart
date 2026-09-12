@@ -21,6 +21,8 @@ import '../../widgets/home_hero.dart';
 import '../../../../shared/user_display_name.dart';
 import '../../../../services/api_contract_client.dart';
 import '../../../../shared/stage_empty_notice.dart';
+import '../../widgets/log_symptoms_section.dart';
+import '../../../../l10n/app_localizations.dart';
 
 class FirstPeriodStartedDashboard extends StatefulWidget {
   final bool isNested;
@@ -676,8 +678,7 @@ class _FirstPeriodStartedDashboardState extends State<FirstPeriodStartedDashboar
               ),
             ),
             const SizedBox(height: 2),
-            Text(
-              'No period logged yet',
+            Text(AppLocalizations.of(context).fpsNoPeriodLoggedYet,
               style: GoogleFonts.cormorantGaramond(
                 fontSize: 22,
                 fontWeight: FontWeight.w600,
@@ -769,8 +770,7 @@ class _FirstPeriodStartedDashboardState extends State<FirstPeriodStartedDashboar
                   ),
                   const SizedBox(width: 8),
                   Expanded(
-                    child: Text(
-                      'Insights for your phase',
+                    child: Text(AppLocalizations.of(context).fpsInsightsForYourPhase,
                       style: GoogleFonts.manrope(
                         fontSize: 12.5,
                         fontWeight: FontWeight.w600,
@@ -990,8 +990,7 @@ class _FirstPeriodStartedDashboardState extends State<FirstPeriodStartedDashboar
                 color: const Color(0xFF221510),
               ),
             ),
-            Text(
-              'Quick Guides',
+            Text(AppLocalizations.of(context).fpsQuickGuides,
               style: GoogleFonts.manrope(
                 fontSize: 11,
                 fontWeight: FontWeight.w600,
@@ -1268,8 +1267,7 @@ class _FirstPeriodStartedDashboardState extends State<FirstPeriodStartedDashboar
                   ),
                   InkWell(
                     onTap: () => _showCrampRescueModal(context),
-                    child: Text(
-                      'Cramp Rescue →',
+                    child: Text(AppLocalizations.of(context).fpsCrampRescue,
                       style: GoogleFonts.manrope(fontSize: 11, fontWeight: FontWeight.w700, color: blushyPrimary),
                     ),
                   ),
@@ -1522,8 +1520,7 @@ class _FirstPeriodStartedDashboardState extends State<FirstPeriodStartedDashboar
                   TextButton.icon(
                     onPressed: () => _openDocsyWithPrompt(context, 'What should I do if I get my period at school?'),
                     icon: const Icon(Icons.auto_awesome_rounded, size: 13, color: blushyPrimary),
-                    label: Text(
-                      'School Tips',
+                    label: Text(AppLocalizations.of(context).fpsSchoolTips,
                       style: GoogleFonts.manrope(fontSize: 11.5, fontWeight: FontWeight.w700, color: blushyPrimary),
                     ),
                   ),
@@ -1560,8 +1557,7 @@ class _FirstPeriodStartedDashboardState extends State<FirstPeriodStartedDashboar
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    'My School Bag Kit',
+                  Text(AppLocalizations.of(context).fpsMySchoolBagKit,
                     style: GoogleFonts.cormorantGaramond(
                       fontSize: 20,
                       fontWeight: FontWeight.w700,
@@ -1657,8 +1653,7 @@ class _FirstPeriodStartedDashboardState extends State<FirstPeriodStartedDashboar
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'Things I’m noticing lately',
+              Text(AppLocalizations.of(context).fpsThingsIMNoticingLately,
                 style: GoogleFonts.cormorantGaramond(
                   fontSize: 20,
                   fontWeight: FontWeight.w700,
@@ -1713,8 +1708,7 @@ class _FirstPeriodStartedDashboardState extends State<FirstPeriodStartedDashboar
                       _openDocsyWithPrompt(context, 'Can you explain why I am noticing $listStr during puberty and my first year of periods?');
                     },
                     icon: const Icon(Icons.auto_awesome_rounded, size: 14, color: Colors.white),
-                    label: Text(
-                      'Understand with Docsy →',
+                    label: Text(AppLocalizations.of(context).fpsUnderstandWithDocsy,
                       style: GoogleFonts.manrope(fontSize: 11.5, fontWeight: FontWeight.w700),
                     ),
                     style: ElevatedButton.styleFrom(
@@ -1909,8 +1903,7 @@ class _FirstPeriodStartedDashboardState extends State<FirstPeriodStartedDashboar
                   ),
                 ),
                 const SizedBox(height: 18),
-                Text(
-                  'Cramp Rescue',
+                Text(AppLocalizations.of(context).fpsCrampRescue2,
                   style: GoogleFonts.cormorantGaramond(fontSize: 24, fontWeight: FontWeight.w700, color: const Color(0xFF221510)),
                 ),
                 const SizedBox(height: 4),
@@ -1926,7 +1919,7 @@ class _FirstPeriodStartedDashboardState extends State<FirstPeriodStartedDashboar
                   child: ElevatedButton(
                     onPressed: () => Navigator.pop(context),
                     style: ElevatedButton.styleFrom(backgroundColor: blushyPrimary, foregroundColor: Colors.white),
-                    child: Text('I feel better', style: GoogleFonts.manrope(fontWeight: FontWeight.w700)),
+                    child: Text(AppLocalizations.of(context).fpsIFeelBetter, style: GoogleFonts.manrope(fontWeight: FontWeight.w700)),
                   ),
                 ),
               ],
@@ -2012,7 +2005,7 @@ class _FirstPeriodStartedDashboardState extends State<FirstPeriodStartedDashboar
                       }
                     },
                     icon: const Icon(Icons.share_rounded, size: 16, color: Colors.white),
-                    label: Text('Share with Mom →', style: GoogleFonts.manrope(fontWeight: FontWeight.w700)),
+                    label: Text(AppLocalizations.of(context).fpsShareWithMom, style: GoogleFonts.manrope(fontWeight: FontWeight.w700)),
                     style: ElevatedButton.styleFrom(backgroundColor: blushyPrimary, foregroundColor: Colors.white),
                   ),
                 ),
@@ -2173,6 +2166,8 @@ class _FirstPeriodStartedDashboardState extends State<FirstPeriodStartedDashboar
                     onRetry: _loadPeriodData,
                   ),
                   _buildPeriodTrackerCard(context),
+                  const SizedBox(height: 22),
+                  const LogSymptomsSection(stageKey: 'firstperiodstarted'),
                   const SizedBox(height: 18),
                   _buildNoteFromDocsy(context),
                   const SizedBox(height: 18),
@@ -2216,6 +2211,8 @@ class _FirstPeriodStartedDashboardState extends State<FirstPeriodStartedDashboar
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 _buildPeriodTrackerCard(context),
+                                const SizedBox(height: 22),
+                                const LogSymptomsSection(stageKey: 'firstperiodstarted'),
                                 const SizedBox(height: 18),
                                 _buildNoteFromDocsy(context),
                                 const SizedBox(height: 18),
