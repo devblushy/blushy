@@ -201,3 +201,45 @@ test('only the symptom groups a partner may see reach him', async () => {
   );
   assert.ok(filter.includes('PARTNER_VISIBLE_SYMPTOMS.has'), filter);
 });
+
+test('a stage without predictions still shares its cycle day', async () => {
+  // Reported as: she turned cycle sharing on and her partner still read
+  // "Private".
+  //
+  // `contractStateFor` returns INSUFFICIENT_DATA whenever a branch does not
+  // support predictions, and first period and perimenopause are two such
+  // branches -- both with `cycleTracking: true`, both showing her a day and a
+  // phase on her own home screen. The partner context read the phase only on
+  // READY, so those two stages could never share a cycle, whatever she
+  // permitted.
+  const { readFileSync } = await import('node:fs');
+  const source = readFileSync('src/services/partnerSafeService.js', 'utf8');
+
+  const gate = source.slice(
+    source.indexOf('const hasDay ='),
+    source.indexOf('context.cyclePhase = {'),
+  );
+
+  assert.ok(gate.includes('INSUFFICIENT_DATA'), gate);
+  assert.ok(gate.includes('currentCycleDay != null'),
+    'a state alone is not enough -- there has to be a day in it');
+
+  // And the forecast stays gated on its own, so those branches get the ring
+  // and no countdown rather than an invented one.
+  const window = source.slice(
+    source.indexOf('context.cyclePhase = {'),
+    source.indexOf('capabilities.fertility'),
+  );
+  assert.ok(window.includes('cycle.data.prediction?.nextPeriodStartDate'), window);
+});
+
+test('the two stages that were blanked declare tracking without predictions', async () => {
+  // If this ever changes, the fix above is aimed at the wrong thing.
+  const { getBranchCapabilities } = await import('../src/domain/lifeStages.js');
+
+  for (const stage of ['first_period', 'perimenopause']) {
+    const caps = getBranchCapabilities(stage);
+    assert.equal(caps.cycleTracking, true, `${stage} tracks cycles`);
+    assert.equal(caps.cyclePredictions, false, `${stage} does not predict`);
+  }
+});

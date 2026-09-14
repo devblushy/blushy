@@ -209,7 +209,26 @@ async function buildSubjectContext(subjectUserId, { referenceDate = new Date() }
     // of every day: she read Day 16, he read Day 15. Passing her zone and no
     // explicit date lets both sides agree on when today starts.
     const cycle = await getCycleState(subjectUserId, { timezone: stageState.timezone ?? null });
-    if (cycle.state === RESPONSE_STATES.READY) {
+
+    // READY is not the only state that has a cycle day in it.
+    //
+    // `contractStateFor` returns INSUFFICIENT_DATA whenever a branch does not
+    // support *predictions* -- which is true of first period and
+    // perimenopause, both of which track cycles perfectly well and show her a
+    // day and a phase on her own home screen. Reading the phase only on READY
+    // therefore withheld it from those two stages no matter what she
+    // permitted: she turned cycle sharing on, and her partner still read
+    // "Private". Reported exactly that way.
+    //
+    // What those branches genuinely lack is the forecast, and that is gated
+    // separately below on `prediction.nextPeriodStartDate`, which is null for
+    // them. So they get the ring and the day, and no countdown -- which is
+    // the honest shape rather than an absent card.
+    const hasDay = cycle.data?.currentCycle?.currentCycleDay != null;
+    const cycleReadable = cycle.state === RESPONSE_STATES.READY
+      || cycle.state === RESPONSE_STATES.INSUFFICIENT_DATA;
+
+    if (cycleReadable && hasDay) {
       context.cyclePhase = {
         phase: cycle.data.currentCycle?.phase,
         cycleDay: cycle.data.currentCycle?.currentCycleDay,
