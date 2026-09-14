@@ -450,32 +450,16 @@ export async function requestPartnerBreakup(req, res, next) {
       actorUserId: user.user_id,
     });
 
-    const breakupCompleted = current?.status === 'breakup';
-
-    publishToUsers(
-      [user.user_id],
-      'partner.updated',
-      {
-        reason: breakupCompleted ? 'breakup-completed' : 'breakup-requested',
-        connectionId,
-      },
-    );
-
+    // There is no longer a request to wait on: the connection is over the
+    // moment one of them says so, and the other is told rather than asked.
     publishToUsers(
       [current.partnerUserId, user.user_id],
       'partner.updated',
-      {
-        reason: breakupCompleted ? 'breakup-completed' : 'breakup-requested',
-        connectionId,
-      },
+      { reason: 'breakup-completed', connectionId },
     );
 
     res.status(200).json({
-      message: breakupCompleted
-        ? 'Breakup completed.'
-        : current.status === 'breakup_pending'
-            ? 'Breakup request recorded.'
-            : 'Breakup requested.',
+      message: 'Breakup completed.',
       connection: current,
     });
   } catch (error) {

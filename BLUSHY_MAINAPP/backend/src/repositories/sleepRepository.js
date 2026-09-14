@@ -32,21 +32,6 @@ function mapRow(row) {
 }
 
 
-async function pruneSleepHistory(userId, retentionDays = 7) {
-  const cleanUserId = typeof userId === 'string' ? userId.replace('user:', '') : userId;
-  const safeRetentionDays = Number.isInteger(retentionDays) && retentionDays > 0 ? retentionDays : 7;
-
-  const todayStr = todayIso();
-  const today = dayStart(todayStr);
-  today.setUTCDate(today.getUTCDate() - (safeRetentionDays - 1));
-
-  const collName = await getColl(cleanUserId, 'user_sleep_logs');
-  await db.collection(collName).deleteMany({
-    user_id: cleanUserId,
-    entry_date: { $lt: today },
-  });
-}
-
 async function getSleepByDate(userId, entryDate = todayIso()) {
   const cleanUserId = typeof userId === 'string' ? userId.replace('user:', '') : userId;
   const finalEntryDate = entryDate || todayIso();
@@ -122,7 +107,6 @@ async function getSleepByUserId(userId, limit = 30) {
 }
 
 export const sleepRepository = {
-  pruneSleepHistory,
   getSleepByDate,
   upsertSleepByDate,
   getRecentSleepLogs,

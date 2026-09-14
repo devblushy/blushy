@@ -147,7 +147,14 @@ export async function api(method, path, { token = null, body = null, headers = {
     parsed = text;
   }
 
-  return { status: response.status, body: parsed };
+  // Headers come back too: rate-limit tests read Retry-After, which is the
+  // only place the seconds remaining are reported.
+  const responseHeaders = {};
+  response.headers.forEach((value, key) => {
+    responseHeaders[key.toLowerCase()] = value;
+  });
+
+  return { status: response.status, body: parsed, headers: responseHeaders };
 }
 
 export function getDb() {

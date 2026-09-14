@@ -133,7 +133,7 @@ export async function runDailyChatSummaryOnce(now = new Date()) {
   const userKeys = await aiHistoryRepository.listUserKeysWithHistory();
 
   let summarizedUsers = 0;
-  let clearedMessages = 0;
+  let summarizedMessages = 0;
 
   for (const userKey of userKeys) {
     const history = await aiHistoryRepository.listHistory(userKey);
@@ -156,16 +156,21 @@ export async function runDailyChatSummaryOnce(now = new Date()) {
       summaryText,
     });
 
-    await aiHistoryRepository.clearHistory(userKey);
+    // The history is deliberately left in place. This job used to clear it
+    // here, which meant every conversation was destroyed at midnight IST and
+    // the chat screen could only ever show what had been said since -- "today
+    // only". The summary is a reflection written alongside the conversation,
+    // not a replacement for it. `appendConversation` already bounds growth at
+    // the latest 300 exchanges per user.
 
     summarizedUsers += 1;
-    clearedMessages += history.length;
+    summarizedMessages += history.length;
   }
 
   return {
     summaryDateIst: dateKey,
     summarizedUsers,
-    clearedMessages,
+    summarizedMessages,
   };
 }
 
@@ -194,7 +199,7 @@ export function startDailyChatSummaryScheduler() {
       const result = await runDailyChatSummaryOnce(now);
       lastRunDateKey = ist.dateKey;
       logger.info(
-        `Daily chat summary completed. date_ist=${result.summaryDateIst} users=${result.summarizedUsers} cleared_messages=${result.clearedMessages}`,
+        `Daily chat summary completed. date_ist=${result.summaryDateIst} users=${result.summarizedUsers} messages=${result.summarizedMessages}`,
       );
     } catch (error) {
       logger.error(`Daily chat summary failed: ${error?.message ?? error}`);

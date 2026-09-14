@@ -1,4 +1,5 @@
 import { emailAuthService } from '../services/emailAuthService.js';
+import { clearLoginAttempts } from '../middleware/rateLimiter.js';
 import { analyseOnboarding } from '../services/onboardingAnalysisService.js';
 import { googleAuthService } from '../services/googleAuthService.js';
 import { createHttpError } from '../utils/httpError.js';
@@ -390,6 +391,10 @@ export async function loginWithEmail(req, res, next) {
       ip: req.ip,
       userAgent: req.get('user-agent'),
     });
+
+    // The password was right, so the failures before it are forgotten rather
+    // than held against the next attempt.
+    await clearLoginAttempts(req);
 
     res.status(200).json(result);
   } catch (error) {

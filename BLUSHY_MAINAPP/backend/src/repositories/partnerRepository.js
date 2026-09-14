@@ -104,6 +104,15 @@ function mapConnectionRow(row, viewerUserId) {
       ...(row.permissions ?? {}),
     },
     partnerUserId: viewerIsUserA ? row.user_b_id : row.user_a_id,
+    // The name the partner chose, when they have set one. The three
+    // aggregations below join the user document and only passed the
+    // address through, so the portal had nothing else to show and put an
+    // email where a name belongs: "codeaviii@gmail.com's Portal".
+    //
+    // Left null rather than falling back to the address here: the client
+    // already has its own fallback, and a repository that answers an email
+    // to a question about a name makes the two impossible to tell apart.
+    partnerName: viewerIsUserA ? (row.user_b_name ?? null) : (row.user_a_name ?? null),
     partnerEmail: viewerIsUserA ? row.user_b_email : row.user_a_email,
     partnerRole: viewerIsUserA ? row.user_b_role : row.user_a_role,
     viewerIsSender: viewerIsUserA,
@@ -581,6 +590,23 @@ async function respondToConnection({ connectionId, actorUserId, action }) {
   });
 }
 
+/**
+ * Ends a connection, on one person's say-so.
+ *
+ * It used to take both: the first call parked the row at `breakup_pending`
+ * and the other partner had to agree before anything actually stopped. That
+ * meant someone who wanted out stayed connected -- and kept sharing -- until
+ * the other person chose to let them go. Leaving is now unilateral.
+ *
+ * `breakup_requested_by_user_id` is kept, and is now what the other partner
+ * reads to be told who ended it.
+ *
+ * A second call on an already-ended connection is the other partner
+ * acknowledging the notice: the row goes to `ended`, which
+ * `listConnectionsForUser` filters out, so it stops being shown to either of
+ * them. `breakup` is not in OPEN_CONNECTION_STATUSES, so neither state blocks
+ * a fresh invitation between the same two people.
+ */
 async function requestBreakup({ connectionId, actorUserId }) {
   return withTransaction(async (client) => {
     const current = await getConnectionForUser(connectionId, actorUserId, client);
@@ -588,26 +614,18 @@ async function requestBreakup({ connectionId, actorUserId }) {
       return null;
     }
 
-    if (!OPEN_CONNECTION_STATUSES.has(current.status)) {
-      return current;
-    }
-
-    if (current.status === 'breakup_pending' && current.breakupRequestedByUserId && current.breakupRequestedByUserId !== actorUserId) {
+    if (current.status === 'breakup') {
       await client.collection('partner_connections').updateOne(
         { connection_id: connectionId },
-        {
-          $set: {
-            status: 'breakup',
-            breakup_requested_at: new Date(),
-            ended_at: new Date(),
-            updated_at: new Date()
-          }
-        }
+        { $set: { status: 'ended', updated_at: new Date() } }
       );
-      return getConnectionForUser(connectionId, actorUserId, client);
+      // Read back from what we already have: `getConnectionForUser` filters
+      // `ended` out, so re-reading here would answer null and the caller
+      // would lose the partner it still has to notify.
+      return { ...current, status: 'ended' };
     }
 
-    if (current.breakupRequestedByUserId === actorUserId) {
+    if (!OPEN_CONNECTION_STATUSES.has(current.status)) {
       return current;
     }
 
@@ -615,9 +633,10 @@ async function requestBreakup({ connectionId, actorUserId }) {
       { connection_id: connectionId },
       {
         $set: {
-          status: 'breakup_pending',
+          status: 'breakup',
           breakup_requested_by_user_id: actorUserId,
           breakup_requested_at: new Date(),
+          ended_at: new Date(),
           updated_at: new Date()
         }
       }
@@ -659,8 +678,14 @@ async function listConnectionsForUser(userId) {
   return connections.map((row) => mapConnectionRow({
     ...row,
     user_a_email: row.user_a?.email,
+    user_a_name: row.user_a?.display_name
+      || row.user_a?.onboarding_answers?.preferred_name
+      || null,
     user_a_role: row.user_a?.role,
     user_b_email: row.user_b?.email,
+    user_b_name: row.user_b?.display_name
+      || row.user_b?.onboarding_answers?.preferred_name
+      || null,
     user_b_role: row.user_b?.role
   }, userId));
 }
@@ -698,8 +723,14 @@ async function getConnectionForUser(connectionId, userId, client = db) {
   return connections[0] ? mapConnectionRow({
     ...connections[0],
     user_a_email: connections[0].user_a?.email,
+    user_a_name: connections[0].user_a?.display_name
+      || connections[0].user_a?.onboarding_answers?.preferred_name
+      || null,
     user_a_role: connections[0].user_a?.role,
     user_b_email: connections[0].user_b?.email,
+    user_b_name: connections[0].user_b?.display_name
+      || connections[0].user_b?.onboarding_answers?.preferred_name
+      || null,
     user_b_role: connections[0].user_b?.role
   }, userId) : null;
 }
@@ -1490,8 +1521,14 @@ async function getActiveConnectionForUser(userId) {
   return connections[0] ? mapConnectionRow({
     ...connections[0],
     user_a_email: connections[0].user_a?.email,
+    user_a_name: connections[0].user_a?.display_name
+      || connections[0].user_a?.onboarding_answers?.preferred_name
+      || null,
     user_a_role: connections[0].user_a?.role,
     user_b_email: connections[0].user_b?.email,
+    user_b_name: connections[0].user_b?.display_name
+      || connections[0].user_b?.onboarding_answers?.preferred_name
+      || null,
     user_b_role: connections[0].user_b?.role
   }, userId) : null;
 }

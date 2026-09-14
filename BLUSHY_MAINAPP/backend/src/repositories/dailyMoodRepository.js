@@ -26,23 +26,8 @@ function mapRow(row) {
 }
 
 
-async function pruneDailyMoodHistory(userId, retentionDays = 30) {
-  const cleanUserId = typeof userId === 'string' ? userId.replace('user:', '') : userId;
-  const safeRetentionDays = Number.isInteger(retentionDays) && retentionDays > 0 ? retentionDays : 30;
-
-  const todayStr = todayIso();
-  const today = dayStart(todayStr);
-  today.setUTCDate(today.getUTCDate() - (safeRetentionDays - 1));
-
-  await db.collection(await getColl(cleanUserId, 'user_daily_moods')).deleteMany({
-    user_id: cleanUserId,
-    entry_date: { $lt: today },
-  });
-}
-
 async function getDailyMood(userId, entryDate = todayIso()) {
   const cleanUserId = typeof userId === 'string' ? userId.replace('user:', '') : userId;
-  await pruneDailyMoodHistory(cleanUserId, 30);
 
   const finalEntryDate = entryDate || todayIso();
   const entryDateObj = dayStart(finalEntryDate);
@@ -57,7 +42,6 @@ async function getDailyMood(userId, entryDate = todayIso()) {
 
 async function upsertDailyMood({ userId, entryDate = todayIso(), mood, energyLevel, stressLevel, symptoms = [], notes = '' }) {
   const cleanUserId = typeof userId === 'string' ? userId.replace('user:', '') : userId;
-  await pruneDailyMoodHistory(cleanUserId, 30);
 
   const finalEntryDate = entryDate || todayIso();
   const entryDateObj = dayStart(finalEntryDate);
@@ -94,8 +78,9 @@ async function upsertDailyMood({ userId, entryDate = todayIso(), mood, energyLev
 
 async function getRecentDailyMoods(userId, days = 30) {
   const cleanUserId = typeof userId === 'string' ? userId.replace('user:', '') : userId;
-  const safeDays = Number.isInteger(days) && days > 0 ? Math.min(days, 30) : 30;
-  await pruneDailyMoodHistory(cleanUserId, 30);
+  // Kept as a sanity bound rather than a retention policy: nothing deletes
+  // mood rows any more, so a caller asking for a year should get a year.
+  const safeDays = Number.isInteger(days) && days > 0 ? Math.min(days, 365) : 30;
 
   const result = await db.collection(await getColl(cleanUserId, 'user_daily_moods'))
     .find({ user_id: cleanUserId })
@@ -108,7 +93,6 @@ async function getRecentDailyMoods(userId, days = 30) {
 
 async function getMoodStreakDays(userId, endDate = todayIso()) {
   const cleanUserId = typeof userId === 'string' ? userId.replace('user:', '') : userId;
-  await pruneDailyMoodHistory(cleanUserId, 30);
 
   const finalEndDate = endDate || todayIso();
   const endDateObj = dayStart(finalEndDate);
@@ -156,7 +140,6 @@ async function getMoodsByUserId(userId, limit = 30) {
 }
 
 export const dailyMoodRepository = {
-  pruneDailyMoodHistory,
   getDailyMood,
   upsertDailyMood,
   getRecentDailyMoods,
