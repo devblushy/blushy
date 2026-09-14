@@ -17,6 +17,7 @@ import {
   buildActivityList,
 } from '../domain/sharedActivities.js';
 import { buildPartnerCareSuggestions, buildPartnerSharedDataPayload, buildCycleInfo } from '../services/partnerSuggestionService.js';
+import { getLifeStageState } from './lifeStageRepository.js';
 import { getDynamicPartnerNeeds } from '../services/partnerNeedsService.js';
 import { aiFetch } from '../utils/aiRequest.js';
 
@@ -1287,6 +1288,25 @@ async function getSharedData({ connectionId, viewerUserId }) {
     console.error('Error getting dynamic partner needs:', err);
   }
 
+  // Her life stage, and only where she has said her onboarding may be shared.
+  //
+  // Read behind the switch rather than read-then-filtered: if she has not
+  // agreed, the query is never made at all. It is the one field here that says
+  // what she is going through rather than how she is today -- pregnancy,
+  // postpartum, trying to conceive -- so it belongs to `shareOnboarding`
+  // alongside the rest of her answers.
+  let lifeStage = null;
+  if (permissions.shareOnboarding) {
+    try {
+      const state = await getLifeStageState(partnerUserId);
+      lifeStage = state?.lifeStage ?? null;
+    } catch (err) {
+      // A stage that cannot be read is simply not shown. Failing the whole
+      // payload over it would blank the cycle and mood she did agree to.
+      console.error('Error reading partner life stage:', err);
+    }
+  }
+
   const connectedAt = connection.senderAcceptedAt || connection.receiverAcceptedAt || connection.createdAt || null;
   const todayDateStr = new Date().toISOString().slice(0, 10);
   let completedActionIds = [];
@@ -1301,6 +1321,7 @@ async function getSharedData({ connectionId, viewerUserId }) {
     partnerUserId,
     partnerUser,
     permissions,
+    lifeStage,
     mood: data.mood,
     sleep: data.sleep,
     cycleStartDate: data.cycle,

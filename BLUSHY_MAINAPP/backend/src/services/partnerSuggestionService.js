@@ -315,6 +315,7 @@ export function buildPartnerSharedDataPayload({
   connectionId,
   partnerUserId,
   partnerUser,
+  lifeStage = null,
   permissions,
   mood,
   sleep,
@@ -370,6 +371,11 @@ export function buildPartnerSharedDataPayload({
       : null,
     shareInsights: Boolean(permissions?.shareInsights),
     latestInsights: null,
+    // Null unless she shares her onboarding. The flag travels with it so the
+    // client can tell "she has not chosen a stage" from "she has not shared
+    // one" -- two different things, and only one of them is about privacy.
+    shareOnboarding: Boolean(permissions?.shareOnboarding),
+    lifeStage: permissions?.shareOnboarding ? (lifeStage ?? null) : null,
     suggestions,
     completedActionIds: Array.isArray(completedActionIds) ? completedActionIds : [],
     dynamicNeeds: dynamicNeeds || null,
