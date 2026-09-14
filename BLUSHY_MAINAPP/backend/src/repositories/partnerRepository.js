@@ -1247,8 +1247,26 @@ async function getSharedData({ connectionId, viewerUserId }) {
     if (!data.sleep) data.sleep = await sleepFromEvents(partnerUserId, today);
   }
 
+  // Her timezone, read whatever she shares.
+  //
+  // It is not personal data leaving the server -- it never enters the payload
+  // -- it is only what decides when her day starts. Without it this counted
+  // in UTC, so her partner's Learn tab read a day behind the card above it.
+  let subjectTimezone = null;
+  try {
+    subjectTimezone = (await getLifeStageState(partnerUserId))?.timezone ?? null;
+  } catch (err) {
+    console.error('Error reading partner timezone for cycle info:', err);
+  }
+
   const cycleInfo = (isPartnerWoman && permissions.shareCycle && data.cycle)
-    ? buildCycleInfo(data.cycle, partnerUser?.onboardingAnswers ?? {}, new Date(), periodEntries)
+    ? buildCycleInfo(
+        data.cycle,
+        partnerUser?.onboardingAnswers ?? {},
+        new Date(),
+        periodEntries,
+        subjectTimezone,
+      )
     : null;
 
   const hasAnyData = (permissions.shareMood && data.mood) || 
@@ -1322,6 +1340,7 @@ async function getSharedData({ connectionId, viewerUserId }) {
     partnerUser,
     permissions,
     lifeStage,
+    timezone: subjectTimezone,
     mood: data.mood,
     sleep: data.sleep,
     cycleStartDate: data.cycle,

@@ -16,11 +16,35 @@ function unique(values) {
   return [...new Set(values.filter((value) => typeof value === 'string' && value.trim().length > 0))];
 }
 
+/**
+ * The calendar date it is *where she is*, as UTC midnight of that date.
+ *
+ * Returns null when no zone is given, so the caller keeps the old UTC
+ * behaviour rather than silently adopting the server's zone.
+ */
+function todayInTimezone(reference, timezone) {
+  if (!timezone) return null;
+  try {
+    const ymd = new Intl.DateTimeFormat('en-CA', {
+      timeZone: timezone,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }).format(reference);
+    const parsed = new Date(`${ymd}T00:00:00.000Z`);
+    return Number.isNaN(parsed.getTime()) ? null : parsed;
+  } catch (_) {
+    // An unknown zone string is not worth failing a payload over.
+    return null;
+  }
+}
+
 export function buildCycleInfo(
   cycleStartDate,
   onboardingAnswers = {},
   referenceDate = new Date(),
   periodEntries = [],
+  timezone = null,
 ) {
   const dates = [];
 
@@ -91,7 +115,14 @@ export function buildCycleInfo(
     }
   }
 
-  const todayNormalized = new Date(Date.UTC(ref.getUTCFullYear(), ref.getUTCMonth(), ref.getUTCDate()));
+  // Her day, not UTC's.
+  //
+  // This took the UTC calendar date, so anywhere east of UTC the day rolled
+  // over hours late: her Learn tab read Day 19 while the card above it, which
+  // goes through the partner-safe path, already read Day 20. Two cards in one
+  // app disagreeing by a day, because they counted "today" in two places.
+  const todayNormalized = todayInTimezone(ref, timezone)
+    ?? new Date(Date.UTC(ref.getUTCFullYear(), ref.getUTCMonth(), ref.getUTCDate()));
   const startNormalized = new Date(Date.UTC(start.getUTCFullYear(), start.getUTCMonth(), start.getUTCDate()));
 
   let currentCycleStart = new Date(startNormalized);
@@ -321,6 +352,7 @@ export function buildPartnerSharedDataPayload({
   sleep,
   cycleStartDate,
   periodEntries = [],
+  timezone = null,
   suggestions,
   dynamicNeeds = null,
   connectedAt = null,
@@ -365,7 +397,7 @@ export function buildPartnerSharedDataPayload({
     shareCycle: canShareCycle,
     cycleInfo: canShareCycle
       ? {
-          ...buildCycleInfo(effectiveCycleStart, onboardingAnswers, new Date(), periodEntries),
+          ...buildCycleInfo(effectiveCycleStart, onboardingAnswers, new Date(), periodEntries, timezone),
           answers: extractCycleAnswers(onboardingAnswers),
         }
       : null,
