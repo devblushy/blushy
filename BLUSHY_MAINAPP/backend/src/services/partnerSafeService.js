@@ -45,6 +45,36 @@ import { db } from '../utils/db.js';
  */
 
 const PARTNER_CONTRACT_VERSION = 'partner-safe-v1.0.0';
+
+/**
+ * The names her own "Symptoms" section offers, and nothing else.
+ *
+ * Five categories in `symptom_categories.dart` write `symptom_logged`:
+ * Symptoms, Intimate health, Vaginal discharge, Hair and skin, and Digestion
+ * and stool. The event type alone cannot tell them apart -- only the name can
+ * -- so filtering on the type handed her partner every one of them under a
+ * switch labelled "Symptoms". "Vaginal itching" travelled to him on the same
+ * permission as "Cramps".
+ *
+ * An allowlist rather than a blocklist: a new intimate-health option added
+ * later must not reach a partner because nobody remembered to exclude it.
+ * Anything not named here is simply withheld, and she can still share it
+ * herself in her own words.
+ */
+const PARTNER_VISIBLE_SYMPTOMS = new Set([
+  'cramps',
+  'headache',
+  'tender breasts',
+  'backache',
+  'abdominal pain',
+  'acne',
+  'fatigue',
+  'cravings',
+  'insomnia',
+  'swelling',
+  'dry skin',
+  'dry eyes',
+]);
 const CONNECTIONS = 'partner_connections';
 
 function cleanUserId(userId) {
@@ -137,7 +167,12 @@ async function buildSubjectContext(subjectUserId, { referenceDate = new Date() }
   const sleep = latestOf('sleep_logged');
   if (sleep) context.sleep = { durationHours: sleep.payload?.durationHours, quality: sleep.payload?.quality, loggedAt: sleep.timestamp };
 
-  const symptoms = recent.filter((event) => event.eventType === 'symptom_logged').slice(0, 5);
+  // Filtered by name, not by event type -- see PARTNER_VISIBLE_SYMPTOMS.
+  const symptoms = recent
+    .filter((event) => event.eventType === 'symptom_logged')
+    .filter((event) =>
+      PARTNER_VISIBLE_SYMPTOMS.has(String(event.payload?.symptom ?? '').toLowerCase().trim()))
+    .slice(0, 5);
   if (symptoms.length > 0) {
     context.symptoms = symptoms.map((event) => ({ symptom: event.payload?.symptom, loggedAt: event.timestamp }));
   }

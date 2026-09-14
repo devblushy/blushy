@@ -152,3 +152,39 @@ test('the lengths his ring needs travel with the phase he already sees', async (
   assert.ok(block.includes('cycleLengthDays'), block);
   assert.ok(block.includes('periodLengthDays'), block);
 });
+
+test('only the names her own Symptoms section offers reach him', async () => {
+  // Five categories in symptom_categories.dart write `symptom_logged`:
+  // Symptoms, Intimate health, Vaginal discharge, Hair and skin, and
+  // Digestion. Filtering on the event type handed her partner all five under
+  // a switch labelled "Symptoms" -- "Vaginal itching" travelled to him on the
+  // same permission as "Cramps".
+  const { readFileSync } = await import('node:fs');
+  const source = readFileSync('src/services/partnerSafeService.js', 'utf8');
+
+  const list = source.slice(
+    source.indexOf('const PARTNER_VISIBLE_SYMPTOMS'),
+    source.indexOf(']);', source.indexOf('const PARTNER_VISIBLE_SYMPTOMS')),
+  );
+
+  for (const allowed of ['cramps', 'headache', 'tender breasts', 'abdominal pain', 'fatigue']) {
+    assert.ok(list.includes(`'${allowed}'`), `${allowed} is one of hers`);
+  }
+  for (const withheld of [
+    'vaginal itching',
+    'vaginal dryness',
+    'clumpy white',
+    'hair thinning',
+    'excess facial hair',
+  ]) {
+    assert.ok(!list.includes(`'${withheld}'`), `${withheld} must not be on this list`);
+  }
+
+  // An allowlist, not a blocklist: a new intimate-health option added later
+  // must not reach a partner because nobody remembered to exclude it.
+  const filter = source.slice(
+    source.indexOf("filter((event) => event.eventType === 'symptom_logged')"),
+    source.indexOf('.slice(0, 5)', source.indexOf("filter((event) => event.eventType === 'symptom_logged')")),
+  );
+  assert.ok(filter.includes('PARTNER_VISIBLE_SYMPTOMS.has'), filter);
+});
