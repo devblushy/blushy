@@ -63,9 +63,19 @@ async function verifyToken(token) {
     }
 
     if (!payload) {
+      // Nothing on this path used to be logged, so a phone whose token was
+      // refused and a phone that never reached the server at all looked
+      // exactly alike from here: silence either way. When someone reports
+      // that Google sign-in does not work, this line is what says whether
+      // the request arrived.
+      logger.warn(
+        `googleLogin: ID token rejected (${error ? error.message : 'unknown verification error'}). ` +
+        `Audiences configured: ${allowedAudiences.length}.`,
+      );
       throw createHttpError(401, `Invalid Google ID Token: ${error ? error.message : 'Unknown verification error'}`);
     }
 
+    logger.info('googleLogin: ID token verified');
     return payload;
   } else {
     // If it's a raw Access Token (fallback for web client environments):
@@ -95,6 +105,10 @@ async function verifyToken(token) {
         name: data.name || data.given_name || 'Blushy User',
       };
     } catch (e) {
+      // The app falls back to the access token when Google hands it no ID
+      // token, which is itself a symptom worth seeing: it means the server
+      // client id did not take effect on the device.
+      logger.warn(`googleLogin: access-token fallback rejected (${e.message})`);
       throw createHttpError(401, `Invalid Google Token: ${e.message}`);
     }
   }
@@ -102,8 +116,17 @@ async function verifyToken(token) {
 
 export async function signInWithGoogle(idToken, role = 'woman') {
   if (typeof idToken !== 'string' || idToken.trim().length === 0) {
+    logger.warn('googleLogin: request arrived with no token');
     throw createHttpError(400, 'Google ID Token is required.');
   }
+
+  // Which kind of token the device sent, without writing the token down. An
+  // ID token is three dot-separated parts; anything else is the access-token
+  // fallback, which only happens when Google declined to mint an ID token.
+  const looksLikeIdToken = idToken.split('.').length === 3;
+  logger.info(
+    `googleLogin: attempt received (${looksLikeIdToken ? 'id_token' : 'access_token_fallback'}, role=${role})`,
+  );
 
   const payload = await verifyToken(idToken);
   const googleId = payload.sub;
