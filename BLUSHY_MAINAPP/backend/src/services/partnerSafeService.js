@@ -152,9 +152,27 @@ async function buildSubjectContext(subjectUserId, { referenceDate = new Date() }
   }
 
   if (capabilities.cyclePredictions || capabilities.cycleTracking) {
-    const cycle = await getCycleState(subjectUserId, { referenceDate: referenceDate.toISOString().slice(0, 10) });
+    // Her timezone, not ours, and not UTC.
+    //
+    // This passed `referenceDate.toISOString().slice(0, 10)` -- the UTC
+    // calendar date -- which overrode the timezone handling
+    // `calculatePeriodPredictions` already does. Her phone counts the day
+    // locally, so anywhere east of UTC her partner was a day behind for part
+    // of every day: she read Day 16, he read Day 15. Passing her zone and no
+    // explicit date lets both sides agree on when today starts.
+    const cycle = await getCycleState(subjectUserId, { timezone: stageState.timezone ?? null });
     if (cycle.state === RESPONSE_STATES.READY) {
-      context.cyclePhase = { phase: cycle.data.currentCycle?.phase, cycleDay: cycle.data.currentCycle?.currentCycleDay };
+      context.cyclePhase = {
+        phase: cycle.data.currentCycle?.phase,
+        cycleDay: cycle.data.currentCycle?.currentCycleDay,
+        // The two lengths her own ring is drawn with. Without them his ring
+        // fell back to 28 and 5 -- a shape belonging to nobody, sitting under
+        // a heading with her name on it. They are cycle facts, no more
+        // revealing than the phase and day beside them, and they travel under
+        // the same `cycle.phase` grant rather than a new one.
+        cycleLengthDays: cycle.data.currentCycle?.cycleLengthDays ?? null,
+        periodLengthDays: cycle.data.currentCycle?.periodDurationDays ?? null,
+      };
       if (cycle.data.prediction?.nextPeriodStartDate) {
         context.nextPeriodWindow = {
           earliest: cycle.data.prediction.predictionRange?.earliestDate ?? cycle.data.prediction.nextPeriodStartDate,

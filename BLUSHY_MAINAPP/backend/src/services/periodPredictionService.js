@@ -145,6 +145,7 @@ export async function calculatePeriodPredictions(userId, options = {}) {
         isEstimate: false,
         cycleStartDate: null,
         latestConfirmedPeriodStartDate: null,
+        cycleLengthDays: null,
         periodDurationDays: null,
         periodDurationSource: null,
         periodDurationObservations: 0,
@@ -209,6 +210,7 @@ export async function calculatePeriodPredictions(userId, options = {}) {
         isEstimate: true,
         cycleStartDate: null,
         latestConfirmedPeriodStartDate: null,
+        cycleLengthDays: null,
         periodDurationDays: periodPredictionConfig.defaultPeriodDurationDays,
         periodDurationSource: 'default',
         periodDurationObservations: 0,
@@ -397,6 +399,10 @@ export async function calculatePeriodPredictions(userId, options = {}) {
       isEstimate: true,
       cycleStartDate: isoDate(latestConfirmedPeriodStartDate),
       latestConfirmedPeriodStartDate: isoDate(latestConfirmedPeriodStartDate),
+      // The length every other number here is derived from. It was used
+      // throughout and never reported, so anything drawing a ring from this
+      // block had to assume 28 -- which is a number about nobody.
+      cycleLengthDays: calculatedCycleLength,
       periodDurationDays,
       periodDurationSource,
       periodDurationObservations,

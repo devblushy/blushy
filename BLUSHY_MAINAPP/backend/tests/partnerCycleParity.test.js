@@ -1,0 +1,154 @@
+import test, { before, after } from 'node:test';
+import assert from 'node:assert/strict';
+
+import { randomUUID } from 'node:crypto';
+
+import { startTestServer, stopTestServer, getDb } from './helpers/testServer.js';
+import { calculatePeriodPredictions } from '../src/services/periodPredictionService.js';
+
+/**
+ * Her partner has to be looking at her cycle, not at a reconstruction of it.
+ *
+ * Two things were wrong, and both showed up as the ring on his screen
+ * disagreeing with the ring on hers.
+ *
+ * **The day.** `partnerSafeService` asked for her cycle with
+ * `referenceDate.toISOString().slice(0, 10)` -- the UTC calendar date -- which
+ * overrode the timezone handling this service already does. Her phone counts
+ * the day locally, so anywhere east of UTC he was a day behind for part of
+ * every day. Reported from India: she read Day 16, he read Day 15.
+ *
+ * **The shape.** Her cycle length was computed here, used for every other
+ * number, and never reported. Anything drawing a ring from this block had to
+ * assume 28 days -- a shape belonging to nobody, under a heading with her name
+ * on it.
+ */
+
+before(async () => { await startTestServer(); });
+after(async () => { await stopTestServer(); });
+
+let seq = 0;
+const nextUser = () => `cycle_parity_${Date.now()}_${seq++}`;
+
+/// Three period starts 30 days apart, so the computed length is 30 and not the
+/// 28 a default would produce.
+async function seedCycle(userId, startDates) {
+  // The prediction reads `user_period_logs_woman` via `getPeriodEntries`, not
+  // the health-event stream, so that is what has to be seeded.
+  for (const date of startDates) {
+    await getDb().collection('user_period_logs_woman').insertOne({
+      _id: randomUUID(),
+      user_id: userId,
+      period_start_date: date,
+      period_end_date: null,
+      source: 'manual_tracker',
+      created_at: new Date(),
+      updated_at: new Date(),
+    });
+  }
+  await getDb().collection('users_woman').updateOne(
+    { user_id: userId },
+    {
+      $set: {
+        user_id: userId,
+        role: 'woman',
+        timezone: 'Asia/Kolkata',
+        life_stage: 'cycle_tracking',
+        onboarding_answers: { life_stage: 'cycle_tracking' },
+      },
+    },
+    { upsert: true },
+  );
+  await getDb().collection('user_life_stage').updateOne(
+    { user_id: userId },
+    { $set: { user_id: userId, life_stage: 'cycle_tracking', timezone: 'Asia/Kolkata' } },
+    { upsert: true },
+  );
+}
+
+test('the cycle length it computes is the one it reports', async () => {
+  const userId = nextUser();
+  await seedCycle(userId, ['2026-07-02', '2026-08-01', '2026-08-31']);
+
+  const result = await calculatePeriodPredictions(userId, { referenceDate: '2026-09-15' });
+
+  assert.equal(result.hasData, true);
+  assert.equal(
+    result.currentCycle.cycleLengthDays,
+    30,
+    'the 30-day gap she actually logged, not a 28-day default',
+  );
+});
+
+test('and the day it reports is measured against that same length', async () => {
+  const userId = nextUser();
+  await seedCycle(userId, ['2026-07-02', '2026-08-01', '2026-08-31']);
+
+  const result = await calculatePeriodPredictions(userId, { referenceDate: '2026-09-15' });
+
+  // 2026-08-31 is Day 1, so 2026-09-15 is Day 16 -- the number she sees.
+  assert.equal(result.currentCycle.currentCycleDay, 16);
+});
+
+test('a timezone ahead of UTC is counted in her zone, not ours', async () => {
+  // The failure was time-of-day dependent, which is why it looked intermittent:
+  // in Asia/Kolkata every moment before 05:30 local is still "yesterday" in
+  // UTC. Asking in her zone has to give her day.
+  const userId = nextUser();
+  await seedCycle(userId, ['2026-08-31']);
+
+  const inHerZone = await calculatePeriodPredictions(userId, { timezone: 'Asia/Kolkata' });
+  const utcDate = new Date().toISOString().slice(0, 10);
+  const asUtcDate = await calculatePeriodPredictions(userId, { referenceDate: utcDate });
+
+  assert.equal(
+    inHerZone.todayDate,
+    new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' }).format(new Date()),
+    'today is the date it is in her zone',
+  );
+
+  // Whenever the two calendars disagree, hers is the one that must win. The
+  // difference is never more than a day.
+  const diff = Math.abs(
+    (new Date(inHerZone.todayDate) - new Date(asUtcDate.todayDate)) / 86400000,
+  );
+  assert.ok(diff <= 1, `unexpected gap of ${diff} days`);
+  assert.equal(
+    inHerZone.currentCycle.currentCycleDay - asUtcDate.currentCycle.currentCycleDay,
+    Math.round((new Date(inHerZone.todayDate) - new Date(asUtcDate.todayDate)) / 86400000),
+    'the day count moves exactly with the calendar it was asked about',
+  );
+});
+
+test('the partner-safe path asks in her timezone and passes no UTC date', async () => {
+  // Pinned on the source, because the bug was one argument: an explicit
+  // reference date silently outranks the timezone logic underneath it.
+  const { readFileSync } = await import('node:fs');
+  const source = readFileSync('src/services/partnerSafeService.js', 'utf8');
+
+  const call = source.slice(
+    source.indexOf('const cycle = await getCycleState('),
+    source.indexOf(';', source.indexOf('const cycle = await getCycleState(')),
+  );
+
+  assert.ok(call.includes('timezone'), 'her zone is passed');
+  assert.ok(
+    !call.includes('toISOString'),
+    'a UTC calendar date here overrides the timezone handling underneath',
+  );
+});
+
+test('the lengths his ring needs travel with the phase he already sees', async () => {
+  // Under the same `cycle.phase` grant, not a new one: they are cycle facts,
+  // no more revealing than the phase and day beside them.
+  const { readFileSync } = await import('node:fs');
+  const source = readFileSync('src/services/partnerSafeService.js', 'utf8');
+
+  const block = source.slice(
+    source.indexOf('context.cyclePhase = {'),
+    source.indexOf('};', source.indexOf('context.cyclePhase = {')),
+  );
+
+  assert.ok(block.includes('cycleLengthDays'), block);
+  assert.ok(block.includes('periodLengthDays'), block);
+});
