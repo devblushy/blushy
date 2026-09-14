@@ -126,6 +126,7 @@ flutter:
     - family: AdaHybrid
       fonts:
         - asset: assets/fonts/AdaHybrid-Bold.ttf
+          weight: 700
     - family: Inter
       fonts:
         - asset: assets/fonts/Inter[opsz,wght].ttf

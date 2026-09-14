@@ -12,12 +12,32 @@ import '../core/storage.dart';
 import '../features/partner/presentation/partner_profile_screen.dart';
 import '../services/api_blushy_service.dart';
 import '../features/notifications/notification_inbox.dart';
+import 'docsy_wordmark.dart';
+import '../l10n/app_localizations.dart';
 
 /// The size the header's leading text is set at, wordmark or tab name.
 ///
 /// Shared so the two cannot drift: switching tabs should change the word, not
 /// the size of it.
 const double _headerLeadingSize = 22;
+
+/// The size a tab's own name is set at.
+///
+/// A quarter smaller than the wordmark it sits in place of: BLUSHY. is the
+/// product, and a tab name printed at the same size competes with it.
+const double _tabTitleSize = _headerLeadingSize * 0.75;
+
+/// A tab name, in the display face with the accent full stop.
+///
+/// The stop is the same one BLUSHY. ends on -- the mark that says this is a
+/// Blushy page rather than a screen title.
+TextStyle _tabTitleStyle() => const TextStyle(
+      fontFamily: 'AdaHybrid',
+      fontSize: _tabTitleSize,
+      fontWeight: FontWeight.w700,
+      letterSpacing: 1.5,
+      color: BlushyColors.primary,
+    );
 
 class BlushyHeader extends StatelessWidget implements PreferredSizeWidget {
   const BlushyHeader({super.key, this.title});
@@ -61,17 +81,21 @@ class BlushyHeader extends StatelessWidget implements PreferredSizeWidget {
                         child: Semantics(
                           label: title!,
                           excludeSemantics: true,
-                          child: Text(
-                            title!.toUpperCase(),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: GoogleFonts.manrope(
-                              fontSize: _headerLeadingSize,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 1.5,
-                              color: BlushyColors.primary,
-                            ),
-                          ),
+                          // Docsy's own tab gets its wordmark here, the way
+                          // the untitled header shows BLUSHY. Compared against
+                          // the localised label rather than the literal
+                          // "Docsy", so it still matches in every language.
+                          child: title! == AppLocalizations.of(context).navSia
+                              // Docsy keeps its square mark rather than the
+                              // round stop, so the two names stay tellable
+                              // apart at a glance.
+                              ? DocsyWordmark(
+                                  text: title!.toUpperCase(),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: _tabTitleStyle(),
+                                )
+                              : _TabTitle(title: title!),
                         ),
                       ),
                   ],
@@ -151,6 +175,31 @@ class BlushyHeader extends StatelessWidget implements PreferredSizeWidget {
 }
 
 /// The BLUSHY. lockup in Ada Hybrid bold style.
+/// One tab's name, ending in the accent stop.
+class _TabTitle extends StatelessWidget {
+  const _TabTitle({required this.title});
+
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text.rich(
+      TextSpan(
+        children: [
+          TextSpan(text: title.toUpperCase()),
+          const TextSpan(
+            text: '.',
+            style: TextStyle(color: BlushyColors.accent),
+          ),
+        ],
+      ),
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      style: _tabTitleStyle(),
+    );
+  }
+}
+
 class _Wordmark extends StatelessWidget {
   const _Wordmark();
 

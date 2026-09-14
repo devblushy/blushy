@@ -47,7 +47,10 @@ void main() {
     await tester.pumpWidget(_host(const BlushyHeader(title: 'Community')));
     await tester.pumpAndSettle();
 
-    expect(find.text('COMMUNITY'), findsOneWidget);
+    // The name now ends on the accent stop, so it is rich text rather than a
+    // plain string -- see tab_header_test.dart for the mark itself.
+    expect(find.textContaining('COMMUNITY', findRichText: true),
+        findsOneWidget);
     expect(_wordmark(), findsNothing,
         reason: 'the tab name replaces the wordmark rather than joining it');
   });
@@ -56,25 +59,52 @@ void main() {
     await tester.pumpWidget(_host(const BlushyHeader(title: 'M Studio')));
     await tester.pumpAndSettle();
 
-    final text = tester.widget<Text>(find.text('M STUDIO'));
-    expect(text.style?.color, BlushyColors.primary,
+    final text = tester.widget<RichText>(
+      find.descendant(
+        of: find.byType(BlushyHeader),
+        matching: find.byType(RichText),
+      ).first,
+    );
+    expect(text.text.toPlainText(), 'M STUDIO.');
+    expect(text.text.style?.color, BlushyColors.primary,
         reason: 'the same red the wordmark uses, not a near miss');
   });
 
-  testWidgets('the name is set at the same size as the wordmark',
+  testWidgets('a tab name is set below the wordmark, not level with it',
       (tester) async {
-    // Switching tabs should change the word in the header, not the size of it.
+    // They used to be the same size, so a screen title competed with the
+    // product name. A tab name is three quarters of it now.
     await tester.pumpWidget(_host(const BlushyHeader()));
     await tester.pumpAndSettle();
     final mark = tester.widget<RichText>(_wordmark());
     final markSize = (mark.text as TextSpan).style?.fontSize;
 
+    await tester.pumpWidget(const SizedBox.shrink());
     await tester.pumpWidget(_host(const BlushyHeader(title: 'Community')));
     await tester.pumpAndSettle();
-    final nameSize = tester.widget<Text>(find.text('COMMUNITY')).style?.fontSize;
+    final name = tester.widget<RichText>(
+      find.descendant(
+        of: find.byType(BlushyHeader),
+        matching: find.byType(RichText),
+      ).first,
+    );
+    final nameSize = name.text.style?.fontSize;
 
     expect(markSize, isNotNull);
-    expect(nameSize, markSize);
+    expect(nameSize, isNotNull);
+    expect(nameSize, closeTo(markSize! * 0.75, 0.01));
+
+    // And every tab name is set at that one size, whichever tab it is.
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pumpWidget(_host(const BlushyHeader(title: 'Partner')));
+    await tester.pumpAndSettle();
+    final other = tester.widget<RichText>(
+      find.descendant(
+        of: find.byType(BlushyHeader),
+        matching: find.byType(RichText),
+      ).first,
+    );
+    expect(other.text.style?.fontSize, nameSize);
   });
 
   testWidgets('screen readers get the name as written, not the caps',
@@ -119,9 +149,14 @@ void main() {
     expect(find.byIcon(Icons.person_outline_rounded), findsOneWidget,
         reason: 'the controls are not pushed off the edge');
 
-    final text = tester.widget<Text>(
-      find.text('EIN SEHR LANGER REGISTERKARTENNAME HIER'),
+    final text = tester.widget<RichText>(
+      find.descendant(
+        of: find.byType(BlushyHeader),
+        matching: find.byType(RichText),
+      ).first,
     );
+    expect(text.text.toPlainText(),
+        'EIN SEHR LANGER REGISTERKARTENNAME HIER.');
     expect(text.overflow, TextOverflow.ellipsis);
     expect(text.maxLines, 1);
   });
@@ -157,8 +192,12 @@ void main() {
     ));
     await tester.pumpAndSettle();
 
+    // Docsy's tab carries its square mark in a WidgetSpan, so the span's
+    // plain-text projection is the name followed by U+FFFC. Match the name the
+    // tab renders rather than the placeholder the mark contributes -- the five
+    // labels share no substring, so this is no weaker a check.
     for (final label in labels) {
-      expect(find.text(label), findsOneWidget, reason: label);
+      expect(find.textContaining(label), findsOneWidget, reason: label);
     }
   });
 }

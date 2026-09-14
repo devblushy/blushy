@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../theme/colors.dart';
 import '../l10n/app_localizations.dart';
 import 'docsy_avatar.dart';
+import 'docsy_wordmark.dart';
 
 /// Five destinations, with Docsy raised in the middle.
 ///
@@ -125,8 +126,8 @@ class BlushyBottomNavigation extends StatelessWidget {
                 color: isActive ? activeColor : const Color(0xFF645A60),
               ),
               const SizedBox(height: 3),
-              Text(
-                siaLabel,
+              DocsyWordmark(
+                text: siaLabel,
                 style: GoogleFonts.manrope(
                   fontSize: 10.5,
                   color: isActive ? activeColor : const Color(0xFF645A60),
