@@ -215,9 +215,10 @@ class _SignupScreenState extends State<SignupScreen> {
           // The cause is named instead.
           final raw = e.toString().replaceFirst(RegExp(r'^Exception: '), '');
           final cleaned = ApiAuthService.cleanErrorMessage(e);
-          _errorMessage = cleaned.startsWith('Unable to connect')
-              ? 'Google sign-in failed: $raw'
-              : cleaned;
+          _errorMessage = _googleFailureMessage(raw) ??
+              (cleaned.startsWith('Unable to connect')
+                  ? 'Google sign-in failed: $raw'
+                  : cleaned);
         });
       }
     } finally {
@@ -225,6 +226,40 @@ class _SignupScreenState extends State<SignupScreen> {
         setState(() => _isSubmitting = false);
       }
     }
+  }
+
+  /// Plain words for the Play-services codes that come back as bare numbers.
+  ///
+  /// `ApiException: 10` is the one that matters and the one that reads as
+  /// nothing: it means Google would not mint a token because it could not
+  /// match this build to an Android OAuth client -- the signing certificate
+  /// the APK was signed with is not registered against the package name in
+  /// the Google project. It is invisible in development, because the debug
+  /// keystore usually *is* registered, and it appears the moment a release
+  /// build is installed. Telling somebody "ApiException: 10" sends them to
+  /// check the server, which is fine.
+  ///
+  /// Returns null when the error is not one of these, so the general handling
+  /// above still applies.
+  static String? _googleFailureMessage(String raw) {
+    if (raw.contains('ApiException: 10') || raw.contains('DEVELOPER_ERROR')) {
+      return 'Google sign-in is not set up for this build. Its signing '
+          'certificate is not registered with the Google project, so Google '
+          'refused to issue a token. Signing in with email still works.';
+    }
+    if (raw.contains('ApiException: 7') || raw.contains('NETWORK_ERROR')) {
+      return 'Google sign-in could not reach Google. Check the connection and '
+          'try again.';
+    }
+    if (raw.contains('ApiException: 12500') || raw.contains('SIGN_IN_REQUIRED')) {
+      return 'Google sign-in could not complete on this device. Signing in '
+          'with email still works.';
+    }
+    if (raw.contains('12501')) {
+      // The user backed out of the account picker. Not a failure.
+      return null;
+    }
+    return null;
   }
 
   /// Confirms the account was created, then sends the user to the login tab.

@@ -722,7 +722,39 @@ class ApiAuthService implements AuthService {
   }
 
 
+  /// How long is actually left on a 429, in words. Null for anything else.
+  ///
+  /// `Retry-After` and `RateLimit-Reset` are both seconds remaining, and the
+  /// server sends both. Either will do; neither was being read.
+  static String? _rateLimitMessage(DioException e) {
+    final response = e.response;
+    if (response?.statusCode != 429) return null;
+
+    final header = response!.headers.value('retry-after') ??
+        response.headers.value('ratelimit-reset');
+    final seconds = int.tryParse(header?.trim() ?? '');
+    if (seconds == null || seconds <= 0) {
+      // Rate limited, but the server did not say for how long. Better than
+      // repeating a window length that may have almost run out.
+      return 'Too many attempts. Please wait a little and try again.';
+    }
+
+    if (seconds < 60) {
+      return 'Too many attempts. Please try again in $seconds seconds.';
+    }
+    final minutes = (seconds / 60).ceil();
+    return 'Too many attempts. Please try again in '
+        '$minutes ${minutes == 1 ? 'minute' : 'minutes'}.';
+  }
+
   String _extractErrorMessage(DioException e) {
+    // A refusal for going too fast is worded from the clock, not the policy.
+    // The server says "try again in 15 minutes" because that is the window it
+    // is configured with -- but somebody fourteen minutes into it was being
+    // told to wait fifteen more. `Retry-After` is what is actually left.
+    final waitMessage = _rateLimitMessage(e);
+    if (waitMessage != null) return waitMessage;
+
     if (e.response != null && e.response?.data != null) {
       final data = e.response!.data;
       if (data is Map<String, dynamic>) {

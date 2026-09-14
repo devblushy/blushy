@@ -1042,7 +1042,19 @@ class _BlushySiaScreenState extends State<BlushySiaScreen> with TickerProviderSt
     DateTime? lastDay;
 
     for (final msg in _messages) {
-      final at = DateTime.tryParse(msg['at'] ?? '');
+      // `.toLocal()` is the whole fix for "today's messages move to
+      // yesterday when I reopen the app".
+      //
+      // The server stores timestamps in UTC, so `DateTime.tryParse` returns a
+      // UTC DateTime and `at.year/month/day` are UTC calendar fields. At
+      // 01:00 in Asia/Kolkata that is still the previous date in UTC, so a
+      // message sent minutes ago was filed under "Yesterday" -- but only
+      // after a reload, because a message added during the session carries a
+      // local timestamp and grouped correctly. Switching the app off and on
+      // is exactly what swaps one for the other.
+      //
+      // A no-op on a timestamp that is already local, so both kinds agree.
+      final at = DateTime.tryParse(msg['at'] ?? '')?.toLocal();
       if (at != null) {
         final day = DateTime(at.year, at.month, at.day);
         if (lastDay == null || day != lastDay) {
@@ -1118,7 +1130,9 @@ class _BlushySiaScreenState extends State<BlushySiaScreen> with TickerProviderSt
       return const SizedBox.shrink();
     }
     final isSia = msg['sender'] == 'sia';
-    final sentAt = DateTime.tryParse(msg['at'] ?? '');
+    // Local for the same reason as the day separator above: a UTC timestamp
+    // rendered raw shows the clock time in London, not in her kitchen.
+    final sentAt = DateTime.tryParse(msg['at'] ?? '')?.toLocal();
     // Docsy answers from the left and she writes from the right, with a
     // face on each side. The bubbles are width-capped so the side they sit on
     // is actually visible; as full-width blocks it made no difference.
@@ -1382,20 +1396,51 @@ class _BlushySiaScreenState extends State<BlushySiaScreen> with TickerProviderSt
     );
   }
 
-  Widget _buildInputControlPanel() {
-    return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: BlushyTheme.getPagePadding(context),
-        vertical: 16.0,
+  /// One of the small round controls inside the composer pill.
+  ///
+  /// [filled] is the on state -- something attached, or the mic listening --
+  /// and shows as a tinted disc behind the glyph rather than a colour change
+  /// alone, which at this size is easy to miss.
+  Widget _composerAction({
+    required IconData icon,
+    required VoidCallback onTap,
+    bool filled = false,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        width: 42,
+        height: 42,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          // A soft disc always, as the reference draws it -- the glyph alone
+          // on the cream did not read as a control. It warms to the brand red
+          // once something is attached.
+          color: filled
+              ? BlushyColors.primary.withValues(alpha: 0.12)
+              : BlushyColors.taupe,
+          shape: BoxShape.circle,
+        ),
+        child: Icon(
+          icon,
+          size: 22,
+          color: filled ? BlushyColors.primary : BlushyColors.text,
+        ),
       ),
-      // A card sitting above the page rather than a bar welded to the bottom
-      // of it, so it matches the nav below and the cards above.
-      // Full width, rising from the bottom with rounded top corners, as on
-      // the reference.
-      decoration: const BoxDecoration(
-        color: BlushyColors.surface,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-        border: Border(top: BlushySurface.edge),
+    );
+  }
+
+  Widget _buildInputControlPanel() {
+    // Floating: no bar, no panel edge. The pill sits on the page with a soft
+    // shadow under it, so the conversation runs behind it rather than
+    // stopping at a lid.
+    return Padding(
+      padding: EdgeInsets.fromLTRB(
+        BlushyTheme.getPagePadding(context),
+        8,
+        BlushyTheme.getPagePadding(context),
+        12,
       ),
       child: Column(
         children: [
@@ -1477,94 +1522,110 @@ class _BlushySiaScreenState extends State<BlushySiaScreen> with TickerProviderSt
             ),
           ],
 
-          Row(
-            children: [
-              GestureDetector(
-                onTap: () => _showAttachmentOptionsModal(context),
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    color: _attachedFile != null ? BlushyColors.primary.withValues(alpha: 0.1) : Colors.transparent,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    _attachedFile != null ? Icons.add_circle_rounded : Icons.add_circle_outline_rounded,
-                    color: _attachedFile != null ? BlushyColors.primary : BlushyColors.secondaryText,
-                    size: 30,
-                  ),
+          // One pill, as on the reference composer: the attach control, the
+          // field, the mic and the send button sit inside a single rounded
+          // container instead of three separate shapes competing across the
+          // row. The controls take the brand red, BlushyColors.primary
+          // (#DD0D22) -- the same red the Docsy tab uses when it is active,
+          // not the accent orange.
+          Container(
+            padding: const EdgeInsets.all(7),
+            decoration: BoxDecoration(
+              color: BlushyColors.surface,
+              borderRadius: BorderRadius.circular(32),
+              border: Border.all(color: BlushyColors.border),
+              boxShadow: const [
+                BoxShadow(
+                  color: BlushyColors.shadow,
+                  blurRadius: 20,
+                  offset: Offset(0, 8),
                 ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                // A fixed height. A long message scrolls inside the field
-                // rather than growing it, so the bar never changes shape.
-                child: Container(
-                  height: 52,
-                  padding: const EdgeInsets.symmetric(horizontal: 18),
-                  decoration: BoxDecoration(
-                    color: BlushyColors.background,
-                    borderRadius: BorderRadius.circular(28),
-                    border: Border.all(color: BlushyColors.border),
-                  ),
-                  child: TextField(
-                    controller: _chatController,
-                    expands: true,
-                    minLines: null,
-                    maxLines: null,
-                    textAlignVertical: TextAlignVertical.center,
-                    keyboardType: TextInputType.multiline,
-                    textCapitalization: TextCapitalization.sentences,
-                    style: GoogleFonts.manrope(fontSize: 13, color: BlushyColors.text),
-                    decoration: InputDecoration(
-                      hintText: _attachedFile != null
-                          ? "Ask Docsy about ${_attachedFile!.name}..."
-                          : _placeholders[_placeholderIndex],
-                      hintStyle: GoogleFonts.manrope(fontSize: 12, color: BlushyColors.secondaryText),
-                      border: InputBorder.none,
-                      isDense: true,
-                      contentPadding: const EdgeInsets.symmetric(vertical: 10),
+              ],
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // Attach. Tinted once something is attached, so the pill says
+                // so on its own rather than only through the chip above it.
+                _composerAction(
+                  icon: Icons.add_rounded,
+                  onTap: () => _showAttachmentOptionsModal(context),
+                  filled: _attachedFile != null,
+                ),
+                Expanded(
+                  // One height, always. A long message scrolls inside the
+                  // field rather than growing the pill -- the decision the
+                  // fixed-height field already made, and what the reference
+                  // composer does too. `expands` is what fills that height.
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 6),
+                    child: SizedBox(
+                      height: 44,
+                      child: TextField(
+                        controller: _chatController,
+                        expands: true,
+                        minLines: null,
+                        maxLines: null,
+                        textAlignVertical: TextAlignVertical.center,
+                        keyboardType: TextInputType.multiline,
+                        textCapitalization: TextCapitalization.sentences,
+                        style: GoogleFonts.manrope(fontSize: 13, color: BlushyColors.text),
+                        decoration: InputDecoration(
+                          hintText: _attachedFile != null
+                              ? "Ask Docsy about ${_attachedFile!.name}..."
+                              : _placeholders[_placeholderIndex],
+                          hintStyle: GoogleFonts.manrope(fontSize: 12, color: BlushyColors.secondaryText),
+                          // The placeholders rotate and some are long; without
+                          // this the hint wraps to two lines inside a field
+                          // sized for one.
+                          hintMaxLines: 1,
+                          border: InputBorder.none,
+                          isDense: true,
+                          contentPadding: const EdgeInsets.symmetric(vertical: 10),
+                        ),
+                      ),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(width: 12),
-              // Rebuilt as she types. The icon switches between mic and send
-              // on the field's contents, but nothing was listening to the
-              // controller, so it stayed a mic until some unrelated rebuild
-              // happened along -- and since Enter now inserts a newline rather
-              // than submitting, this button is the only way to send.
-              ValueListenableBuilder<TextEditingValue>(
-                valueListenable: _chatController,
-                builder: (context, value, _) {
-                  final hasContent =
-                      value.text.trim().isNotEmpty || _attachedFile != null;
-                  return GestureDetector(
-                onTap: () {
-                  if (hasContent) {
-                    _sendUserMessage(_chatController.text);
-                  } else {
-                    _toggleVoiceRecording();
-                  }
-                },
-                child: Container(
-                  width: 52,
-                  height: 52,
-                  decoration: const BoxDecoration(
-                    color: BlushyColors.primary,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    hasContent
-                        ? Icons.send_rounded
-                        : (_isListeningVoice ? Icons.stop_rounded : Icons.mic_rounded),
-                    color: Colors.white,
-                    size: 22,
-                  ),
+                // One action on the right, as on the reference: the mic
+                // until there is something to send, then send. Rebuilt as she
+                // types -- nothing was listening to the controller before, so
+                // it stayed a mic until some unrelated rebuild came along.
+                ValueListenableBuilder<TextEditingValue>(
+                  valueListenable: _chatController,
+                  builder: (context, value, _) {
+                    final hasContent =
+                        value.text.trim().isNotEmpty || _attachedFile != null;
+                    return GestureDetector(
+                      onTap: () {
+                        if (hasContent) {
+                          _sendUserMessage(_chatController.text);
+                        } else {
+                          _toggleVoiceRecording();
+                        }
+                      },
+                      child: Container(
+                        width: 46,
+                        height: 46,
+                        decoration: const BoxDecoration(
+                          color: BlushyColors.primary,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          hasContent
+                              ? Icons.send_rounded
+                              : (_isListeningVoice
+                                  ? Icons.stop_rounded
+                                  : Icons.mic_rounded),
+                          color: Colors.white,
+                          size: 21,
+                        ),
+                      ),
+                    );
+                  },
                 ),
-              );
-                },
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),

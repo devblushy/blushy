@@ -5,7 +5,7 @@
 Welcome to **Blushy**, a digital health support and community platform designed to empower individuals with health tracking, AI-assisted insights, and meaningful community connections. Your privacy is our absolute priority. This Privacy Policy outlines how we collect, use, protect, and handle your personal information.
 
 ## 1. Our Privacy Philosophy
-Blushy is a **privacy-first** platform. We believe that your health data is deeply personal and belongs solely to you. We have built our architecture with end-to-end encryption and anonymous identifiers to ensure that your data remains secure and confidential. **We will never sell or share your personal health data with third parties.**
+Blushy is a **privacy-first** platform. We believe that your health data is deeply personal and belongs solely to you. We encrypt data in transit and at rest, use anonymous identifiers, and share nothing with a partner unless you explicitly turn that sharing on. **We will never sell or share your personal health data with third parties.** Section 4 sets out exactly what our servers can and cannot read.
 
 ## 2. Information We Collect
 
@@ -29,9 +29,11 @@ We use your information strictly to provide and improve the Blushy experience:
 
 ## 4. Data Security and Encryption
 Your data security is the foundation of Blushy:
-- **End-to-End Encryption:** Your personal health stats, cycle dates, and AI chat logs are stored securely using encryption.
+- **Encryption in Transit:** All communication between the app and our servers uses HTTPS/TLS.
+- **Encryption at Rest:** Our database provider encrypts stored data at the storage layer.
 - **Anonymous Identifiers:** We use hashed values for sensitive identifiers (like your phone number) and anonymous user IDs to decouple your real-world identity from your health data.
-- **Secure Infrastructure:** All data in transit is encrypted, and our backend is designed to minimize the retention of unencrypted personal data.
+- **What we can read:** Blushy is **not** end-to-end encrypted. Our servers can read the health data you log, because the app has to read it to calculate your cycle, generate patterns and answer you through Docsy. Anyone who tells you a cycle-tracking app with server-side insights is end-to-end encrypted is mistaken about what the term means.
+- **Access:** Access to production data is limited to what is needed to operate and support the service.
 
 ## 5. Sharing of Your Information
 - **With Your Consent:** We share your cycle phases and wellness recommendations with your partner **only** if you explicitly send them a secure connection invite and they accept it.
