@@ -2,14 +2,13 @@ import 'package:flutter/material.dart';
 import '../../shared/skeleton.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../theme/colors.dart';
-import '../../shared/blushy_surface.dart';
-import '../../theme/scale.dart';
 import '../../services/api_blushy_service.dart';
 import 'recovery_session_player.dart';
 import '../../core/theme.dart' hide BlushyColors;
 import '../../core/storage.dart';
 import '../journal/journal_screen.dart';
 import '../journal/notes/notes_journal_screen.dart';
+import '../journal/repository/journal_repository.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../services/journal_storage.dart';
@@ -18,6 +17,7 @@ import '../partner/digibouquet/state/bouquet_state.dart';
 import '../partner/digibouquet/screens/home_screen.dart' show HomeScreen;
 import '../partner/digibouquet/models/auth_models.dart';
 import '../../services/auth_storage.dart';
+import '../../shared/user_display_name.dart';
 import 'package:provider/provider.dart';
 
 
@@ -46,6 +46,15 @@ class _BlushyMStudioScreenState extends State<BlushyMStudioScreen> with TickerPr
   /// Content Garden used to sit here too. They were removed from the hub, not
   /// from the app: all four are still reached from inside the Journal, which
   /// is where the writing they read actually lives.
+  // The Stage 1 tokens, named as STAGE1_DESIGN_RULES.md names them, so this
+  // page and the dashboards are demonstrably the same system rather than two
+  // that happen to look alike.
+  static const Color _canvas = Color(0xFFFAF7F2);
+  static const Color _crimson = Color(0xFFDD0D22);
+  static const Color _cardBorder = Color(0xFFEFE8E0);
+  static const Color _charcoal = Color(0xFF221510);
+  static const Color _mutedText = Color(0xFF7A6B72);
+
   static const List<Map<String, dynamic>> _sections = [
     {
       'title': 'Journal',
@@ -53,31 +62,36 @@ class _BlushyMStudioScreenState extends State<BlushyMStudioScreen> with TickerPr
       // start with a bold noun are hard to tell apart at a glance; the chip is
       // what separates writing from resting from saving.
       'kind': 'WRITE & REFLECT',
-      'sub': 'Write, record and look back on your thoughts and feelings.',
+      // Two or three words under a name in a small tile. The long sentences
+      // these replaced belonged to a full-width row and wrapped to four lines
+      // in a grid.
+      'sub': 'Write it out',
       'icon': Icons.auto_stories_rounded,
-      'accent': BlushyColors.primary,
+      // From the accent table in STAGE1_DESIGN_RULES.md. These were the theme's
+      // primary and secondary, and `secondary` is #FF9B9E -- a pastel, which
+      // the rules rule out: at a 12% tint it is barely a badge at all.
+      'accent': Color(0xFF7209B7), // Royal Purple
     },
     {
       'title': 'Recovery',
       'kind': 'HEAL & RECHARGE',
-      'sub': 'Guided sessions to help you feel better, anytime.',
+      'sub': 'Slow down',
       'icon': Icons.spa_rounded,
-      'accent': BlushyColors.secondary,
+      'accent': Color(0xFF0D9488), // Emerald Teal
     },
     {
       'title': 'Time Capsules',
       'kind': 'SAVE FOR LATER',
-      'sub': 'Write letters to your future self and unseal them later.',
+      'sub': 'For future you',
       'icon': Icons.hourglass_bottom_rounded,
-      'accent': BlushyColors.accent,
+      'accent': Color(0xFFD97706), // Warm Amber
     },
     {
       'title': 'Bouquet',
       'kind': 'CREATE & SHARE',
-      'sub': 'Arrange a bouquet that reflects how you feel and share it as '
-          'an image.',
+      'sub': 'Send some love',
       'icon': Icons.local_florist_rounded,
-      'accent': BlushyColors.primary,
+      'accent': Color(0xFFF72585), // Vivid Magenta
     },
   ];
 
@@ -187,7 +201,24 @@ class _BlushyMStudioScreenState extends State<BlushyMStudioScreen> with TickerPr
     super.initState();
     _loadCapsules();
     _loadRecoverySessions();
+    _loadLatestEntry();
   }
+
+  /// The most recent thing written, for the studio's own recent list.
+  ///
+  /// Read from the journal's own store rather than invented: an account that
+  /// has written nothing shows nothing, which is the honest empty state.
+  Future<void> _loadLatestEntry() async {
+    final entries =
+        await JournalRepository().getAllEntries(AuthStorage.getUserId() ?? 'anon');
+    if (!mounted) return;
+
+    final sorted = entries.toList()
+      ..sort((a, b) => (b.dateTime ?? b.date).compareTo(a.dateTime ?? a.date));
+    setState(() => _latestEntry = sorted.isEmpty ? null : sorted.first);
+  }
+
+  LocalJournalEntry? _latestEntry;
 
   @override
   void dispose() {
@@ -202,7 +233,7 @@ class _BlushyMStudioScreenState extends State<BlushyMStudioScreen> with TickerPr
     }
 
     return Scaffold(
-      backgroundColor: BlushyColors.background, // Handcrafted cream paper background
+      backgroundColor: _canvas, // Warm cream neutral canvas -- never stark white
       body: SafeArea(
         child: Stack(
           children: [
@@ -258,17 +289,339 @@ class _BlushyMStudioScreenState extends State<BlushyMStudioScreen> with TickerPr
   }
 
   /// The hub: one card per area of the studio.
+  ///
+  /// Four identical cards stacked on a plain canvas read as a settings list.
+  /// The greeting and the eyebrow are deliberately unboxed, which is the rule
+  /// the dashboards follow to break up a run of cards -- see
+  /// STAGE1_DESIGN_RULES.md, "Card vs. Unboxed Component Layout Rules".
   Widget _buildStudioHub() {
     return Column(
       key: const ValueKey('studio_hub'),
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        for (final section in _sections)
-          Padding(
-            padding: const EdgeInsets.only(bottom: BlushySpace.betweenCards),
-            child: _buildStudioHubCard(section),
-          ),
+        _buildStudioGreeting(),
+        const SizedBox(height: 26),
+        _buildTodaysReflection(),
+        const SizedBox(height: 26),
+        _buildEyebrow('Explore'),
+        _buildStudioGrid(),
+        if (_recentItems().isNotEmpty) ...[
+          const SizedBox(height: 26),
+          _buildEyebrow('Recently in your studio'),
+          _buildRecentList(),
+        ],
+        const SizedBox(height: 24),
       ],
+    );
+  }
+
+  /// The four areas, two to a row.
+  ///
+  /// Full-width rows put four near-identical slabs down the page; a grid of
+  /// small tiles reads as a set of places rather than a list of settings. The
+  /// cards stay -- these are the only things here you tap, and a tap target
+  /// is what a card is for.
+  Widget _buildStudioGrid() {
+    return GridView.count(
+      crossAxisCount: 2,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      childAspectRatio: 1.02,
+      mainAxisSpacing: 12,
+      crossAxisSpacing: 12,
+      children: [for (final section in _sections) _buildStudioHubCard(section)],
+    );
+  }
+
+  /// One quiet question, and the way in to answering it.
+  ///
+  /// Unboxed between two hairlines. A prompt inside a card is another feature
+  /// on the page; on the canvas it is the page saying something.
+  Widget _buildTodaysReflection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildEyebrow("Today's reflection"),
+        Container(height: 1, color: const Color(0xFFF3EEE9)),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          child: Text(
+            _reflectionPrompt(),
+            style: GoogleFonts.cormorantGaramond(
+              fontSize: 21,
+              fontWeight: FontWeight.w500,
+              fontStyle: FontStyle.italic,
+              color: _charcoal,
+              height: 1.35,
+            ),
+          ),
+        ),
+        Container(height: 1, color: const Color(0xFFF3EEE9)),
+        // No button under it. The question is something to sit with; a call
+        // to action turns it into a task, and the Journal is one tap away in
+        // the grid below either way.
+      ],
+    );
+  }
+
+  /// The question, chosen from what is actually known.
+  ///
+  /// Deliberately not a claim about how she feels. The app can see when she
+  /// last wrote and what time it is; it cannot see that she has "been feeling
+  /// overwhelmed" without reading her entries, and a prompt that asserted
+  /// that on no evidence would be worse than a plain question. So the state
+  /// picks the set, and the day picks the line within it.
+  String _reflectionPrompt() {
+    final now = DateTime.now();
+    final dayOfYear = now.difference(DateTime(now.year, 1, 1)).inDays;
+
+    final last = _latestEntry;
+    final lastWritten =
+        DateTime.tryParse(last?.dateTime ?? last?.date ?? '');
+    final daysSince =
+        lastWritten == null ? null : now.difference(lastWritten).inDays;
+
+    // A week of questions in each set rather than three, so the same one does
+    // not come back every third day. The day picks it, so it holds for the
+    // whole day and is different tomorrow.
+    late final List<String> set;
+    if (last == null) {
+      set = const [
+        'What have you been carrying that you don\u2019t need to carry alone?',
+        'If today had a shape, what would it be?',
+        'What is one thing you would like to say out loud?',
+        'What would you write about if nobody would ever read it?',
+        'What has today asked of you?',
+        'What is the first thing that comes to mind, unedited?',
+        'What would you like to be able to look back on?',
+      ];
+    } else if (daysSince != null && daysSince == 0) {
+      set = const [
+        'You have already written today. Is there anything left unsaid?',
+        'What changed between this morning and now?',
+        'What would you tell yourself an hour ago?',
+        'What is still sitting with you?',
+        'What did you leave out earlier?',
+        'What would you add if you had another page?',
+        'What are you still turning over?',
+      ];
+    } else if (daysSince != null && daysSince >= 7) {
+      set = const [
+        'It has been a while. What has taken up the most space since?',
+        'What has been on your mind that you have not put into words?',
+        'What would you like to remember about the last few days?',
+        'What has changed since you last wrote?',
+        'What did you not have the room to say?',
+        'Where did the last week go?',
+        'What would you want to remember about now?',
+      ];
+    } else if (now.hour >= 20) {
+      set = const [
+        'What are you taking to bed with you tonight?',
+        'What went better today than you expected?',
+        'What can wait until tomorrow?',
+        'What are you glad is over?',
+        'What was quietly good about today?',
+        'What would you like to put down before sleeping?',
+        'What did today ask of you?',
+      ];
+    } else {
+      set = const [
+        'What is taking up the most space in your mind right now?',
+        'What would make today feel a little lighter?',
+        'What do you need more of this week?',
+        'What are you looking forward to, however small?',
+        'What would you like today to be about?',
+        'What is worth your attention today?',
+        'What would you rather not think about?',
+      ];
+    }
+
+    return set[dayOfYear % set.length];
+  }
+
+  /// What is actually in the studio, newest first.
+  ///
+  /// Real rows only: an account that has written nothing, saved nothing and
+  /// done no session gets no section at all, rather than three placeholders
+  /// pretending it has a history.
+  List<Map<String, dynamic>> _recentItems() {
+    final items = <Map<String, dynamic>>[];
+
+    final entry = _latestEntry;
+    if (entry != null) {
+      items.add({
+        'icon': Icons.auto_stories_rounded,
+        'accent': const Color(0xFF7209B7),
+        'label': entry.title.trim().isEmpty ? 'Untitled' : entry.title.trim(),
+        'meta': 'Your latest journal',
+        'open': () => _openStudioSection('Journal'),
+      });
+    }
+
+    if (_capsules.isNotEmpty) {
+      final capsule = _capsules.first;
+      items.add({
+        'icon': Icons.hourglass_bottom_rounded,
+        'accent': const Color(0xFFD97706),
+        'label': capsule['title']?.toString().trim().isNotEmpty == true
+            ? capsule['title'].toString().trim()
+            : 'A letter to future you',
+        'meta': capsule['sealed'] == true ? 'Sealed' : 'Ready to open',
+        'open': () => _openStudioSection('Time Capsules'),
+      });
+    }
+
+    final done = _sessions.where(
+        (s) => ((s['timesCompleted'] as num?)?.toInt() ?? 0) > 0);
+    if (done.isNotEmpty) {
+      final session = done.first;
+      items.add({
+        'icon': Icons.spa_rounded,
+        'accent': const Color(0xFF0D9488),
+        'label': session['title']?.toString() ?? 'Session',
+        'meta': 'Last recovery session',
+        'open': () => _openStudioSection('Recovery'),
+      });
+    }
+
+    return items;
+  }
+
+  /// The recent rows: on the canvas, separated by hairlines rather than boxed.
+  Widget _buildRecentList() {
+    final items = _recentItems();
+
+    return Column(
+      children: [
+        for (var i = 0; i < items.length; i++) ...[
+          if (i > 0) Container(height: 1, color: const Color(0xFFF3EEE9)),
+          InkWell(
+            onTap: items[i]['open'] as VoidCallback,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 2),
+              child: Row(
+                children: [
+                  Container(
+                    width: 34,
+                    height: 34,
+                    decoration: BoxDecoration(
+                      color: (items[i]['accent'] as Color)
+                          .withValues(alpha: 0.12),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(items[i]['icon'] as IconData,
+                        size: 16, color: items[i]['accent'] as Color),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          items[i]['label'] as String,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.manrope(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: _charcoal,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          items[i]['meta'] as String,
+                          style: GoogleFonts.manrope(
+                            fontSize: 11.5,
+                            color: _mutedText,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Icon(Icons.chevron_right_rounded,
+                      size: 18, color: _mutedText),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  /// The editorial greeting: text straight on the canvas, no card.
+  Widget _buildStudioGreeting() {
+    final name = userDisplayName(context);
+    final hour = DateTime.now().hour;
+    final part = hour < 12
+        ? 'Good morning'
+        : hour < 17
+            ? 'Good afternoon'
+            : 'Good evening';
+
+    return Padding(
+      padding: const EdgeInsets.only(left: 4, right: 4),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildEyebrow('Studio & mindfulness'),
+          Text(
+            'Your quiet space,',
+            style: GoogleFonts.cormorantGaramond(
+              fontSize: 28,
+              fontWeight: FontWeight.w600,
+              color: _charcoal,
+              height: 1.15,
+              letterSpacing: -0.3,
+            ),
+          ),
+          Text(
+            '$name.',
+            style: GoogleFonts.cormorantGaramond(
+              fontSize: 28,
+              fontWeight: FontWeight.w600,
+              fontStyle: FontStyle.italic,
+              color: _crimson,
+              height: 1.15,
+              letterSpacing: -0.3,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            // $part is the time of day, which is why the line changes shape
+            // across it rather than reading the same at 7am and 11pm.
+            part == 'Good evening'
+                ? 'Somewhere to slow down, put things into words, and give '
+                    'yourself a little room to breathe.'
+                : 'A place to slow down, put things into words, and give '
+                    'yourself a little room to breathe.',
+            style: GoogleFonts.manrope(
+              fontSize: 12.5,
+              fontWeight: FontWeight.w400,
+              color: _mutedText,
+              height: 1.45,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// An uppercase category header. Always crimson, never the section's accent:
+  /// four eyebrows in four colours is the rainbow the rules rule out.
+  Widget _buildEyebrow(String label) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 2, bottom: 10),
+      child: Text(
+        label.toUpperCase(),
+        style: GoogleFonts.manrope(
+          fontSize: 10.5,
+          fontWeight: FontWeight.w800,
+          color: _crimson,
+          letterSpacing: 1.1,
+        ),
+      ),
     );
   }
 
@@ -281,62 +634,72 @@ class _BlushyMStudioScreenState extends State<BlushyMStudioScreen> with TickerPr
     final accent = section['accent'] as Color;
     final title = section['title'] as String;
 
-    return BlushySurface(
-      padding: const EdgeInsets.fromLTRB(
-          BlushySpace.lg, BlushySpace.lg, BlushySpace.md, BlushySpace.lg),
-      accent: accent,
-      onTap: () => _openStudioSection(title),
-      child: Row(
-        children: [
-          Container(
-            width: 60,
-            height: 60,
-            decoration: BoxDecoration(
-              color: accent.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Icon(section['icon'] as IconData, size: 26, color: accent),
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(18),
+      child: InkWell(
+        onTap: () => _openStudioSection(title),
+        borderRadius: BorderRadius.circular(18),
+        child: Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            // Pure white with one soft border, the same on every tile. The
+            // accent used to tint the whole surface, the chip and the chevron
+            // as well -- four cards, four colours, and nothing left to mean
+            // "this one is different".
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: _cardBorder),
           ),
-          const SizedBox(width: BlushySpace.lg),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: BlushySpace.sm, vertical: BlushySpace.xs),
-                  decoration: BoxDecoration(
-                    color: accent.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    section['kind'] as String,
-                    style: BlushyType.micro(
-                      color: accent,
-                      weight: FontWeight.w700,
-                      letterSpacing: 0.8,
+          // A tile, not a row. The badge sits above the name the way it does
+          // on the dashboards, which is what lets two fit across a phone
+          // without the subtitle wrapping to four lines.
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              // The one place the accent is allowed: a circular badge.
+              Container(
+                width: 46,
+                height: 46,
+                decoration: BoxDecoration(
+                  color: accent.withValues(alpha: 0.12),
+                  shape: BoxShape.circle,
+                ),
+                child:
+                    Icon(section['icon'] as IconData, size: 22, color: accent),
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.cormorantGaramond(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                      color: _charcoal,
+                      height: 1.1,
                     ),
                   ),
-                ),
-                const SizedBox(height: BlushySpace.md),
-                Text(title, style: BlushyType.title()),
-                const SizedBox(height: BlushySpace.sm),
-                Text(section['sub'] as String, style: BlushyType.body()),
-              ],
-            ),
+                  const SizedBox(height: 2),
+                  Text(
+                    section['sub'] as String,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.manrope(
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.w400,
+                      color: _mutedText,
+                      height: 1.3,
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
-          const SizedBox(width: BlushySpace.sm),
-          Container(
-            width: BlushySpace.control,
-            height: BlushySpace.control,
-            decoration: BoxDecoration(
-              color: accent.withValues(alpha: 0.12),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(Icons.chevron_right_rounded, size: BlushySpace.iconChevron, color: accent),
-          ),
-        ],
+        ),
       ),
     );
   }

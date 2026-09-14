@@ -135,6 +135,11 @@ void main() {
     await withTestImages(() async {
       await _open(tester);
 
+      // The hub is taller than the test window now -- the greeting, the
+      // reflection and the Explore eyebrow sit above the tiles -- so the tile
+      // has to be brought into view before it can be tapped.
+      await tester.ensureVisible(find.text('Journal'));
+      await tester.pump();
       await tester.tap(find.text('Journal'));
       for (var i = 0; i < 3; i++) {
         await tester.pump(const Duration(seconds: 1));
@@ -144,8 +149,11 @@ void main() {
       expect(find.text('Scrapbook'), findsNothing);
 
       // The journal itself: what is in it, and a button to write the next one.
-      expect(find.byType(FloatingActionButton), findsOneWidget,
-          reason: 'the round button is how a new entry is started');
+      // That button moved out of the floating round one and into the
+      // Scaffold's bottom slot, where it names what it does and never covers
+      // the last entry.
+      expect(find.text('Create Journal'), findsOneWidget,
+          reason: 'the button at the bottom is how a new entry is started');
 
       // A pushed route, so the hub is no longer on screen behind it.
       expect(find.text('Recovery'), findsNothing);
@@ -171,6 +179,9 @@ void main() {
     await withTestImages(() async {
       await _open(tester);
 
+      // Same as above: the tiles sit below the fold on the test window.
+      await tester.ensureVisible(find.text('Recovery'));
+      await tester.pump();
       await tester.tap(find.text('Recovery'));
       for (var i = 0; i < 3; i++) {
         await tester.pump(const Duration(seconds: 1));
