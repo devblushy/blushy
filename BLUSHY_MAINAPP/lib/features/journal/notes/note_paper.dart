@@ -141,8 +141,340 @@ class NotePaper extends CustomPainter {
       case NoteTemplate.botanical:
         _softPanel(canvas, rect);
         _botanical(canvas, size, accent);
+
+      // Written-on papers: ruling straight on the ground, no sheet over it.
+      case NoteTemplate.notebookMint:
+        _handRules(canvas, size, accent, seed: 2);
+        _marginRule(canvas, size, const Color(0xFFEFA6B6));
+      case NoteTemplate.notebookBlue:
+        _handRules(canvas, size, accent, seed: 5);
+      case NoteTemplate.gridOat:
+        _squares(canvas, size, accent);
+      case NoteTemplate.gridRed:
+        _squares(canvas, size, accent);
+
+      // Drawn-on pages: a ground with something on it, and the writing goes
+      // in the clear middle.
+      case NoteTemplate.squiggleGrid:
+        _squares(canvas, size, const Color(0xFFCFC4B6));
+        _squiggleBorder(canvas, size, accent, const Color(0xFFE9A0A8));
+      case NoteTemplate.heartsGrid:
+        _squares(canvas, size, const Color(0xFFD8D8D8));
+        _ribbonHearts(canvas, size, accent, const Color(0xFFD62828));
+      case NoteTemplate.wavyGold:
+        _squares(canvas, size, const Color(0xFFCFC4B6));
+        _goldWaveFrame(canvas, size, accent, const Color(0xFFF0509A));
+      case NoteTemplate.rainbowPage:
+        _rainbowWash(canvas, size);
+        _handRules(canvas, size, accent, seed: 8, straight: true);
+      case NoteTemplate.blossomPage:
+        _blossoms(canvas, size, accent);
+        _handRules(canvas, size, const Color(0xFF8C8C8C), seed: 4,
+            straight: true);
+      case NoteTemplate.sunTulips:
+        _handRules(canvas, size, accent, seed: 6, straight: true);
+        _sun(canvas, size);
+        _tulips(canvas, size);
+
       default:
         _softPanel(canvas, rect);
+    }
+  }
+
+  // --- ruling that looks drawn rather than printed --------------------------
+
+  /// Horizontal rules with a slight wander, as a hand draws them.
+  ///
+  /// The wander is deterministic from [seed], so a page does not reshuffle its
+  /// own lines on every repaint -- which at 60fps reads as the paper shaking.
+  void _handRules(
+    Canvas canvas,
+    Size size,
+    Color colour, {
+    required int seed,
+    bool straight = false,
+  }) {
+    final gap = math.max(size.height / 26, 8.0);
+    final paint = Paint()
+      ..color = colour.withValues(alpha: straight ? 0.45 : 0.75)
+      ..strokeWidth = math.max(size.width / 300, 0.9)
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round;
+
+    final random = math.Random(seed);
+    for (double y = gap; y < size.height - gap * 0.4; y += gap) {
+      if (straight) {
+        canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
+        continue;
+      }
+      final path = Path()..moveTo(0, y);
+      final steps = 4;
+      final step = size.width / steps;
+      for (var i = 1; i <= steps; i++) {
+        final drift = (random.nextDouble() - 0.5) * gap * 0.35;
+        path.quadraticBezierTo(
+          step * (i - 0.5),
+          y + drift,
+          step * i,
+          y + (random.nextDouble() - 0.5) * gap * 0.18,
+        );
+      }
+      canvas.drawPath(path, paint);
+    }
+  }
+
+  /// The vertical rule down an exercise book's left margin.
+  void _marginRule(Canvas canvas, Size size, Color colour) {
+    final x = size.width * 0.14;
+    canvas.drawLine(
+      Offset(x, 0),
+      Offset(x, size.height),
+      Paint()
+        ..color = colour
+        ..strokeWidth = math.max(size.width / 260, 1.0),
+    );
+  }
+
+  /// Squared paper, edge to edge.
+  void _squares(Canvas canvas, Size size, Color colour) {
+    final cell = math.max(math.min(size.width, size.height) / 18, 7.0);
+    final paint = Paint()
+      ..color = colour.withValues(alpha: 0.55)
+      ..strokeWidth = math.max(size.width / 420, 0.6);
+    for (double y = 0; y <= size.height; y += cell) {
+      canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
+    }
+    for (double x = 0; x <= size.width; x += cell) {
+      canvas.drawLine(Offset(x, 0), Offset(x, size.height), paint);
+    }
+  }
+
+  // --- things drawn on the page ---------------------------------------------
+
+  /// Two crayon lines looping round the edge, one behind the other.
+  void _squiggleBorder(Canvas canvas, Size size, Color dark, Color light) {
+    Path loop(double inset) {
+      final r = Rect.fromLTWH(size.width * inset, size.height * inset * 0.6,
+          size.width * (1 - inset * 2), size.height * (1 - inset * 1.2));
+      return Path()
+        ..moveTo(r.left, r.top + r.height * 0.18)
+        ..cubicTo(r.left + r.width * 0.25, r.top - r.height * 0.06,
+            r.left + r.width * 0.55, r.top + r.height * 0.16, r.right,
+            r.top + r.height * 0.02)
+        ..moveTo(r.left, r.bottom - r.height * 0.16)
+        ..cubicTo(r.left + r.width * 0.3, r.bottom + r.height * 0.06,
+            r.left + r.width * 0.62, r.bottom - r.height * 0.18, r.right,
+            r.bottom - r.height * 0.02);
+    }
+
+    final width = math.max(size.width / 60, 2.0);
+    canvas.drawPath(
+      loop(0.05),
+      Paint()
+        ..color = light
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = width
+        ..strokeCap = StrokeCap.round,
+    );
+    canvas.drawPath(
+      loop(0.08),
+      Paint()
+        ..color = dark
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = width * 0.9
+        ..strokeCap = StrokeCap.round,
+    );
+  }
+
+  /// A pale ribbon wandering down the page, with small hearts caught on it.
+  void _ribbonHearts(Canvas canvas, Size size, Color ribbon, Color heart) {
+    final path = Path()
+      ..moveTo(size.width * 0.04, size.height * 0.10)
+      ..cubicTo(size.width * 0.34, size.height * 0.02, size.width * 0.22,
+          size.height * 0.28, size.width * 0.52, size.height * 0.24)
+      ..moveTo(size.width * 0.96, size.height * 0.42)
+      ..cubicTo(size.width * 0.66, size.height * 0.50, size.width * 0.92,
+          size.height * 0.68, size.width * 0.62, size.height * 0.74)
+      ..moveTo(size.width * 0.06, size.height * 0.86)
+      ..cubicTo(size.width * 0.30, size.height * 0.78, size.width * 0.24,
+          size.height * 0.98, size.width * 0.48, size.height * 0.94);
+
+    canvas.drawPath(
+      path,
+      Paint()
+        ..color = ribbon
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = math.max(size.width / 55, 2.2)
+        ..strokeCap = StrokeCap.round,
+    );
+
+    for (final spot in [
+      Offset(size.width * 0.45, size.height * 0.20),
+      Offset(size.width * 0.78, size.height * 0.60),
+      Offset(size.width * 0.22, size.height * 0.92),
+    ]) {
+      _heart(canvas, spot, heart, math.max(size.width / 28, 5.0));
+    }
+  }
+
+  /// A small hand-drawn heart, on its point.
+  void _heart(Canvas canvas, Offset centre, Color colour, double size) {
+    final path = Path()
+      ..moveTo(centre.dx, centre.dy + size * 0.55)
+      ..cubicTo(centre.dx - size, centre.dy - size * 0.1, centre.dx - size * 0.35,
+          centre.dy - size * 0.85, centre.dx, centre.dy - size * 0.25)
+      ..cubicTo(centre.dx + size * 0.35, centre.dy - size * 0.85,
+          centre.dx + size, centre.dy - size * 0.1, centre.dx,
+          centre.dy + size * 0.55)
+      ..close();
+    canvas.drawPath(path, Paint()..color = colour);
+  }
+
+  /// A wave drawn round the page as a frame, with hearts pinned to it.
+  void _goldWaveFrame(Canvas canvas, Size size, Color gold, Color heart) {
+    final rect = Rect.fromLTWH(size.width * 0.08, size.height * 0.06,
+        size.width * 0.84, size.height * 0.88);
+    canvas.drawPath(
+      _wavyRect(rect, amplitude: math.min(size.width, size.height) * 0.035),
+      Paint()
+        ..color = gold
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = math.max(size.width / 45, 2.6)
+        ..strokeJoin = StrokeJoin.round,
+    );
+
+    final small = math.max(size.width / 34, 4.0);
+    for (final spot in [
+      Offset(rect.left + rect.width * 0.30, rect.top),
+      Offset(rect.right, rect.top + rect.height * 0.32),
+      Offset(rect.left + rect.width * 0.62, rect.bottom),
+      Offset(rect.left, rect.top + rect.height * 0.66),
+    ]) {
+      _heart(canvas, spot, heart, small);
+    }
+  }
+
+  /// A rainbow washed into one corner, pale enough to write over.
+  void _rainbowWash(Canvas canvas, Size size) {
+    const bands = [
+      Color(0xFFF6C6C6),
+      Color(0xFFF8DEB8),
+      Color(0xFFF6F0BC),
+      Color(0xFFC8E4C4),
+      Color(0xFFC2D6EE),
+      Color(0xFFDCC8E6),
+    ];
+    final centre = Offset(-size.width * 0.35, size.height * 0.62);
+    final span = size.width * 0.42;
+    for (var i = 0; i < bands.length; i++) {
+      canvas.drawCircle(
+        centre,
+        span + (bands.length - i) * (size.width * 0.14),
+        Paint()
+          ..color = bands[i].withValues(alpha: 0.45)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = size.width * 0.14,
+      );
+    }
+  }
+
+  /// Watercolour blossoms: overlapping translucent petals, no outline.
+  void _blossoms(Canvas canvas, Size size, Color colour) {
+    void bloom(Offset centre, double radius) {
+      final petal = Paint()..color = colour.withValues(alpha: 0.38);
+      for (var i = 0; i < 5; i++) {
+        final angle = (math.pi * 2 / 5) * i - math.pi / 2;
+        canvas.drawCircle(
+          centre + Offset(math.cos(angle), math.sin(angle)) * radius * 0.62,
+          radius * 0.55,
+          petal,
+        );
+      }
+      canvas.drawCircle(
+        centre,
+        radius * 0.26,
+        Paint()..color = const Color(0xFFF6D98A).withValues(alpha: 0.75),
+      );
+    }
+
+    final unit = math.min(size.width, size.height);
+    bloom(Offset(size.width * 0.80, size.height * 0.22), unit * 0.22);
+    bloom(Offset(size.width * 0.12, size.height * 0.78), unit * 0.26);
+  }
+
+  /// A sun in the top corner.
+  void _sun(Canvas canvas, Size size) {
+    const gold = Color(0xFFF2C230);
+    final centre = Offset(size.width * 0.82, size.height * 0.09);
+    final radius = math.min(size.width, size.height) * 0.075;
+    canvas.drawCircle(centre, radius, Paint()..color = gold);
+    final ray = Paint()
+      ..color = gold
+      ..strokeWidth = math.max(size.width / 90, 1.6)
+      ..strokeCap = StrokeCap.round;
+    for (var i = 0; i < 8; i++) {
+      final angle = (math.pi * 2 / 8) * i;
+      final direction = Offset(math.cos(angle), math.sin(angle));
+      canvas.drawLine(
+        centre + direction * radius * 1.45,
+        centre + direction * radius * 2.05,
+        ray,
+      );
+    }
+  }
+
+  /// Three tulips in the bottom corner.
+  void _tulips(Canvas canvas, Size size) {
+    const red = Color(0xFFD94A3D);
+    const green = Color(0xFF3F7D43);
+    final unit = math.min(size.width, size.height);
+    final base = Offset(size.width * 0.16, size.height * 0.95);
+
+    // (sideways offset, height as a fraction of the page, head scale)
+    for (final spec in <List<double>>[
+      [-0.10, 0.13, 0.9],
+      [0.0, 0.17, 1.0],
+      [0.10, 0.12, 0.85],
+    ]) {
+      final stemTop =
+          base + Offset(unit * spec[0], -size.height * spec[1]);
+      canvas.drawLine(
+        base + Offset(unit * spec[0] * 0.5, 0),
+        stemTop,
+        Paint()
+          ..color = green
+          ..strokeWidth = math.max(unit / 90, 1.4)
+          ..strokeCap = StrokeCap.round,
+      );
+
+      final head = unit * 0.05 * spec[2];
+      final cup = Path()
+        ..moveTo(stemTop.dx - head, stemTop.dy)
+        ..quadraticBezierTo(
+            stemTop.dx, stemTop.dy + head * 1.3, stemTop.dx + head, stemTop.dy)
+        ..lineTo(stemTop.dx + head * 0.55, stemTop.dy - head * 1.1)
+        ..lineTo(stemTop.dx, stemTop.dy - head * 0.5)
+        ..lineTo(stemTop.dx - head * 0.55, stemTop.dy - head * 1.1)
+        ..close();
+      canvas.drawPath(cup, Paint()..color = red);
+
+      // One leaf per stem, alternating side.
+      final leaf = Path()
+        ..moveTo(stemTop.dx, stemTop.dy + head * 2.4)
+        ..quadraticBezierTo(
+          stemTop.dx + head * 2.2 * (spec[0] >= 0 ? 1 : -1),
+          stemTop.dy + head * 2.6,
+          stemTop.dx,
+          stemTop.dy + head * 4.4,
+        );
+      canvas.drawPath(
+        leaf,
+        Paint()
+          ..color = green
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = math.max(unit / 70, 1.6)
+          ..strokeCap = StrokeCap.round,
+      );
     }
   }
 

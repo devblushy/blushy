@@ -3,6 +3,75 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'note_stickers.dart';
+
+/// One piece of writing, placed where it was put.
+///
+/// A note used to be a single field anchored to the top of the page, so
+/// everything had to start on the first line and run down. Writing is placed
+/// the way stickers are now: tap a spot and it begins there.
+///
+/// Position is a fraction of the writing area, like [NoteSticker], so a note
+/// written on a phone opens with its words in the same places on a tablet.
+class NoteTextBlock {
+  const NoteTextBlock({
+    required this.text,
+    required this.dx,
+    required this.dy,
+    this.width = 0.9,
+  });
+
+  final String text;
+
+  /// 0..1 across and down the writing area, at the block's top-left.
+  final double dx;
+  final double dy;
+
+  /// How much of the width the block may use before it wraps.
+  final double width;
+
+  NoteTextBlock copyWith({
+    String? text,
+    double? dx,
+    double? dy,
+    double? width,
+  }) =>
+      NoteTextBlock(
+        text: text ?? this.text,
+        dx: dx ?? this.dx,
+        dy: dy ?? this.dy,
+        width: width ?? this.width,
+      );
+
+  Map<String, dynamic> toJson() =>
+      {'text': text, 'dx': dx, 'dy': dy, 'width': width};
+
+  static NoteTextBlock? fromJson(Map<String, dynamic> json) {
+    final text = json['text'];
+    if (text is! String) return null;
+    return NoteTextBlock(
+      text: text,
+      // Clamped on the way in, for the reason a sticker's position is: a value
+      // from a corrupted record would put the words off the page, where they
+      // could not be read or dragged back.
+      dx: _fraction(json['dx']),
+      dy: _fraction(json['dy']),
+      width: _width(json['width']),
+    );
+  }
+
+  static double _fraction(Object? value) {
+    final n = value is num ? value.toDouble() : 0.0;
+    return n.isFinite ? n.clamp(0.0, 0.98) : 0.0;
+  }
+
+  static double _width(Object? value) {
+    final n = value is num ? value.toDouble() : 0.9;
+    // Never narrower than a few words, never wider than the page.
+    return n.isFinite ? n.clamp(0.25, 1.0) : 0.9;
+  }
+}
+
 /// One sticker placed on a note.
 ///
 /// Position is a fraction of the page rather than pixels, so a note written on
@@ -13,9 +82,29 @@ class NoteSticker {
     required this.dx,
     required this.dy,
     this.scale = 1.0,
+    this.stickerId,
   });
 
+  /// A drawn sticker, by its id.
+  ///
+  /// Kept beside [emoji] rather than replacing it: every note already saved
+  /// carries an emoji and has to keep opening. A record with an id is drawn;
+  /// one without falls back to the emoji, which is what the older notes are.
+  NoteSticker.drawn(
+    JournalSticker sticker, {
+    required this.dx,
+    required this.dy,
+    this.scale = 1.0,
+  })  : stickerId = sticker.id,
+        emoji = '';
+
   final String emoji;
+
+  /// Set when this is one of the drawn stickers. See [JournalSticker].
+  final String? stickerId;
+
+  /// The drawn sticker this record names, or null when it is an emoji.
+  JournalSticker? get drawn => JournalSticker.byId(stickerId);
 
   /// 0..1 across and down the writing area.
   final double dx;
@@ -28,16 +117,27 @@ class NoteSticker {
         dx: dx ?? this.dx,
         dy: dy ?? this.dy,
         scale: scale ?? this.scale,
+        stickerId: stickerId,
       );
 
-  Map<String, dynamic> toJson() =>
-      {'emoji': emoji, 'dx': dx, 'dy': dy, 'scale': scale};
+  Map<String, dynamic> toJson() => {
+        'emoji': emoji,
+        'dx': dx,
+        'dy': dy,
+        'scale': scale,
+        // Written only when there is one, so an emoji sticker's record is
+        // unchanged from what older builds wrote.
+        if (stickerId != null) 'stickerId': stickerId,
+      };
 
   static NoteSticker? fromJson(Map<String, dynamic> json) {
-    final emoji = json['emoji']?.toString();
-    if (emoji == null || emoji.isEmpty) return null;
+    final emoji = json['emoji']?.toString() ?? '';
+    final id = json['stickerId']?.toString();
+    // One or the other has to be there, or there is nothing to draw.
+    if (emoji.isEmpty && (id == null || id.isEmpty)) return null;
     return NoteSticker(
       emoji: emoji,
+      stickerId: id,
       // Clamped on the way in: a value from a corrupted or hand-edited record
       // would otherwise place a sticker outside the page, where it cannot be
       // seen or dragged back.
@@ -70,7 +170,12 @@ class NoteStyle {
     this.fontSize = 16,
     this.background = 0xFFFFFBF5,
     this.stickers = const [],
+    this.blocks = const [],
     this.photo,
+    this.bold = false,
+    this.italic = false,
+    this.underline = false,
+    this.ink,
   });
 
   final NoteTemplate template;
@@ -82,12 +187,38 @@ class NoteStyle {
 
   final List<NoteSticker> stickers;
 
+  /// The writing, in the places it was put.
+  ///
+  /// Empty for every note saved before writing could be placed. Those carry
+  /// their words in the entry's `body` instead, and the editor seeds a single
+  /// block from it when one is opened -- see `NoteEditorScreen`.
+  final List<NoteTextBlock> blocks;
+
   /// Her chosen background, base64-encoded, for [NoteTemplate.photo].
   ///
   /// Carried in the entry rather than as a file path: a path breaks when the
   /// photo is moved or the gallery entry deleted, and does not exist on web at
   /// all. See [NotePhoto] for why it is shrunk before it gets here.
   final String? photo;
+
+  /// Emphasis, applied to the whole note.
+  ///
+  /// The writing is one plain text field, so these are the note's voice rather
+  /// than a run inside it. Per-word emphasis would need the body stored as a
+  /// document instead of a string, and every entry already saved is a string.
+  final bool bold;
+  final bool italic;
+  final bool underline;
+
+  /// The colour of the writing, ARGB, when one has been chosen.
+  ///
+  /// Null means "whatever stays legible on this paper", which is what every
+  /// note did before there was a choice -- see [NoteBackgrounds.inkFor].
+  final int? ink;
+
+  /// The writing colour for this style on [paperColour].
+  Color inkOn(int paperColour) =>
+      ink != null ? Color(ink!) : NoteBackgrounds.inkFor(paperColour);
 
   static const NoteStyle fallback = NoteStyle();
 
@@ -97,7 +228,12 @@ class NoteStyle {
     double? fontSize,
     int? background,
     List<NoteSticker>? stickers,
+    List<NoteTextBlock>? blocks,
     String? photo,
+    bool? bold,
+    bool? italic,
+    bool? underline,
+    int? ink,
   }) =>
       NoteStyle(
         template: template ?? this.template,
@@ -105,7 +241,29 @@ class NoteStyle {
         fontSize: fontSize ?? this.fontSize,
         background: background ?? this.background,
         stickers: stickers ?? this.stickers,
+        blocks: blocks ?? this.blocks,
         photo: photo ?? this.photo,
+        bold: bold ?? this.bold,
+        italic: italic ?? this.italic,
+        underline: underline ?? this.underline,
+        ink: ink ?? this.ink,
+      );
+
+  /// The same style with the writing colour handed back to the paper.
+  ///
+  /// `copyWith` cannot express it, for the reason [withoutPhoto] exists:
+  /// passing null there means "leave it alone".
+  NoteStyle withPaperInk() => NoteStyle(
+        template: template,
+        fontId: fontId,
+        fontSize: fontSize,
+        background: background,
+        stickers: stickers,
+        blocks: blocks,
+        photo: photo,
+        bold: bold,
+        italic: italic,
+        underline: underline,
       );
 
   /// The same style with no background photograph.
@@ -118,6 +276,11 @@ class NoteStyle {
         fontSize: fontSize,
         background: background,
         stickers: stickers,
+        blocks: blocks,
+        bold: bold,
+        italic: italic,
+        underline: underline,
+        ink: ink,
       );
 
   Color get backgroundColor => Color(background);
@@ -132,6 +295,12 @@ class NoteStyle {
       fontSize: fontSize,
       height: 1.55,
       color: color ?? const Color(0xFF2E2623),
+      fontWeight: bold ? FontWeight.w700 : null,
+      fontStyle: italic ? FontStyle.italic : null,
+      decoration: underline ? TextDecoration.underline : null,
+      // Without this the underline sits on the text's own colour only by
+      // luck; on the dark papers it drew in the default black.
+      decorationColor: color,
     );
     try {
       return NoteFonts.byId(fontId).builder(base);
@@ -146,9 +315,19 @@ class NoteStyle {
         'fontSize': fontSize,
         'background': background,
         'stickers': [for (final s in stickers) s.toJson()],
+        // Omitted when the writing has never been placed, so a note saved by
+        // an older build round-trips byte-identically.
+        if (blocks.isNotEmpty)
+          'blocks': [for (final b in blocks) b.toJson()],
         // Omitted when there is none, so every entry without a photo does not
         // carry a null for one.
         if (photo != null) 'photo': photo,
+        // Same reasoning: an unemphasised note's record is byte-identical to
+        // what older builds wrote.
+        if (bold) 'bold': true,
+        if (italic) 'italic': true,
+        if (underline) 'underline': true,
+        if (ink != null) 'ink': ink,
       };
 
   String encode() => jsonEncode(toJson());
@@ -189,6 +368,15 @@ class NoteStyle {
           if (item is Map<String, dynamic>)
             ?NoteSticker.fromJson(item),
       ],
+      blocks: [
+        for (final item in (json['blocks'] as List? ?? const []))
+          if (item is Map<String, dynamic>)
+            ?NoteTextBlock.fromJson(item),
+      ],
+      bold: json['bold'] == true,
+      italic: json['italic'] == true,
+      underline: json['underline'] == true,
+      ink: json['ink'] is int ? json['ink'] as int : null,
     );
   }
 }
@@ -240,7 +428,57 @@ enum NoteTemplate {
   /// The wider left inset is the point: the stems grow in that margin, and at
   /// an even inset the panel covered them and left a plain sheet.
   botanical('botanical', 'Botanical',
-      ground: 0xFFF5E3C0, accent: 0xFF8E6FA8, inset: 0.07, insetLeft: 0.30);
+      ground: 0xFFF5E3C0, accent: 0xFF8E6FA8, inset: 0.07, insetLeft: 0.30),
+
+  // --- written-on papers --------------------------------------------------
+  //
+  // These carry a `ground`, so they are decorated pages and get their own
+  // painting, but they deliberately lay no panel over it: the ruling *is* the
+  // page, and a sheet on top would hide it. The insets are small for the same
+  // reason -- the writing runs across the page the way it does on real paper,
+  // with a wider left margin only where something is drawn down that side.
+
+  /// School exercise paper: wavy mint rules and a pink margin rule.
+  notebookMint('notebook-mint', 'Mint notebook',
+      ground: 0xFFFFFFFF, accent: 0xFF9CCFC4, inset: 0.03, insetLeft: 0.17),
+
+  /// The same hand, warmer: blue rules on cream.
+  notebookBlue('notebook-blue', 'Blue notebook',
+      ground: 0xFFFDF6E3, accent: 0xFF6B8FD4, inset: 0.04),
+
+  /// Fine squared paper in oat.
+  gridOat('grid-oat', 'Oat grid',
+      ground: 0xFFF4EDE4, accent: 0xFFC3B5A6, inset: 0.04),
+
+  /// The same squares, in red on cream.
+  gridRed('grid-red', 'Red grid',
+      ground: 0xFFFFFBF2, accent: 0xFFE0705E, inset: 0.04),
+
+  // --- drawn-on pages -----------------------------------------------------
+
+  /// Crayon squiggles looping across squared paper.
+  squiggleGrid('squiggle-grid', 'Red squiggle',
+      ground: 0xFFF6F0E8, accent: 0xFFB4222C, inset: 0.11),
+
+  /// Squared paper with a blue ribbon wandering down it, and small hearts.
+  heartsGrid('hearts-grid', 'Blue hearts',
+      ground: 0xFFFFFFFF, accent: 0xFF9CC9E8, inset: 0.11),
+
+  /// A gold wave drawn as a frame, pinned with hearts.
+  wavyGold('wavy-gold', 'Gold wave',
+      ground: 0xFFF7F2E9, accent: 0xFFF2B430, inset: 0.12),
+
+  /// A rainbow washed in behind the ruling.
+  rainbowPage('rainbow', 'Rainbow',
+      ground: 0xFFF7FAFD, accent: 0xFFAFC6E0, inset: 0.05),
+
+  /// Watercolour blossoms, soft enough to write straight over.
+  blossomPage('blossom', 'Blossom',
+      ground: 0xFFFFFDFD, accent: 0xFFF4A7B9, inset: 0.05),
+
+  /// A sun in one corner and tulips in the other.
+  sunTulips('sun-tulips', 'Sun and tulips',
+      ground: 0xFFFDF8EC, accent: 0xFF7BAEC0, inset: 0.05);
 
   const NoteTemplate(
     this.id,
@@ -295,6 +533,11 @@ class NoteFont {
 class NoteFonts {
   const NoteFonts._();
 
+  /// The typefaces on offer, all from Google Fonts and all free to ship.
+  ///
+  /// The ids are what get written into a saved note, so they never change --
+  /// several of the older ones name a family the app no longer uses, and
+  /// renaming them would restyle every note already written.
   static final List<NoteFont> all = [
     NoteFont('poppins', 'Poppins', (b) => GoogleFonts.manrope(textStyle: b)),
     NoteFont('lora', 'Serif', (b) => GoogleFonts.instrumentSerif(textStyle: b)),
@@ -303,12 +546,56 @@ class NoteFonts {
         (b) => GoogleFonts.architectsDaughter(textStyle: b)),
     NoteFont('mono', 'Typewriter', (b) => GoogleFonts.robotoMono(textStyle: b)),
     NoteFont('inter', 'Plain', (b) => GoogleFonts.inter(textStyle: b)),
+
+    // Hands.
+    NoteFont('patrick', 'Print', (b) => GoogleFonts.patrickHand(textStyle: b)),
+    NoteFont('indie', 'Felt tip', (b) => GoogleFonts.indieFlower(textStyle: b)),
+    NoteFont('shadows', 'Pencil',
+        (b) => GoogleFonts.shadowsIntoLight(textStyle: b)),
+    NoteFont('gloria', 'Marker',
+        (b) => GoogleFonts.gloriaHallelujah(textStyle: b)),
+    NoteFont('dancing', 'Script',
+        (b) => GoogleFonts.dancingScript(textStyle: b)),
+    // Kalam carries Devanagari as well as Latin, so a Hindi entry written in
+    // it does not fall back to the system face mid-note.
+    NoteFont('kalam', 'Brush', (b) => GoogleFonts.kalam(textStyle: b)),
+
+    // Set type.
+    NoteFont('playfair', 'Editorial',
+        (b) => GoogleFonts.playfairDisplay(textStyle: b)),
+    NoteFont('garamond', 'Book', (b) => GoogleFonts.ebGaramond(textStyle: b)),
+    NoteFont('baskerville', 'Letterpress',
+        (b) => GoogleFonts.libreBaskerville(textStyle: b)),
+    NoteFont('quicksand', 'Rounded',
+        (b) => GoogleFonts.quicksand(textStyle: b)),
+    NoteFont('nunito', 'Soft', (b) => GoogleFonts.nunito(textStyle: b)),
+    NoteFont('courier', 'Courier',
+        (b) => GoogleFonts.courierPrime(textStyle: b)),
   ];
 
   static bool has(String? id) => all.any((f) => f.id == id);
 
   static NoteFont byId(String id) =>
       all.firstWhere((f) => f.id == id, orElse: () => all.first);
+}
+
+/// The writing colours on offer.
+///
+/// Darker and more saturated than the papers, because they have to hold their
+/// own as small text rather than as a field of colour behind it.
+class NoteInks {
+  const NoteInks._();
+
+  static const List<int> all = [
+    0xFF2E2623, // near black
+    0xFF4A5B74, // slate
+    0xFF1F5F4B, // pine
+    0xFF8A4B12, // umber
+    0xFFB23A48, // rose
+    0xFF7A3E9D, // plum
+    0xFF1C4E8A, // ink blue
+    0xFFC2410C, // clay
+  ];
 }
 
 /// The paper colours on offer.
