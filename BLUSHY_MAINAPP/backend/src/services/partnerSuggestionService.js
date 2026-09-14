@@ -1,4 +1,4 @@
-import { periodDurationBounds } from '../config/periodPredictionConfig.js';
+import { periodDurationBounds, periodPredictionConfig } from '../config/periodPredictionConfig.js';
 import { resolvePeriodDuration } from '../domain/periodDuration.js';
 
 function toList(value) {
@@ -19,8 +19,8 @@ function unique(values) {
 /**
  * The calendar date it is *where she is*, as UTC midnight of that date.
  *
- * Returns null when no zone is given, so the caller keeps the old UTC
- * behaviour rather than silently adopting the server's zone.
+ * Returns null only when the zone is unusable, so the caller still has a UTC
+ * path to fall back to rather than throwing on a bad string.
  */
 function todayInTimezone(reference, timezone) {
   if (!timezone) return null;
@@ -115,13 +115,20 @@ export function buildCycleInfo(
     }
   }
 
-  // Her day, not UTC's.
+  // Her day, not UTC's, and not a different fallback from everyone else's.
   //
   // This took the UTC calendar date, so anywhere east of UTC the day rolled
   // over hours late: her Learn tab read Day 19 while the card above it, which
-  // goes through the partner-safe path, already read Day 20. Two cards in one
-  // app disagreeing by a day, because they counted "today" in two places.
-  const todayNormalized = todayInTimezone(ref, timezone)
+  // goes through the partner-safe path, already read Day 20.
+  //
+  // Passing her timezone was only half of it. Most accounts have no timezone
+  // stored at all, and `calculatePeriodPredictions` -- the engine every other
+  // surface counts with -- falls back to `defaultFallbackTimezone` rather than
+  // to UTC. Falling back to UTC here left the two builders one day apart on
+  // exactly the accounts that had nothing stored, which was the reported case.
+  // Same constant, so they agree by construction.
+  const zone = timezone || periodPredictionConfig.defaultFallbackTimezone;
+  const todayNormalized = todayInTimezone(ref, zone)
     ?? new Date(Date.UTC(ref.getUTCFullYear(), ref.getUTCMonth(), ref.getUTCDate()));
   const startNormalized = new Date(Date.UTC(start.getUTCFullYear(), start.getUTCMonth(), start.getUTCDate()));
 
