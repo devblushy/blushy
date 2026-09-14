@@ -10,6 +10,7 @@ import '../../../services/api_contract_client.dart';
 import '../../../models/blushy_models.dart';
 import '../../../shared/api_state_card.dart';
 import '../../../l10n/app_localizations.dart';
+import '../partner_display_name.dart';
 
 class PartnerLearnScreen extends StatefulWidget {
   const PartnerLearnScreen({super.key});
@@ -432,12 +433,14 @@ class _PartnerLearnScreenState extends State<PartnerLearnScreen> {
     final bool canShareCycle = permissions['shareCycle'] != false;
     final bool canShareMood = permissions['shareMood'] != false;
 
-    String partnerName = _activeConnection?['partner']?['displayName'] ??
-        _activeConnection?['partnerEmail'] ??
-        (partnerUser?['display_name'] ?? partnerUser?['email'] ?? "Partner");
-    if (partnerName.contains('@')) {
-      partnerName = partnerName.split('@').first;
-    }
+    // `partnerName` is what the server now sends; the rest stay as
+    // fallbacks for a connection payload that predates it.
+    String partnerName = partnerDisplayName(
+      _activeConnection == null
+          ? null
+          : Map<String, dynamic>.from(_activeConnection!),
+      fallback: partnerUser?['display_name'] as String? ?? "Partner",
+    );
 
     String siaHeadline = "Docsy AI Partner Care Insights";
     String siaSubtext = "Live advice strictly respecting partner privacy permissions.";
@@ -445,7 +448,15 @@ class _PartnerLearnScreenState extends State<PartnerLearnScreen> {
     if (canShareCycle && cycleInfo != null && cycleInfo['phase'] != null) {
       final phase = cycleInfo['phase'];
       final day = cycleInfo['currentCycleDay'];
-      siaHeadline = "$partnerName is on Day ${day ?? ''} ($phase Phase)";
+      // The server's phase strings already end in the word -- "Luteal phase",
+      // "Ovulation phase" -- so appending it rendered "Luteal phase Phase".
+      final phaseLabel = phase.toString().trim();
+      final named = phaseLabel.toLowerCase().endsWith('phase')
+          ? phaseLabel
+          : '$phaseLabel phase';
+      siaHeadline = day == null
+          ? "$partnerName is in her ${named.toLowerCase()}"
+          : "$partnerName is on Day $day (${named.toLowerCase()})";
       siaSubtext = "Hormones adjust energy levels during this phase.";
     } else if (canShareMood && moodData != null && moodData['mood'] != null) {
       siaHeadline = "$partnerName logged feeling ${moodData['mood']} today";
@@ -573,12 +584,12 @@ class _PartnerLearnScreenState extends State<PartnerLearnScreen> {
   List<Widget> _buildAllowedPartnerArticles() {
     final partnerUser = _sharedData?['partnerUser'];
 
-    String partnerName = _activeConnection?['partner']?['displayName'] ??
-        _activeConnection?['partnerEmail'] ??
-        (partnerUser?['display_name'] ?? "Partner");
-    if (partnerName.contains('@')) {
-      partnerName = partnerName.split('@').first;
-    }
+    final String partnerName = partnerDisplayName(
+      _activeConnection == null
+          ? null
+          : Map<String, dynamic>.from(_activeConnection!),
+      fallback: partnerUser?['display_name'] as String? ?? "Partner",
+    );
     final String possessive =
         (partnerName.startsWith('qpfv') || partnerName.length > 15 || partnerName == 'Partner')
             ? "Her"

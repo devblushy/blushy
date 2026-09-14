@@ -170,6 +170,7 @@ class CycleRingCard extends StatelessWidget {
     this.onCalendar,
     this.onInsights,
     this.onSetUp,
+    this.showNextCycleCountdown = true,
   });
 
   final CycleCardState state;
@@ -185,6 +186,16 @@ class CycleRingCard extends StatelessWidget {
   final VoidCallback? onCalendar;
   final VoidCallback? onInsights;
   final VoidCallback? onSetUp;
+
+  /// Whether to show "Next cycle begins in N days".
+  ///
+  /// That line needs her cycle length, and computes `(length ?? 28) - day`
+  /// when it does not have one. On her own screen the length is always known.
+  /// On her partner's it is not: the permission-filtered payload carries her
+  /// phase and day, and the next-period window only when she shares that
+  /// separately -- so the countdown would have been a 28-day assumption
+  /// printed as her number. False leaves it out instead.
+  final bool showNextCycleCountdown;
 
   @override
   Widget build(BuildContext context) {
@@ -298,7 +309,7 @@ class _Ready extends StatelessWidget {
         const SizedBox(height: 2),
 
         // 3. Status Line: Next cycle begins in ...
-        Center(
+        if (card.showNextCycleCountdown) Center(
           child: RichText(
             textAlign: TextAlign.center,
             text: TextSpan(

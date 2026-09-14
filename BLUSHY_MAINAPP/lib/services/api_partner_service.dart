@@ -279,17 +279,31 @@ class ApiPartnerService {
     }
   }
 
-  /// Breaks up or cancels a partner connection: `POST /partner/connections/:connectionId/breakup`
-  Future<bool> breakupConnection(String connectionId) async {
+  /// Asks to end a partner connection:
+  /// `POST /partner/connections/:connectionId/breakup`
+  ///
+  /// Returns the connection's resulting status, or null when the call failed.
+  /// It is deliberately not a bool: disconnecting takes both partners, so the
+  /// server answers `breakup_pending` for whoever asks first and `breakup`
+  /// once the second one agrees. This used to return true for both and the
+  /// screen said "Partner disconnected." either way -- telling the first
+  /// person the connection had ended while it was still live.
+  Future<String?> breakupConnection(String connectionId) async {
     try {
-      await _dio.post(
+      final response = await _dio.post(
         '/partner/connections/$connectionId/breakup',
         options: _authOptions(),
       );
-      return true;
+      final data = response.data;
+      if (data is Map && data['connection'] is Map) {
+        final status = (data['connection'] as Map)['status'];
+        if (status is String && status.isNotEmpty) return status;
+      }
+      // A 200 with a shape we did not expect still means the request landed.
+      return 'breakup_pending';
     } catch (e) {
       debugPrint('BlushyPartner: Error disconnecting partner: $e');
-      return false;
+      return null;
     }
   }
 

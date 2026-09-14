@@ -1,10 +1,18 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'partner_home_sections.dart';
+import 'live_refresh.dart';
+import '../../../services/partner_websocket_service.dart';
+import 'partner_stage_today.dart';
+import '../partner_stage.dart';
+import 'private_space_partner_state.dart';
+import 'cycle_harmony_card.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/storage.dart';
 import '../../../core/state.dart';
 import '../../../theme/colors.dart';
 import '../../../services/auth_storage.dart';
-import '../../../core/stage_config.dart';
 import 'partner_sia.dart';
 import '../../../core/theme.dart' hide BlushyColors;
 import '../../../services/api_partner_service.dart';
@@ -14,6 +22,8 @@ import '../../../models/blushy_models.dart';
 import '../../../shared/api_state_card.dart';
 import 'partner_privacy_screen.dart';
 import '../../../l10n/app_localizations.dart';
+import '../partner_display_name.dart';
+import '../../../shared/docsy_wordmark.dart';
 
 class PartnerHomeScreen extends StatefulWidget {
   const PartnerHomeScreen({super.key});
@@ -22,7 +32,8 @@ class PartnerHomeScreen extends StatefulWidget {
   State<PartnerHomeScreen> createState() => _PartnerHomeScreenState();
 }
 
-class _PartnerHomeScreenState extends State<PartnerHomeScreen> {
+class _PartnerHomeScreenState extends State<PartnerHomeScreen>
+    with WidgetsBindingObserver, LiveRefresh {
   final ApiPartnerService _partnerService = ApiPartnerService();
   bool _isLoading = true;
   Map<String, dynamic>? _activeConnection;
@@ -71,12 +82,57 @@ class _PartnerHomeScreenState extends State<PartnerHomeScreen> {
 
   String _getTodayDateKey() => DateTime.now().toIso8601String().substring(0, 10);
 
+  /// The server already announces the things worth reacting to instantly.
+  ///
+  /// `PartnerScreen` has listened to this since it was written; Home never
+  /// did, so when she changed what she shares, the one screen built entirely
+  /// out of what she shares was the last to find out -- up to a poll interval
+  /// later, or not until it was reopened. The socket is a broadcast singleton,
+  /// so listening here costs no second connection.
+  StreamSubscription<PartnerWebSocketEvent>? _wsSubscription;
+
   @override
   void initState() {
     super.initState();
     _loadLocalCompletedActions();
     _fetchLivePartnerData();
+    startLiveRefresh();
+    _listenForLiveChanges();
   }
+
+  void _listenForLiveChanges() {
+    final ws = PartnerWebSocketService();
+    ws.connect();
+    _wsSubscription = ws.events.listen((event) {
+      if (!mounted) return;
+      const worthRefetching = {
+        'permissions-updated',
+        'invitation-accepted',
+        'breakup-requested',
+        'breakup-completed',
+        'shared-data-updated',
+      };
+      if (worthRefetching.contains(event.reason)) {
+        refreshQuietly();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _wsSubscription?.cancel();
+    stopLiveRefresh();
+    super.dispose();
+  }
+
+  /// A refresh with no spinner and no flicker.
+  ///
+  /// `_isLoading` is deliberately untouched: the progress bar at the top of
+  /// the screen is for the first load, when there is nothing to look at yet.
+  /// Showing it every forty-five seconds would make a working screen look
+  /// like a struggling one.
+  @override
+  Future<void> refreshNow() => _fetchLivePartnerData();
 
   void _loadLocalCompletedActions() {
     try {
@@ -552,6 +608,19 @@ class _PartnerHomeScreenState extends State<PartnerHomeScreen> {
     return null;
   }
 
+  /// Opens the Docsy tab, optionally with a question already asked.
+  ///
+  /// Home never answers anything itself. Her permitted context and the safety
+  /// ruleset are assembled on the Docsy screen; a second answering surface
+  /// would be a second place for either to be missed.
+  void _openDocsy([String? question]) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => PartnerSiaScreen(initialPrompt: question),
+      ),
+    );
+  }
+
   /// Opens the sharing settings, where the per-signal request buttons live.
   ///
   /// He cannot grant himself anything there; every request goes to her to
@@ -687,8 +756,71 @@ class _PartnerHomeScreenState extends State<PartnerHomeScreen> {
                 ),
               );
             }),
+
+            // A phase on its own is a label. What makes it useful is knowing
+            // what to do with it, so the questions worth asking in this phase
+            // sit directly under it -- the same three the Docsy tab offers,
+            // from one list, so the two cannot drift.
+            if (section.key == 'cycle_context' && section.items.isNotEmpty)
+              _phasePrompts(section.items.first['phase']?.toString()),
           ],
         ),
+      ),
+    );
+  }
+
+  /// Questions worth asking in the phase she is actually in.
+  ///
+  /// Tapping one opens Docsy with it already asked, because the answer needs
+  /// her permitted context and the safety ruleset, and both live there. This
+  /// card only knows which question to put in front of him.
+  Widget _phasePrompts(String? phase) {
+    final questions = partnerPhaseQuestions(phase);
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(height: 1, color: BlushyColors.border),
+          const SizedBox(height: 12),
+          Text(
+            'WORTH ASKING',
+            style: GoogleFonts.manrope(
+              fontSize: 9,
+              fontWeight: FontWeight.bold,
+              color: BlushyColors.secondaryText,
+              letterSpacing: 1.0,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              for (final question in questions)
+                InkWell(
+                  onTap: () => _openDocsy(question),
+                  borderRadius: BorderRadius.circular(20),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: BlushyColors.border),
+                    ),
+                    child: Text(
+                      question,
+                      style: GoogleFonts.manrope(
+                        fontSize: 11.5,
+                        fontWeight: FontWeight.w600,
+                        color: BlushyColors.text,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -832,6 +964,61 @@ class _PartnerHomeScreenState extends State<PartnerHomeScreen> {
     );
   }
 
+  /// How long the two have been connected, or null when the payload does not
+  /// say. Never guessed: a made-up "together for 184 days" is a claim about
+  /// their relationship that the app has no basis for.
+  int? _connectedSince(Object? raw) {
+    final at = DateTime.tryParse(raw?.toString() ?? '');
+    if (at == null) return null;
+    final days = DateTime.now().difference(at).inDays;
+    return days < 0 ? null : days;
+  }
+
+  /// Whether anything personal is actually reaching this screen.
+  ///
+  /// Read off what arrived rather than off the permission flags alone: a
+  /// permission that is on but has nothing behind it is not sharing.
+  bool _isSharingAnything(
+    Map<String, dynamic> permitted,
+    Map<String, dynamic>? cycleInfo,
+    Map<String, dynamic>? moodData,
+  ) {
+    if (cycleInfo != null || moodData != null) return true;
+
+    // Not `permitted.isNotEmpty`.
+    //
+    // `buildPartnerSafeContext` always returns `relationshipActive`,
+    // `partnerPreferredName`, `lifeStage` and `relationshipType` -- the
+    // non-private context that keeps the partner app useful when nothing is
+    // shared. So the map was never empty, this was always true, and the
+    // "nothing is being shared" state could not appear at all. Instead he got
+    // a stage card, an empty tracker and a set of default actions, which
+    // reads as though she is sharing when she is not.
+    //
+    // Only the keys that carry something of hers count.
+    const personal = [
+      'cyclePhase',
+      'nextPeriodWindow',
+      'fertileWindow',
+      'pregnancyWeek',
+      'pregnancyMilestone',
+      'postpartumMilestone',
+      'mood',
+      'energyLevel',
+      'sleep',
+      'symptoms',
+      'appointments',
+      'generalInsights',
+    ];
+    return personal.any((key) {
+      final value = permitted[key];
+      if (value == null) return false;
+      if (value is Iterable) return value.isNotEmpty;
+      if (value is Map) return value.isNotEmpty;
+      return true;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final bool isConnected = _activeConnection != null && _activeConnection!.isNotEmpty;
@@ -862,46 +1049,41 @@ class _PartnerHomeScreenState extends State<PartnerHomeScreen> {
     // Partner display name
     String partnerName = "Her";
     if (isConnected) {
-      partnerName = _activeConnection!['partner']?['displayName'] ??
-          _activeConnection!['partnerEmail'] ??
-          (partnerUser?['display_name'] ?? partnerUser?['email'] ?? "Her");
-      if (partnerName.contains('@')) {
-        partnerName = partnerName.split('@').first;
-      }
+      // `partnerName` is what the server now sends; the rest stay as
+      // fallbacks for a connection payload that predates it.
+      partnerName = partnerDisplayName(
+        Map<String, dynamic>.from(_activeConnection!),
+        fallback: partnerUser?['display_name'] as String? ?? "Her",
+      );
     }
 
-    String activeStage = partnerUser?['lifeStage'] ?? "everydayWellness";
-    final stageDetails = StageConfig.forStage(activeStage);
+    // Her stage, from the payloads that actually carry it.
+    //
+    // This read `partnerUser['lifeStage']`, which is not a field -- the stage
+    // sits at the top level of the shared-data payload, behind her
+    // `shareOnboarding` switch, and on `permittedContext` behind the same
+    // permission filter as everything else. So it was null on every account
+    // and fell back to "everydayWellness": a partner of someone in her third
+    // trimester was shown an ordinary week.
+    //
+    // `PartnerStage.resolve` also settles the two spellings. The server
+    // normalises stages to snake_case; `StageConfig` switches on camelCase.
+    // Nothing translated, so even a stage that did arrive matched no case.
+    final stage = PartnerStage.resolve(
+      permittedContext: permitted,
+      lifeStageContext: _partnerHome.data?.lifeStageContext,
+      sharedData: _sharedData,
+    );
+    final stageToday = PartnerStageToday(
+      stage: stage,
+      permitted: permitted,
+      partnerName: partnerName,
+    );
     final connectedDateRaw = _activeConnection?['senderAcceptedAt'] ??
         _activeConnection?['receiverAcceptedAt'] ??
         _activeConnection?['createdAt'] ??
         _sharedData?['connectedAt'];
 
-    // Dynamic headline for "Docsy noticed something"
-    String siaHeadline = isConnected
-        ? "Tending to your relationship garden builds healthy, quiet mutual support."
-        : "Connect with your partner to see her live cycle and wellness insights.";
-    String siaSubtext = isConnected
-        ? "Insights will update live as she logs her day."
-        : "Send an invite or ask her for her partner code.";
-
-    if (cycleInfo != null && cycleInfo['phase'] != null) {
-      final phase = cycleInfo['phase'];
-      final day = cycleInfo['currentCycleDay'];
-      if (day != null) {
-        siaHeadline = "$partnerName is on Day $day ($phase Phase).";
-      } else {
-        siaHeadline = "$partnerName is in her $phase Phase.";
-      }
-      if (moodData != null && moodData['mood'] != null) {
-        siaSubtext = "She recently logged feeling ${moodData['mood']}.";
-      } else {
-        siaSubtext = "Live cycle tracking shared with you.";
-      }
-    } else if (suggestions.isNotEmpty && suggestions.first is Map) {
-      siaHeadline = suggestions.first['title']?.toString() ?? siaHeadline;
-      siaSubtext = suggestions.first['description']?.toString() ?? siaSubtext;
-    }
 
     // Dynamic list of support actions
     final List<Map<String, dynamic>> actionItems = [];
@@ -928,8 +1110,6 @@ class _PartnerHomeScreenState extends State<PartnerHomeScreen> {
       ]);
     }
 
-    final int completedCount = actionItems.where((a) => _completedActionIds.contains(a['id'])).length;
-    final bool isAllCompleted = actionItems.isNotEmpty && completedCount == actionItems.length;
 
     return Scaffold(
       backgroundColor: BlushyColors.background,
@@ -943,7 +1123,12 @@ class _PartnerHomeScreenState extends State<PartnerHomeScreen> {
                 backgroundColor: Colors.transparent,
               ),
             Expanded(
-              child: SingleChildScrollView(
+              child: RefreshIndicator(
+                color: BlushyColors.primary,
+                onRefresh: refreshQuietly,
+                child: SingleChildScrollView(
+                // Always scrollable, so the pull works on a short screen too.
+                physics: const AlwaysScrollableScrollPhysics(),
                 padding: EdgeInsets.symmetric(
                   horizontal: BlushyTheme.getPagePadding(context),
                   vertical: 16.0,
@@ -951,183 +1136,105 @@ class _PartnerHomeScreenState extends State<PartnerHomeScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-              // Greeting Section
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        isConnected ? "Good morning, partner" : "Partner Dashboard",
-                        style: GoogleFonts.manrope(height: 1.5, fontSize: 26, fontWeight: FontWeight.bold, color: BlushyColors.text),
+              // 01 -- who you are connected to, and the state of it.
+              PartnerEditorialHeader(
+                partnerName: isConnected ? partnerName : null,
+                cycleInfo: cycleInfo,
+                connectedSince: _connectedSince(connectedDateRaw),
+                live: _partnerHome.isReady,
+                eyebrow: stageToday.greetingEyebrow,
+                verb: stageToday.greetingVerb,
+                stageFacts: stageToday.greetingFacts,
+              ),
+              const SizedBox(height: 22),
+
+              // 02 -- four signals, each one real or honestly empty.
+              PartnerSignalRow(
+                cycleInfo: cycleInfo,
+                moodData: moodData,
+                permitted: permitted,
+                sharingActive: isConnected && _isSharingAnything(permitted, cycleInfo, moodData),
+                // Stage-specific signals where her stage is known: a due date
+                // and the next appointment say more in pregnancy than a cycle
+                // day does. Null keeps the stage-agnostic four.
+                badges: stage.isKnown ? stageToday.signalBadges : null,
+              ),
+              const SizedBox(height: 22),
+
+              if (isConnected) ...[
+                ConnectionSanctuary(
+                  sharing: _isSharingAnything(permitted, cycleInfo, moodData),
+                  onManage: _openSharingSettings,
+                ),
+                const SizedBox(height: 22),
+
+                // Nothing personal is reaching him. Say so once, calmly, and
+                // offer the things that still work -- rather than leaving him
+                // to read a screen of empty cards and go looking for why.
+                //
+                // Deliberately the same whether she paused her sharing or
+                // never turned it on: which of the two it is belongs to her.
+                if (!_isSharingAnything(permitted, cycleInfo, moodData)) ...[
+                  PrivateSpacePartnerState(
+                    partnerName: partnerName,
+                    onBloom: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => const PartnerSiaScreen(),
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        isConnected
-                            ? "Connected with $partnerName • Live insights enabled"
-                            : "Here's how you can show up and support today.",
-                        style: GoogleFonts.manrope(height: 1.5, fontSize: 12, color: BlushyColors.secondaryText),
-                      ),
-                    ],
+                    ),
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.refresh_rounded, color: BlushyColors.primary),
-                    tooltip: 'Refresh live data',
-                    onPressed: _fetchLivePartnerData,
+                  const SizedBox(height: 24),
+                ] else ...[
+                  // What today may be like for her, hedged because a phase is
+                  // a tendency across many people rather than a fact about
+                  // one -- and a way to ask rather than assume.
+                  if (stageToday.stageLeads)
+                    PartnerStageCard(today: stageToday)
+                  else
+                    CycleHarmonyCard(
+                      partnerName: partnerName,
+                      cycleInfo: cycleInfo,
+                      onAskDocsy: () => _openDocsy(),
+                    ),
+                  const SizedBox(height: 18),
+
+                  // 03b -- her tracker, read-only. Draws nothing unless she
+                  // shares a day, a pregnancy week or a recovery week.
+                  PartnerCycleTracker(today: stageToday),
+                  const SizedBox(height: 18),
+
+                  // 04 -- what would actually help, from what she logged.
+                  SupportActionsCard(
+                    actions: actionItems,
+                    completedIds: _completedActionIds.toSet(),
+                    onToggle: _toggleActionCompletion,
                   ),
+                  const SizedBox(height: 18),
                 ],
+
+                // 05 -- a way into Docsy with the stage already in mind.
+                // Shown whether or not she is sharing: when she is not, the
+                // general questions are the ones he needs most.
+                PartnerDocsyPrompt(
+                  today: stageToday,
+                  onAsk: _openDocsy,
+                ),
+                const SizedBox(height: 24),
+              ],
+
+              // The greeting is the editorial header above. What was here
+              // was a second one, in a different typeface, saying the same
+              // thing; only the refresh it carried was worth keeping.
+              Align(
+                alignment: Alignment.centerRight,
+                child: IconButton(
+                  icon: const Icon(Icons.refresh_rounded, color: BlushyColors.primary),
+                  tooltip: 'Refresh live data',
+                  onPressed: _fetchLivePartnerData,
+                ),
               ),
               _buildUsSection(),
               const SizedBox(height: 24),
-
-              // Docsy Noticed (Live Permissions-dependent UI)
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(24.0),
-                decoration: BoxDecoration(
-                  color: BlushyColors.successSoft,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: BlushyColors.successSoft),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        const Icon(Icons.auto_awesome, color: BlushyColors.success, size: 18),
-                        const SizedBox(width: 8),
-                        Text(
-                          "Docsy noticed something",
-                          style: GoogleFonts.manrope(height: 1.5, fontSize: 12, fontWeight: FontWeight.bold, color: BlushyColors.success),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      siaHeadline,
-                      style: GoogleFonts.manrope(fontSize: 18, fontWeight: FontWeight.bold, color: BlushyColors.text, height: 1.3),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      siaSubtext,
-                      style: GoogleFonts.manrope(height: 1.5, fontSize: 11, color: BlushyColors.secondaryText),
-                    ),
-                    const SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: () => _showHelpOptionsDialog(context),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: BlushyColors.success,
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        elevation: 0,
-                      ),
-                      child: Text(
-                        AppLocalizations.of(context).phSeeHowICan,
-                        style: GoogleFonts.manrope(height: 1.5, fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20),
-
-              // Her Live Health & Cycle Status Card
-              _buildHerLiveCycleCard(partnerName, cycleInfo, moodData),
-              const SizedBox(height: 24),
-
-              // Today's Support Checklists Header
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "Today's Support Actions",
-                    style: GoogleFonts.manrope(height: 1.5, fontSize: 18, fontWeight: FontWeight.bold, color: BlushyColors.text),
-                  ),
-                  if (actionItems.isNotEmpty)
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: isAllCompleted
-                            ? BlushyColors.successSoft
-                            : BlushyColors.primary.withValues(alpha: 0.08),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Text(
-                        isAllCompleted
-                            ? "All Done 🎉"
-                            : "$completedCount/${actionItems.length} Done",
-                        style: GoogleFonts.manrope(height: 1.5, 
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
-                          color: isAllCompleted
-                              ? BlushyColors.success
-                              : BlushyColors.primary,
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-              const SizedBox(height: 12),
-
-                    // Celebration banner when all completed
-                    if (isAllCompleted)
-                      Container(
-                        margin: const EdgeInsets.only(bottom: 12),
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: BlushyColors.successSoft,
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: BlushyColors.success),
-
-                        ),
-                        child: Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: const BoxDecoration(
-                                color: BlushyColors.success,
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(Icons.celebration_rounded, color: Colors.white, size: 20),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    AppLocalizations.of(context).phAllTodaySActions,
-                                    style: GoogleFonts.manrope(height: 1.5, 
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                      color: BlushyColors.success,
-                                    ),
-                                  ),
-                                  Text(
-                                    "You showed up for her today. Tending to your relationship garden keeps love strong.",
-                                    style: GoogleFonts.manrope(height: 1.5, 
-                                      fontSize: 12,
-                                      color: BlushyColors.success,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                    // Action checklist cards
-                    for (var action in actionItems)
-                      _buildActionCard(
-                        actionId: action['id'].toString(),
-                        title: action['title'].toString(),
-                        description: action['description'].toString(),
-                        category: action['category']?.toString(),
-                      ),
-
-                    const SizedBox(height: 24),
 
                     // Help CTA
                     SizedBox(
@@ -1146,44 +1253,9 @@ class _PartnerHomeScreenState extends State<PartnerHomeScreen> {
                       ),
                     ),
                     const SizedBox(height: 24),
-
-                    // A Little Context
-                    Text(
-                      "Understanding Her Stage",
-                      style: GoogleFonts.manrope(height: 1.5, fontSize: 18, fontWeight: FontWeight.bold, color: BlushyColors.text),
-                    ),
-                    const SizedBox(height: 12),
-                    Container(
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: BlushyColors.surface,
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: BlushyColors.border),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "ACTIVE STAGE: ${stageDetails.formatPartnerSubLabel(connectedDateRaw).toUpperCase()}",
-                            style: GoogleFonts.manrope(height: 1.5, fontSize: 10, fontWeight: FontWeight.bold, color: BlushyColors.primary, letterSpacing: 1.0),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            "Supporting her through ${stageDetails.displayName}",
-                            style: GoogleFonts.manrope(height: 1.5, fontSize: 15, fontWeight: FontWeight.bold, color: BlushyColors.text),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            stageDetails.gardenQuote.isNotEmpty
-                                ? stageDetails.gardenQuote
-                                : "Understanding her cycle rhythms helps foster deeper mutual empathy and harmony.",
-                            style: GoogleFonts.manrope(fontSize: 12, color: BlushyColors.secondaryText, height: 1.45),
-                          ),
-                        ],
-                      ),
-                    ),
                   ],
                 ),
+              ),
               ),
             ),
           ],
@@ -1199,8 +1271,8 @@ class _PartnerHomeScreenState extends State<PartnerHomeScreen> {
             ),
           );
         },
-        label: Text(
-          AppLocalizations.of(context).phDrDocsy,
+        label: DocsyWordmark(
+          text: AppLocalizations.of(context).phDrDocsy,
           style: GoogleFonts.manrope(height: 1.5, fontSize: 12, fontWeight: FontWeight.w700, color: Colors.white),
         ),
         icon: const Icon(Icons.auto_awesome_rounded, color: Colors.white, size: 16),
@@ -1208,308 +1280,9 @@ class _PartnerHomeScreenState extends State<PartnerHomeScreen> {
     );
   }
 
-  Widget _buildActionCard({
-    required String actionId,
-    required String title,
-    required String description,
-    String? category,
-  }) {
-    final bool isCompleted = _completedActionIds.contains(actionId);
-
-    return InkWell(
-      onTap: () => _toggleActionCompletion(actionId),
-      borderRadius: BorderRadius.circular(12),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        margin: const EdgeInsets.symmetric(vertical: 6),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: isCompleted ? BlushyColors.successSoft : BlushyColors.surface,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: isCompleted ? BlushyColors.successSoft : BlushyColors.border,
-            width: isCompleted ? 1.5 : 1.0,
-          ),
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 2.0),
-              child: Icon(
-                isCompleted ? Icons.check_box_rounded : Icons.check_box_outline_blank_rounded,
-                color: isCompleted ? BlushyColors.success : BlushyColors.secondaryText,
-                size: 22,
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          title,
-                          style: GoogleFonts.manrope(height: 1.5, 
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: isCompleted ? BlushyColors.success : BlushyColors.text,
-                            decoration: isCompleted ? TextDecoration.lineThrough : null,
-                            decorationColor: BlushyColors.success,
-                            decorationThickness: 2.0,
-                          ),
-                        ),
-                      ),
-                      if (category != null)
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: isCompleted
-                                ? BlushyColors.successSoft
-                                : BlushyColors.primary.withValues(alpha: 0.08),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Text(
-                            category,
-                            style: GoogleFonts.manrope(height: 1.5, 
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
-                              color: isCompleted ? BlushyColors.success : BlushyColors.primary,
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    description,
-                    style: GoogleFonts.manrope(
-                      fontSize: 12,
-                      color: isCompleted ? Colors.grey.shade500 : BlushyColors.secondaryText,
-                      decoration: isCompleted ? TextDecoration.lineThrough : null,
-                      decorationColor: Colors.grey.shade400,
-                      decorationThickness: 1.5,
-                      height: 1.35,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  /// Shown when the partner has not shared cycle data, or has logged none.
-  ///
-  /// Any mood they did share is still shown -- permissions are per signal, so
-  /// having no cycle access does not mean having no access at all.
-  Widget _buildNoCycleSharedCard(String partnerName, Map<String, dynamic>? moodData) {
-    final String? mood = moodData?['mood']?.toString() ?? moodData?['notes']?.toString();
-
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: BlushyColors.surface,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: BlushyColors.border),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: BlushyColors.secondaryText.withValues(alpha: 0.10),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: const Icon(Icons.lock_outline_rounded,
-                    color: BlushyColors.secondaryText, size: 22),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "$partnerName's Cycle & Mood",
-                      style: GoogleFonts.manrope(height: 1.5, 
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                        color: BlushyColors.text,
-                      ),
-                    ),
-                    Text(
-                      AppLocalizations.of(context).phNotSharedWithYou,
-                      style: GoogleFonts.manrope(height: 1.5, 
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: BlushyColors.secondaryText,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          if (mood != null && mood.isNotEmpty) ...[
-            const SizedBox(height: 14),
-            Container(
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: BlushyColors.background,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Text(
-                'Mood shared today: $mood',
-                style: GoogleFonts.manrope(height: 1.5, fontSize: 12, color: BlushyColors.text),
-              ),
-            ),
-          ],
-          const SizedBox(height: 14),
-          Text(
-            'They choose what to share, and can change it at any time.',
-            style: GoogleFonts.manrope(height: 1.5, fontSize: 11, color: BlushyColors.secondaryText),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildHerLiveCycleCard(String partnerName, Map<String, dynamic>? cycleInfo, Map<String, dynamic>? moodData) {
-    // With nothing shared this used to default to "Follicular" and tell the
-    // partner "Estrogen is rising. Her focus and mood are high." -- stated as
-    // fact about a real person who had shared nothing. Say so instead.
-    final String? knownPhase = cycleInfo?['phase']?.toString();
-    if (knownPhase == null || knownPhase.trim().isEmpty) {
-      return _buildNoCycleSharedCard(partnerName, moodData);
-    }
-    final String phase = knownPhase;
-    final dynamic rawDay = cycleInfo?['currentCycleDay'];
-    final int? cycleDay = (rawDay is int) ? rawDay : int.tryParse(rawDay?.toString() ?? '');
-    final String? mood = moodData?['mood']?.toString() ?? moodData?['notes']?.toString();
-
-    Color phaseColor = BlushyColors.secondary;
-    IconData phaseIcon = Icons.spa_rounded;
-    String phaseDescription = "Her natural energy and creativity are building up. Great time for shared plans and active dates together.";
-    String phaseEmoji = "🌿";
-
-    switch (phase.toLowerCase()) {
-      case 'menstrual':
-        phaseColor = BlushyColors.primary;
-        phaseIcon = Icons.water_drop_rounded;
-        phaseEmoji = "🩸";
-        phaseDescription = "Energy is lower. She may experience fatigue or cramps. Offer warmth, rest, and handle dinner tonight.";
-        break;
-      case 'follicular':
-        phaseColor = BlushyColors.success;
-        phaseIcon = Icons.nature_rounded;
-        phaseEmoji = "🌱";
-        phaseDescription = "Estrogen is rising. Her focus and mood are high. Great time to try new activities together.";
-        break;
-      case 'ovulation':
-      case 'fertile':
-        phaseColor = BlushyColors.accent;
-        phaseIcon = Icons.wb_sunny_rounded;
-        phaseEmoji = "✨";
-        phaseDescription = "Peak energy and social confidence. Perfect for meaningful dates, deep conversations, and quality time.";
-        break;
-      case 'luteal':
-      case 'pms':
-        phaseColor = BlushyColors.accent;
-        phaseIcon = Icons.nightlight_round;
-        phaseEmoji = "🌙";
-        phaseDescription = "Progesterone is high. She might feel sensitive, tired, or crave quiet. Extra patience and reassurance are key.";
-        break;
-    }
-
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: BlushyColors.surface,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: BlushyColors.border),
-
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: phaseColor.withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Icon(phaseIcon, color: phaseColor, size: 22),
-                  ),
-                  const SizedBox(width: 12),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "$partnerName's Cycle & Mood",
-                        style: GoogleFonts.manrope(height: 1.5, fontSize: 15, fontWeight: FontWeight.bold, color: BlushyColors.text),
-                      ),
-                      Text(
-                        cycleDay != null ? "Day $cycleDay • $phase Phase $phaseEmoji" : "$phase Phase $phaseEmoji",
-                        style: GoogleFonts.manrope(height: 1.5, fontSize: 12, fontWeight: FontWeight.w600, color: phaseColor),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              if (mood != null && mood.isNotEmpty)
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: BlushyColors.background,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: BlushyColors.border),
-                  ),
-                  child: Row(
-                    children: [
-                      const Text("Mood: ", style: TextStyle(fontSize: 10, color: BlushyColors.secondaryText)),
-                      Text(mood, style: GoogleFonts.manrope(height: 1.5, fontSize: 11, fontWeight: FontWeight.bold, color: BlushyColors.text)),
-                    ],
-                  ),
-                ),
-            ],
-          ),
-          const SizedBox(height: 14),
-          Container(
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: phaseColor.withValues(alpha: 0.06),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Icon(Icons.info_outline_rounded, size: 16, color: phaseColor),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    phaseDescription,
-                    style: GoogleFonts.manrope(fontSize: 12, color: BlushyColors.text, height: 1.4),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  // `_buildActionCard`, `_buildNoCycleSharedCard` and
+  // `_buildHerLiveCycleCard` lived here. The first drew a second copy of
+  // the support checklist that `SupportActionsCard` already draws; the
+  // other two drew a phase card below the one `PartnerStageCard` and
+  // `CycleHarmonyCard` draw above. Two of each, disagreeing in wording.
 }

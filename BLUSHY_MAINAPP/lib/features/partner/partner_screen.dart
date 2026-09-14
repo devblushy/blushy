@@ -24,6 +24,10 @@ import 'widgets/breathing_sync_sheet.dart';
 import 'date_idea.dart';
 import '../../services/api_blushy_service.dart';
 import 'presentation/partner_privacy_screen.dart';
+import 'partner_display_name.dart';
+import 'private_space.dart';
+import 'presentation/private_space_sheet.dart';
+import 'presentation/relationship_hubs.dart';
 
 
 class BlushyPartnerScreen extends StatefulWidget {
@@ -497,10 +501,13 @@ class _BlushyPartnerScreenState extends State<BlushyPartnerScreen> {
       if (!_hadActiveConnection && hasActiveNow) {
         _hadActiveConnection = true;
         final activeConn = connections.firstWhere((c) => c['status'] == 'active', orElse: () => <String, dynamic>{});
-        final partnerEmail = activeConn['partnerEmail'] as String? ?? activeConn['partnerUserId'] as String? ?? 'Partner';
+        // The moment they connect is the moment to start using their name.
+        // Invitations stay addressed by email -- that is how you reach someone
+        // you have not connected with -- but this fires after the handshake.
+        final partnerLabel = partnerDisplayName(activeConn);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('🎉 $partnerEmail accepted your request! Live connection active.'),
+            content: Text('🎉 $partnerLabel accepted your request! Live connection active.'),
             backgroundColor: BlushyColors.success,
             duration: const Duration(seconds: 5),
           ),
@@ -605,6 +612,8 @@ class _BlushyPartnerScreenState extends State<BlushyPartnerScreen> {
         unawaited(_loadSharedActivities());
         unawaited(_loadGarden());
         _syncLiveMessages();
+        // If the other partner ended things, this is where we find out.
+        unawaited(_showEndedByPartnerNotice());
       }
     } catch (e) {
       debugPrint('Error fetching partner data: $e');
@@ -1170,34 +1179,101 @@ class _BlushyPartnerScreenState extends State<BlushyPartnerScreen> {
     );
   }
 
-  void _showArgumentModeConfirmationDialog(BlushyOSState state) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          title: const Text("Turn on Argument Mode?"),
-          content: const Text(
-            "While Argument Mode is enabled, your personal insights, mood, cycle and wellbeing updates won't be shared with your partner.\n\nShared relationship activities and milestones will continue to work."
+  /// How long is left, for the label under "Private space active".
+  String _privateSpaceRemaining() {
+    final id = _activeConnectionId;
+    if (id == null) return 'Until you resume';
+    return PrivateSpace.stateFor(id)?.remainingLabel ?? 'Until you resume';
+  }
+
+  /// Pauses what her partner receives, for real.
+  ///
+  /// The old Argument Mode was a local boolean that never left her device: her
+  /// partner kept receiving her cycle, mood and sleep the entire time. This
+  /// switches the personal permission keys off through the endpoint that
+  /// already governs them, so the pause is enforced by the server.
+  ///
+  /// The local flag is still set, because the rest of the app reads it -- but
+  /// it is no longer the thing doing the work.
+  Future<void> _takeSomeSpace(BlushyOSState state) async {
+    final connectionId = _activeConnectionId;
+    if (connectionId == null) {
+      _showConnectFirstDialog();
+      return;
+    }
+
+    final choice = await PrivateSpaceSheet.show(context);
+    if (choice == null || !mounted) return;
+
+    final conn = _connections.firstWhere(
+      (c) => c['connectionId'] == connectionId,
+      orElse: () => <String, dynamic>{},
+    );
+    final permissions = conn['permissions'] is Map
+        ? Map<String, dynamic>.from(conn['permissions'] as Map)
+        : <String, dynamic>{};
+
+    final messenger = ScaffoldMessenger.of(context);
+    final ok = await PrivateSpace.take(
+      connectionId: connectionId,
+      currentPermissions: permissions,
+      forDuration: choice.forDuration,
+      note: choice.note,
+    );
+    if (!mounted) return;
+
+    if (!ok) {
+      messenger.showSnackBar(
+        const SnackBar(
+          // Not "could not reach the server": the server may well have been
+          // reached and have refused. Saying which it was would need the
+          // error itself; what matters to her is that nothing changed.
+          content: Text(
+            'Private space could not be turned on, so nothing has changed. '
+            'Your sharing is still on.',
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text("Cancel"),
+        ),
+      );
+      return;
+    }
+
+    state.setArgumentModeActive(true);
+    await _fetchPartnerData();
+    if (!mounted) return;
+    setState(() {});
+    messenger.showSnackBar(
+      const SnackBar(
+        content: Text('Private space on. Your personal updates are paused.'),
+      ),
+    );
+  }
+
+  /// Puts back exactly the sharing she had before.
+  Future<void> _resumeSharing(BlushyOSState state) async {
+    final connectionId = _activeConnectionId;
+    final messenger = ScaffoldMessenger.of(context);
+
+    if (connectionId != null) {
+      final ok = await PrivateSpace.resume(connectionId);
+      if (!mounted) return;
+      if (!ok) {
+        messenger.showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Could not reach the server. Your sharing is still paused.',
             ),
-            TextButton(
-              onPressed: () {
-                state.setArgumentModeActive(true);
-                Navigator.of(context).pop();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Argument Mode enabled. Personal insights paused.')),
-                );
-              },
-              child: const Text("Turn On"),
-            ),
-          ],
+          ),
         );
-      },
+        return;
+      }
+    }
+
+    state.setArgumentModeActive(false);
+    await _fetchPartnerData();
+    if (!mounted) return;
+    setState(() {});
+    messenger.showSnackBar(
+      const SnackBar(content: Text('Sharing resumed, exactly as it was.')),
     );
   }
 
@@ -1255,6 +1331,31 @@ class _BlushyPartnerScreenState extends State<BlushyPartnerScreen> {
         _buildHeader(state),
         if (_incomingInvitations.isNotEmpty) _buildPendingRequestsBanner(),
         _buildRelationshipStatusCard(state),
+
+        // The four places the relationship lives, grouped by what they are
+        // for. Each opens the tab it always opened -- the eight are still
+        // there, they just no longer compete for the same glance.
+        //
+        // Only once there is somebody on the other side. Four hubs that all
+        // answer "connect first" is the same wall of locked doors the tabs
+        // were, and it would push the one card that opens them off screen.
+        if (_hasPartner)
+        Padding(
+          padding: EdgeInsets.fromLTRB(
+              BlushyTheme.getPagePadding(context), 8,
+              BlushyTheme.getPagePadding(context), 4),
+          child: RelationshipHubGrid(
+            onBloom: () => _openPartnerTab(_tabs.indexOf('Bouquet')),
+            onCapsules: () => _openPartnerTab(_tabs.indexOf('Letters')),
+            onMemories: () => _openPartnerTab(_tabs.indexOf('Memory Book')),
+            onDocsy: () => _openPartnerTab(_tabs.indexOf('Relationship AI')),
+            onMessage: () => _openPartnerTab(_tabs.indexOf('Messenger')),
+            onGift: () => _openPartnerTab(_tabs.indexOf('Gifts')),
+            docsyAvailable: _isSupportingPartner,
+          ),
+        ),
+        if (_hasPartner) const SizedBox(height: 20),
+
         // The quick actions now sit under the Your Timeline heading, with the
         // entries they open -- they were floating between the portal card and
         // that heading, belonging to neither.
@@ -1461,7 +1562,15 @@ class _BlushyPartnerScreenState extends State<BlushyPartnerScreen> {
   }
 
   /// True once there is somebody on the other side.
-  bool get _hasPartner => _connections.isNotEmpty;
+  ///
+  /// An ended connection stays in the list until its notice is acknowledged,
+  /// so this counts live ones only -- otherwise someone whose partner had
+  /// already left would still be shown the connected portal.
+  bool get _hasPartner =>
+      _connections.any((c) => c['status'] == 'active' || c['status'] == null);
+
+  /// Guards the ended-connection notice against showing twice.
+  bool _showingBreakupNotice = false;
 
   /// Opens one of the shared tabs, or says why it will not open yet.
   ///
@@ -1539,6 +1648,132 @@ class _BlushyPartnerScreenState extends State<BlushyPartnerScreen> {
     );
   }
 
+  /// A connection the other partner ended, which this person has not been
+  /// told about yet.
+  ///
+  /// There is no longer anything to agree to -- the row is already over. This
+  /// is only the notice, and reading `breakupRequestedByUserId` is how the
+  /// screen knows whose decision it was.
+  Map<String, dynamic>? get _endedByPartner {
+    final me = AuthStorage.getUserId();
+    for (final conn in _connections) {
+      final requester = conn['breakupRequestedByUserId'];
+      if (conn['status'] == 'breakup' && requester != null && requester != me) {
+        return Map<String, dynamic>.from(conn);
+      }
+    }
+    return null;
+  }
+
+  /// Tells this person their partner has gone, once.
+  ///
+  /// Acknowledging retires the row on the server, so the notice does not
+  /// reappear on the next load.
+  Future<void> _showEndedByPartnerNotice() async {
+    if (_showingBreakupNotice) return;
+    final conn = _endedByPartner;
+    if (conn == null) return;
+
+    final connectionId = conn['connectionId'] as String? ?? '';
+    if (connectionId.isEmpty) return;
+
+    _showingBreakupNotice = true;
+    final partnerLabel = partnerDisplayName(conn, fallback: 'Your partner');
+
+    await showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('$partnerLabel disconnected'),
+        content: Text(
+          '$partnerLabel ended the connection. All sharing between you has '
+          'stopped. You can invite them again whenever you both want to.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+
+    await _partnerService.breakupConnection(connectionId);
+    if (!mounted) {
+      _showingBreakupNotice = false;
+      return;
+    }
+    await _fetchPartnerData();
+    // Held until the refreshed list is in, so a failed acknowledgement cannot
+    // put the same dialog straight back up.
+    _showingBreakupNotice = false;
+    if (!mounted) return;
+    setState(() {});
+  }
+
+  /// Confirms, then ends it.
+  ///
+  /// Leaving used to be a request the other partner had to grant, which left
+  /// whoever wanted out still connected -- and still sharing -- until they
+  /// agreed. One confirmation, and it is over.
+  ///
+  /// Both partners reach this: from the card on the portal and from the
+  /// Manage modal, so there is one behaviour rather than two that can drift.
+  /// [onDone] lets the modal rebuild its own list.
+  Future<void> _disconnectPartner(
+    Map<String, dynamic> conn, {
+    VoidCallback? onDone,
+  }) async {
+    final connectionId = conn['connectionId'] as String? ?? '';
+    if (connectionId.isEmpty) return;
+
+    final partnerLabel = partnerDisplayName(conn, fallback: 'your partner');
+    final messenger = ScaffoldMessenger.of(context);
+
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Disconnect partner?'),
+        content: Text(
+          'Are you sure you want to disconnect from $partnerLabel? This ends '
+          'the connection for both of you and stops all sharing immediately.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(
+              AppLocalizations.of(context).partnerDisconnect,
+              style: const TextStyle(color: Colors.red),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm != true) return;
+
+    final status = await _partnerService.breakupConnection(connectionId);
+    if (!mounted) return;
+
+    await _fetchPartnerData();
+    if (!mounted) return;
+    setState(() {});
+    onDone?.call();
+
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(
+          status == null
+              ? 'Could not reach the server. Nothing has changed.'
+              : 'Disconnected from $partnerLabel. Sharing has stopped.',
+        ),
+      ),
+    );
+  }
+
   Widget _buildRelationshipStatusCard(BlushyOSState state) {
     final active = state.argumentModeActive;
 
@@ -1560,7 +1795,7 @@ class _BlushyPartnerScreenState extends State<BlushyPartnerScreen> {
     final hasConnection = _connections.isNotEmpty;
     final primaryPartner = hasConnection ? _connections.first : null;
     final partnerNameOrEmail = primaryPartner != null
-        ? (primaryPartner['partnerName'] as String? ?? primaryPartner['partnerEmail'] as String? ?? primaryPartner['partnerUserId'] as String? ?? 'Partner')
+        ? partnerDisplayName(Map<String, dynamic>.from(primaryPartner))
         : 'No Partner Connected';
 
     final currentRole = AuthStorage.getRole() ?? state.selectedRole;
@@ -1589,7 +1824,11 @@ class _BlushyPartnerScreenState extends State<BlushyPartnerScreen> {
           // button either side of the icon.
           if (!hasConnection)
             _buildUnpairedPortalHeader(statusSubtitle)
-          else
+          // Identity first, with the whole width to say it in. The name and
+          // the status line used to share this row with two buttons, leaving
+          // them about 90px: the name truncated to "code..." and the status
+          // wrapped onto four lines.
+          else ...[
             Row(
               children: [
                 Container(
@@ -1611,60 +1850,129 @@ class _BlushyPartnerScreenState extends State<BlushyPartnerScreen> {
                     children: [
                       Text(
                         "$partnerNameOrEmail's Portal",
-                        style: GoogleFonts.manrope(height: 1.5, 
+                        style: GoogleFonts.manrope(
+                          height: 1.3,
                           fontSize: 17,
                           fontWeight: FontWeight.bold,
                           color: BlushyColors.text,
                         ),
                         overflow: TextOverflow.ellipsis,
                       ),
+                      const SizedBox(height: 2),
                       Text(
                         statusSubtitle,
-                        style: GoogleFonts.manrope(height: 1.5, 
-                          fontSize: 10,
-                          color: BlushyColors.primary,
+                        style: GoogleFonts.manrope(
+                          height: 1.3,
+                          fontSize: 11,
+                          color: BlushyColors.secondaryText,
                           fontWeight: FontWeight.w600,
                         ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(width: 8),
-                ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: BlushyColors.primary,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    elevation: 0,
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      _selectedTabIndex = 2; // Messenger tab
-                    });
-                  },
-                  icon: const Icon(Icons.chat_bubble_rounded, size: 13, color: Colors.white),
-                  label: Text(
-                    'Open Chat',
-                    style: GoogleFonts.manrope(height: 1.5, fontSize: 11, fontWeight: FontWeight.bold),
+              ],
+            ),
+            const SizedBox(height: 16),
+            // The three things you do here, one row, equal shares.
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: BlushyColors.primary,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 11),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
+                      elevation: 0,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _selectedTabIndex = 2; // Messenger tab
+                      });
+                    },
+                    icon: const Icon(Icons.chat_bubble_rounded,
+                        size: 14, color: Colors.white),
+                    label: Text(
+                      'Open Chat',
+                      style: GoogleFonts.manrope(
+                          height: 1.2, fontSize: 12, fontWeight: FontWeight.bold),
+                    ),
                   ),
                 ),
-                const SizedBox(width: 6),
-                OutlinedButton(
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: BlushyColors.success,
-                    side: const BorderSide(color: BlushyColors.successSoft),
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: BlushyColors.success,
+                      side: const BorderSide(color: BlushyColors.successSoft),
+                      padding: const EdgeInsets.symmetric(vertical: 11),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
+                    ),
+                    onPressed: () => _showHelpOptionsDialog(context),
+                    child: Text(
+                      AppLocalizations.of(context).pTips,
+                      style: GoogleFonts.manrope(
+                          height: 1.2, fontSize: 12, fontWeight: FontWeight.bold),
+                    ),
                   ),
-                  onPressed: () => _showHelpOptionsDialog(context),
-                  child: Text(
-                    AppLocalizations.of(context).pTips,
-                    style: GoogleFonts.manrope(height: 1.5, fontSize: 11, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: BlushyColors.primary,
+                      side: const BorderSide(color: BlushyColors.border),
+                      padding: const EdgeInsets.symmetric(vertical: 11),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
+                    ),
+                    onPressed: _showPartnerConnectionsModal,
+                    child: Text(
+                      'Manage',
+                      style: GoogleFonts.manrope(
+                          height: 1.2, fontSize: 12, fontWeight: FontWeight.bold),
+                    ),
                   ),
                 ),
               ],
             ),
+            const SizedBox(height: 10),
+            // Ending the connection gets its own full-width row, above
+            // Argument Mode. It was a third link crowded onto the toggle row,
+            // where the most consequential control on the card read as the
+            // least important one.
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton(
+                onPressed: primaryPartner == null
+                    ? null
+                    : () => _disconnectPartner(
+                          Map<String, dynamic>.from(primaryPartner),
+                        ),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: BlushyColors.danger,
+                  side: BorderSide(
+                      color: BlushyColors.danger.withValues(alpha: 0.35)),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
+                ),
+                child: Text(
+                  AppLocalizations.of(context).partnerDisconnect,
+                  style: GoogleFonts.manrope(
+                    height: 1.2,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+          ],
           const SizedBox(height: 16),
           const Divider(color: BlushyColors.border),
           const SizedBox(height: 10),
@@ -1679,37 +1987,40 @@ class _BlushyPartnerScreenState extends State<BlushyPartnerScreen> {
                     color: active ? BlushyColors.success : BlushyColors.secondaryText,
                   ),
                   const SizedBox(width: 8),
-                  Text(
-                    "Argument Mode",
-                    style: GoogleFonts.manrope(height: 1.5, 
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: active ? BlushyColors.danger : BlushyColors.text,
-                    ),
+                  // Not Expanded: the enclosing Row is itself inside a Row
+                  // with unbounded width, where a flex child has nothing to
+                  // expand into and the layout throws.
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                        Text(
+                          // "Argument Mode" made wanting privacy sound like a
+                          // fight, and asked her to declare one to get it.
+                          active ? "Private space active" : "Private space",
+                          style: GoogleFonts.manrope(
+                            height: 1.4,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: active ? BlushyColors.primary : BlushyColors.text,
+                          ),
+                        ),
+                        if (active)
+                          Text(
+                            _privateSpaceRemaining(),
+                            style: GoogleFonts.manrope(
+                              fontSize: 10.5,
+                              color: BlushyColors.secondaryText,
+                            ),
+                          ),
+                    ],
                   ),
                 ],
               ),
               Row(
                 children: [
-                  if (hasConnection) ...[
-                    TextButton(
-                      onPressed: _showPartnerConnectionsModal,
-                      style: TextButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        minimumSize: Size.zero,
-                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      ),
-                      child: Text(
-                        'Manage',
-                        style: GoogleFonts.manrope(height: 1.5, 
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                          color: BlushyColors.primary,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                  ],
+                  // Manage and Disconnect moved to their own rows above;
+                  // what is left beside the label is the toggle it names.
                   // It pauses what a partner sees, so with nobody connected
                   // there is nothing for it to pause.
                   Opacity(
@@ -1721,12 +2032,9 @@ class _BlushyPartnerScreenState extends State<BlushyPartnerScreen> {
                           return;
                         }
                         if (!active) {
-                          _showArgumentModeConfirmationDialog(state);
+                          _takeSomeSpace(state);
                         } else {
-                          state.setArgumentModeActive(false);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Argument Mode disabled. Resuming normal sharing.')),
-                          );
+                          _resumeSharing(state);
                         }
                       },
                       child: Container(
@@ -1912,7 +2220,7 @@ class _BlushyPartnerScreenState extends State<BlushyPartnerScreen> {
         builder: (_) => canManage
             ? PartnerSharingScreen(
                 connectionId: connectionId,
-                partnerName: active['partnerEmail']?.toString(),
+                partnerName: partnerDisplayName(Map<String, dynamic>.from(active)),
               )
             : PartnerPrivacyScreen(connectionId: connectionId),
       ),
@@ -2036,7 +2344,7 @@ class _BlushyPartnerScreenState extends State<BlushyPartnerScreen> {
       itemCount: _connections.length,
       itemBuilder: (context, index) {
         final conn = _connections[index];
-        final partnerEmail = conn['partnerEmail'] as String? ?? conn['partnerUserId'] as String? ?? 'Partner';
+        final partnerLabel = partnerDisplayName(Map<String, dynamic>.from(conn));
         final role = conn['partnerRole'] as String? ?? 'Partner';
         final status = conn['status'] as String? ?? 'active';
         final connectionId = conn['connectionId'] as String? ?? '';
@@ -2061,7 +2369,7 @@ class _BlushyPartnerScreenState extends State<BlushyPartnerScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      partnerEmail,
+                      partnerLabel,
                       style: GoogleFonts.manrope(height: 1.5, fontSize: 14, fontWeight: FontWeight.bold, color: BlushyColors.text),
                     ),
                     Text(
@@ -2088,36 +2396,18 @@ class _BlushyPartnerScreenState extends State<BlushyPartnerScreen> {
                           MaterialPageRoute(
                             builder: (_) => PartnerSharingScreen(
                               connectionId: connectionId,
-                              partnerName: partnerEmail.isEmpty ? null : partnerEmail,
+                              partnerName: partnerLabel.isEmpty ? null : partnerLabel,
                             ),
                           ),
                         ),
               ),
+              // Same flow as the card on the portal, so the two cannot drift
+              // apart in what they do or what they claim happened.
               TextButton(
-                onPressed: () async {
-                  final messenger = ScaffoldMessenger.of(context);
-                  final confirm = await showDialog<bool>(
-                    context: context,
-                    builder: (ctx) => AlertDialog(
-                      title: const Text('Disconnect Partner?'),
-                      content: Text('Are you sure you want to disconnect $partnerEmail?'),
-                      actions: [
-                        TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
-                        TextButton(onPressed: () => Navigator.pop(ctx, true), child: Text(AppLocalizations.of(context).partnerDisconnect, style: TextStyle(color: Colors.red))),
-                      ],
-                    ),
-                  );
-                  if (confirm == true && connectionId.isNotEmpty) {
-                    final success = await _partnerService.breakupConnection(connectionId);
-                    if (success) {
-                      await _fetchPartnerData();
-                      setModalState(() {});
-                      messenger.showSnackBar(
-                        const SnackBar(content: Text('Partner disconnected.')),
-                      );
-                    }
-                  }
-                },
+                onPressed: () => _disconnectPartner(
+                  Map<String, dynamic>.from(conn),
+                  onDone: () => setModalState(() {}),
+                ),
                 child: Text(
                   AppLocalizations.of(context).partnerDisconnect,
                   style: GoogleFonts.manrope(height: 1.5, fontSize: 11, color: Colors.red, fontWeight: FontWeight.w600),
@@ -2136,18 +2426,52 @@ class _BlushyPartnerScreenState extends State<BlushyPartnerScreen> {
     final permissionOwnerId = (conn['permissionOwnerUserId'] ?? '').toString();
     final isOwner = permissionOwnerId.isEmpty || currentUserId == permissionOwnerId;
 
+    // Off, matching the server's own defaults.
+    //
+    // These were seeded `true`, so a connection whose permissions had not
+    // loaded presented every switch as already sharing. An unknown privacy
+    // setting has to read as closed; showing it open is a claim about her
+    // that nobody made.
     Map<String, dynamic> perms = {
-      'shareCycle': true,
-      'shareMood': true,
-      'shareSleep': true,
-      'shareInsights': true,
-      'shareOnboarding': true,
-      'allowAiSuggestionsWoman': true,
-      'allowAiSuggestionsMan': true,
-      'allowDecoderMan': true,
+      'shareCycle': false,
+      'shareMood': false,
+      'shareSleep': false,
+      'shareInsights': false,
+      'shareOnboarding': false,
+      'allowAiSuggestionsWoman': false,
+      'allowAiSuggestionsMan': false,
+      'allowDecoderMan': false,
     };
     if (conn['permissions'] is Map) {
       perms.addAll(Map<String, dynamic>.from(conn['permissions'] as Map));
+    }
+
+    /// The keys this person is allowed to change.
+    ///
+    /// Save used to send the whole map. Three of these belong to a particular
+    /// side of the connection -- `allowAiSuggestionsWoman` is hers,
+    /// `allowAiSuggestionsMan` and `allowDecoderMan` are his -- and the server
+    /// refuses the *whole* PATCH if any changed key is not the caller's to
+    /// set. So her stored values for his two switches differing from the
+    /// seeded ones was enough to have every cycle, mood and sleep change she
+    /// had just made thrown out with a 403 she never saw. Seen twice in
+    /// production within two minutes.
+    final actorRole = AuthStorage.getRole();
+    Map<String, dynamic> changeableBy(Map<String, dynamic> all) {
+      const his = {'allowAiSuggestionsMan', 'allowDecoderMan'};
+      const hers = {'allowAiSuggestionsWoman'};
+      final mine = <String, dynamic>{};
+      for (final entry in all.entries) {
+        final allowed = his.contains(entry.key)
+            ? actorRole == 'man'
+            : hers.contains(entry.key)
+                ? actorRole == 'woman'
+                // Everything else is a data-sharing flag, which only the
+                // person sharing may change.
+                : isOwner;
+        if (allowed) mine[entry.key] = entry.value;
+      }
+      return mine;
     }
 
     showModalBottomSheet(
@@ -2222,7 +2546,8 @@ class _BlushyPartnerScreenState extends State<BlushyPartnerScreen> {
                         onPressed: () async {
                           final messenger = ScaffoldMessenger.of(context);
                           final nav = Navigator.of(ctx);
-                          final ok = await _partnerService.updatePermissions(connectionId, perms);
+                          final ok = await _partnerService
+                              .updatePermissions(connectionId, changeableBy(perms));
                           nav.pop();
                           if (ok && mounted) {
                             await _fetchPartnerData();
@@ -2805,7 +3130,7 @@ class _BlushyPartnerScreenState extends State<BlushyPartnerScreen> {
       orElse: () => <String, dynamic>{},
     );
     final hasActivePartner = activeConn.isNotEmpty;
-    final partnerIdentifier = (activeConn['partnerEmail'] ?? activeConn['partnerUserId'] ?? 'Partner').toString();
+    final partnerIdentifier = partnerDisplayName(activeConn);
     final connectionDuration = formatConnectionDuration(activeConn['created_at'] ?? activeConn['createdAt']);
 
     // One list, one card shape. The shared actions used to be a scrolling row

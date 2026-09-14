@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:dio/dio.dart';
-import '../../../core/storage.dart';
 import '../../../theme/colors.dart';
-import '../../../core/stage_config.dart';
-import '../../../services/api_base_url.dart';
-import '../../../services/auth_storage.dart';
+import '../../../services/api_partner_service.dart';
 import '../../../l10n/app_localizations.dart';
+import '../partner_stage.dart';
+import 'partner_stage_today.dart';
+import 'live_refresh.dart';
 
 class PartnerSiaScreen extends StatefulWidget {
   final String? initialPrompt;
@@ -16,13 +15,60 @@ class PartnerSiaScreen extends StatefulWidget {
   State<PartnerSiaScreen> createState() => _PartnerSiaScreenState();
 }
 
-class _PartnerSiaScreenState extends State<PartnerSiaScreen> {
+class _PartnerSiaScreenState extends State<PartnerSiaScreen>
+    with WidgetsBindingObserver, LiveRefresh {
   final TextEditingController _queryController = TextEditingController();
   final List<Map<String, dynamic>> _chatHistory = [];
+  final ApiPartnerService _partnerService = ApiPartnerService();
+
+  /// The connection this coaching is about. Without one there is nobody to
+  /// ground the answers in, and the screen says so rather than guessing.
+  String? _connectionId;
+
+  /// Her cycle phase, when she shares it. Null otherwise, and never inferred.
+  String? _phase;
+
+  /// Her life stage, when she shares her onboarding. Null otherwise.
+  ///
+  /// This used to be read off her `partnerUser` object, where it did not
+  /// exist, so it fell back to "everydayWellness" on every account -- and a
+  /// partner of someone in her third trimester was coached as though she were
+  /// having an ordinary week. The payload carries it now, behind her own
+  /// `shareOnboarding` key.
+  ///
+  /// Held as it arrived and normalised at the point of use: the server sends
+  /// snake_case (`ttc`, `first_period`) and the older client code wrote
+  /// camelCase (`tryingToConceive`, `firstPeriodStarted`). Matching on one
+  /// spelling silently missed the other.
+  String? _stage;
+  bool _loadingConnection = true;
+
+  /// Whether her context actually reached the model on the last answer, and
+  /// whether she has the partner-AI switch on at all. Both come back from the
+  /// server, so the banner reports what happened rather than what we hoped.
+  bool _usedHerContext = false;
+  bool _aiAllowed = true;
+  bool _thinking = false;
+
+  /// The banner and the pills are built from her permitted context, so they
+  /// go stale the same way the home screen did: she changes what she shares,
+  /// or moves to a new phase overnight, and this still says what it said when
+  /// the tab was first opened. Re-read on the same terms as everywhere else.
+  @override
+  Future<void> refreshNow() => _loadConnection();
+
+  @override
+  void dispose() {
+    stopLiveRefresh();
+    _queryController.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() {
     super.initState();
+    _loadConnection();
+    startLiveRefresh();
     if (widget.initialPrompt != null && widget.initialPrompt!.trim().isNotEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _sendQuery(widget.initialPrompt!);
@@ -30,94 +76,188 @@ class _PartnerSiaScreenState extends State<PartnerSiaScreen> {
     }
   }
 
-  @override
-  void dispose() {
-    _queryController.dispose();
-    super.dispose();
+  Future<void> _loadConnection() async {
+    final connections = await _partnerService.getConnections();
+    if (!mounted) return;
+    final active = connections.firstWhere(
+      (c) => c['status'] == 'active',
+      orElse: () => <String, dynamic>{},
+    );
+    final connectionId = active['connectionId']?.toString();
+    setState(() {
+      _connectionId = connectionId;
+      _loadingConnection = false;
+    });
+
+    if (connectionId == null) return;
+
+    // The phase the questions are keyed on, from the same permission-filtered
+    // payload the home screen reads. Absent when she is not sharing her cycle,
+    // which is the case the general set is for.
+    final shared = await _partnerService.getPartnerSharedData(connectionId);
+    if (!mounted) return;
+    final cycle = shared['cycleInfo'];
+    setState(() {
+      _phase = cycle is Map ? cycle['phase']?.toString() : null;
+      _stage = shared['lifeStage']?.toString();
+    });
   }
 
+  /// Three questions worth asking, keyed on where she actually is.
+  ///
+  /// Not on her life stage: `lifeStage` is not in the shared-data payload at
+  /// all, so the value this screen used to read was null on every account and
+  /// silently became "everydayWellness". Keying on something the app does not
+  /// receive would have been three made-up questions wearing a real label.
+  ///
+  /// Phrased as openings rather than answers. "What helps most on a heavy
+  /// day?" leaves room for her to be different from the chart; "She needs a
+  /// heat pack" does not.
+  /// Her stage first where she shares it: being pregnant or six days
+  /// postpartum says more about what he should ask than which week of a cycle
+  /// it is. Falls through to the phase, and the phase set falls through to a
+  /// general one on its own.
+  ///
+  /// Both sets live in `partner_stage_today.dart`, because Partner Home now
+  /// offers the same questions beside the cycle card and two copies is how
+  /// they drift.
+  List<String> get _suggestions =>
+      _stageSuggestions ?? partnerPhaseQuestions(_phase);
+
+  /// Asks the relationship coach, grounded in what she has permitted.
+  ///
+  /// This used to post to `/ai/chat` with `context: 'partner_support'` and
+  /// nothing else -- no cycle, no stage, no mood -- so the "partner coach" was
+  /// a general chatbot that happened to sit in his app.
+  ///
+  /// `/ai/relationship-advice/:connectionId` already existed and was already
+  /// doing the work: it gathers her context *behind her own permission keys*,
+  /// runs the deterministic safety ruleset over the question and the answer,
+  /// and reports back whether her data was used at all. Nothing here decides
+  /// what he may see; the server does, from her switches.
   Future<void> _sendQuery(String query) async {
     final cleanQuery = query.trim();
     if (cleanQuery.isEmpty) return;
-    
+
     setState(() {
       _chatHistory.add({"sender": "user", "text": cleanQuery});
+      _thinking = true;
     });
-    
     _queryController.clear();
 
-    String reply = "";
-    try {
-      final token = AuthStorage.getToken();
-      final dio = Dio(BaseOptions(
-        baseUrl: resolveApiBaseUrl(),
-        connectTimeout: const Duration(seconds: 10),
-        // Absorbs a Render cold start (~27s); see api_community_service.dart
-        // for why this is the timeout that gives rather than connectTimeout.
-        receiveTimeout: const Duration(seconds: 60),
-        headers: token != null ? {'Authorization': 'Bearer $token'} : {},
-      ));
-
-      final response = await dio.post('/ai/chat', data: {
-        'message': cleanQuery,
-        'context': 'partner_support',
-      });
-
-      if (response.data is Map && response.data['reply'] != null) {
-        reply = response.data['reply'].toString();
-      }
-    } catch (_) {}
-
-    if (reply.isEmpty) {
-      final lower = cleanQuery.toLowerCase();
-      if (lower.contains("discharge")) {
-        reply = "Vaginal discharge is completely normal and healthy! It is your body's natural way of cleaning itself and usually begins 6 to 18 months before your first period arrives.";
-      } else if (lower.contains("school") || (lower.contains("first") && lower.contains("period"))) {
-        reply = "If your first period starts at school, take a deep breath. Use a pad from your pouch or visit your school nurse. You can also tie a sweater around your waist. You are 100% safe and doing great!";
-      } else if (lower.contains("normal") || lower.contains("body") || lower.contains("growing") || lower.contains("breast")) {
-        reply = "Everyone's body grows at its own unique, healthy pace! Breast buds, height changes, and new body hair are all natural signs of your body blossoming.";
-      } else if (lower.contains("nervous") || lower.contains("overwhelm") || lower.contains("scared")) {
-        reply = "Feeling nervous is completely normal when your body is changing. Taking things one day at a time, talking to someone you trust, and taking deep breaths can help you feel centered.";
-      } else if (lower.contains("period") || lower.contains("menstrual") || lower.contains("cramp")) {
-        reply = "During her menstrual phase, her energy is biologically lowest. Best ways you can support her: offer a warm heat pack, brew soothing tea, and handle dinner or errands so she can rest.";
-      } else if (lower.contains("follicular") || lower.contains("after period")) {
-        reply = "In her follicular phase, estrogen is rising, which boosts energy, focus, and social enthusiasm. Great time to plan fun dates, try new activities, or tackle shared goals together.";
-      } else if (lower.contains("ovulat") || lower.contains("fertile")) {
-        reply = "During ovulation, estrogen and testosterone peak. She typically feels confident, sociable, and energetic. Enjoy deep quality time and meaningful conversations.";
-      } else if (lower.contains("luteal") || lower.contains("pms") || lower.contains("mood") || lower.contains("irrit")) {
-        reply = "During her luteal phase (PMS), progesterone increases, which can cause fatigue, food cravings, or mood fluctuations. Offer extra patience, reassurance, comforting snacks, and gentle support.";
-      } else if (lower.contains("tired") || lower.contains("fatigue") || lower.contains("sleep")) {
-        reply = "When she feels fatigued, simple practical help makes the biggest difference: ask 'Can I take care of dinner tonight?' and make sure she has quiet space to decompress.";
-      } else {
-        reply = "Docsy is right here with you! You can ask anything about your body, changes you notice, or how you are feeling today.";
-      }
-    }
-
-    if (mounted) {
+    final connectionId = _connectionId;
+    if (connectionId == null) {
       setState(() {
-        _chatHistory.add({"sender": "sia", "text": reply});
+        _thinking = false;
+        _chatHistory.add({
+          "sender": "sia",
+          "text": "Once you are connected, I can ground what I say in what "
+              "she has chosen to share. Until then I can still answer general "
+              "questions about how to support her.",
+        });
       });
+      return;
     }
+
+    final result = await _partnerService.askRelationshipAi(
+      connectionId: connectionId,
+      question: cleanQuery,
+    );
+    if (!mounted) return;
+
+    final error = result['error']?.toString();
+    final answer = result['answer']?.toString();
+
+    setState(() {
+      _thinking = false;
+      _usedHerContext = result['usedPartnerData'] == true;
+      _aiAllowed = result['aiSuggestionsEnabled'] != false;
+
+      if (answer != null && answer.trim().isNotEmpty) {
+        _chatHistory.add({"sender": "sia", "text": answer.trim()});
+        return;
+      }
+
+      // No invented answer. The fallbacks here were written for a girl going
+      // through puberty -- "visit your school nurse", "your body blossoming"
+      // -- and were being served to her partner, which was worse than saying
+      // nothing at all.
+      _chatHistory.add({
+        "sender": "sia",
+        "text": error != null && error.trim().isNotEmpty
+            ? "I could not reach Docsy just now. $error"
+            : "I could not reach Docsy just now. Please try again in a moment.",
+      });
+    });
+  }
+
+  /// Questions worth asking for the stage she is actually in.
+  ///
+  /// The set lives in `partner_stage_today.dart` because Partner Home
+  /// offers the same three; keeping one copy is what stops a stage being
+  /// added to one surface and missed on the other.
+  ///
+  /// Null for the stages where a cycle phase says more -- living with her
+  /// cycle, hormonal health -- so those fall through rather than being given
+  /// a vaguer version of what the phase already answers.
+  List<String>? get _stageSuggestions =>
+      partnerStageQuestions(PartnerStage.from(_stage));
+
+  Widget _contextBanner() {
+    late final IconData icon;
+    late final String text;
+    late final Color tint;
+
+    if (!_aiAllowed) {
+      icon = Icons.lock_person_rounded;
+      tint = const Color(0xFF7209B7);
+      text = 'She has partner suggestions switched off. I can still help with '
+          'general questions.';
+    } else if (_usedHerContext) {
+      icon = Icons.sync_rounded;
+      tint = const Color(0xFF0D9488);
+      text = 'Grounded in what she is sharing with you today.';
+    } else {
+      icon = Icons.self_improvement_rounded;
+      tint = BlushyColors.secondaryText;
+      text = 'Nothing personal is being shared right now. I can still help '
+          'with general questions.';
+    }
+
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 10, 16, 4),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFFEFE8E0)),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, size: 15, color: tint),
+          const SizedBox(width: 9),
+          Expanded(
+            child: Text(
+              text,
+              style: GoogleFonts.manrope(
+                fontSize: 11.5,
+                color: const Color(0xFF7A6B72),
+                height: 1.35,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    String activeStage = "everydayWellness";
-    try {
-      final profile = BlushyStorage.read('user_profile.json');
-      if (profile['profile'] != null) {
-        activeStage = profile['profile']['lifeStage'] ?? "everydayWellness";
-      }
-    } catch (_) {}
-
-    final stageDetails = StageConfig.forStage(activeStage);
-
-    // Dynamic suggested questions based on life stage
-    final List<String> suggestions = [
-      "How can I support her during ${stageDetails.partnerSubLabel.toLowerCase()}?",
-      "Why might she be more tired right now?",
-      "What is practical vs emotional support?",
-    ];
+    // These read `user_profile.json`, which on a partner account is *his*
+    // profile -- so the "stage-aware" question was keyed on his own stage,
+    // which is 'partner'. The questions now come from her phase, where she
+    // shares it, and are general where she does not.
+    final List<String> suggestions = _suggestions;
 
     return Scaffold(
       backgroundColor: BlushyColors.background,
@@ -143,6 +283,21 @@ class _PartnerSiaScreenState extends State<PartnerSiaScreen> {
       body: SafeArea(
         child: Column(
           children: [
+            // What this answer is grounded in. Held back until the connection
+            // is known, so it does not flash "nothing shared" on every open.
+            if (!_loadingConnection) _contextBanner(),
+            if (_thinking)
+              const Padding(
+                padding: EdgeInsets.only(top: 6),
+                child: SizedBox(
+                  height: 2,
+                  child: LinearProgressIndicator(
+                    minHeight: 2,
+                    color: BlushyColors.primary,
+                    backgroundColor: Colors.transparent,
+                  ),
+                ),
+              ),
             // Chat messages
             Expanded(
               child: _chatHistory.isEmpty

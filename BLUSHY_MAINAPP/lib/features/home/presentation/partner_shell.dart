@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../partner/presentation/partner_sia.dart';
 import '../../../theme/colors.dart';
 import '../../../shared/header.dart';
 import '../../../core/theme.dart' hide BlushyColors;
@@ -40,6 +41,11 @@ class _PartnerShellState extends State<PartnerShell>
   static const List<String> _labels = <String>[
     'Home',
     'Community',
+    // Centre, the way Docsy sits in the middle of her own bar. It was reachable
+    // only from a floating button and from inside the sixth tab of the portal,
+    // which is a long way to go for the thing that explains what she is going
+    // through.
+    'Docsy',
     'Learn',
     'Partner',
   ];
@@ -47,6 +53,7 @@ class _PartnerShellState extends State<PartnerShell>
   final List<Widget> _screens = [
     const PartnerHomeScreen(),
     const PartnerCommunityScreen(),
+    const PartnerSiaScreen(),
     const PartnerLearnScreen(),
     const BlushyPartnerScreen(),
   ];
@@ -107,14 +114,19 @@ class _PartnerShellState extends State<PartnerShell>
               label: _labels[1],
             ),
             BottomNavigationBarItem(
+              icon: const Icon(Icons.auto_awesome_outlined),
+              activeIcon: const Icon(Icons.auto_awesome_rounded),
+              label: _labels[2],
+            ),
+            BottomNavigationBarItem(
               icon: const Icon(Icons.auto_stories_outlined),
               activeIcon: const Icon(Icons.auto_stories_rounded),
-              label: _labels[2],
+              label: _labels[3],
             ),
             BottomNavigationBarItem(
               icon: const Icon(Icons.favorite_border_rounded),
               activeIcon: const Icon(Icons.favorite_rounded),
-              label: _labels[3],
+              label: _labels[4],
             ),
           ],
         ),

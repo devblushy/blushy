@@ -9,6 +9,7 @@ import '../../../services/api_blushy_service.dart';
 import '../../../models/blushy_models.dart';
 import 'partner_privacy_screen.dart';
 import '../../../shared/confirm_sign_out.dart';
+import '../partner_display_name.dart';
 
 class PartnerProfileScreen extends StatefulWidget {
   const PartnerProfileScreen({super.key});
@@ -138,9 +139,10 @@ class _PartnerProfileScreenState extends State<PartnerProfileScreen> {
   Widget build(BuildContext context) {
     String connectedPartnerName = "Not connected";
     if (_activeConnection != null) {
-      connectedPartnerName = _activeConnection!['partner']?['displayName'] ??
-          _activeConnection!['partnerEmail'] ??
-          "Connected Partner";
+      connectedPartnerName = partnerDisplayName(
+        Map<String, dynamic>.from(_activeConnection!),
+        fallback: "Connected Partner",
+      );
     }
 
     return Scaffold(
