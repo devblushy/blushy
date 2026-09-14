@@ -153,12 +153,15 @@ test('the lengths his ring needs travel with the phase he already sees', async (
   assert.ok(block.includes('periodLengthDays'), block);
 });
 
-test('only the names her own Symptoms section offers reach him', async () => {
+test('only the symptom groups a partner may see reach him', async () => {
   // Five categories in symptom_categories.dart write `symptom_logged`:
   // Symptoms, Intimate health, Vaginal discharge, Hair and skin, and
   // Digestion. Filtering on the event type handed her partner all five under
   // a switch labelled "Symptoms" -- "Vaginal itching" travelled to him on the
   // same permission as "Cramps".
+  //
+  // Two groups are open: her Symptoms section, and Digestion, which is
+  // ordinary enough to be worth a partner knowing. The other three stay shut.
   const { readFileSync } = await import('node:fs');
   const source = readFileSync('src/services/partnerSafeService.js', 'utf8');
 
@@ -167,13 +170,23 @@ test('only the names her own Symptoms section offers reach him', async () => {
     source.indexOf(']);', source.indexOf('const PARTNER_VISIBLE_SYMPTOMS')),
   );
 
-  for (const allowed of ['cramps', 'headache', 'tender breasts', 'abdominal pain', 'fatigue']) {
-    assert.ok(list.includes(`'${allowed}'`), `${allowed} is one of hers`);
+  const allowedGroups = {
+    symptoms: ['cramps', 'headache', 'tender breasts', 'backache', 'abdominal pain',
+      'acne', 'fatigue', 'cravings', 'insomnia', 'swelling', 'dry skin', 'dry eyes'],
+    digestion: ['nausea', 'bloating', 'constipation', 'diarrhea'],
+  };
+  for (const [group, names] of Object.entries(allowedGroups)) {
+    for (const name of names) {
+      assert.ok(list.includes(`'${name}'`), `${name} (${group}) should be visible`);
+    }
   }
+
   for (const withheld of [
     'vaginal itching',
     'vaginal dryness',
+    'unusual',
     'clumpy white',
+    'grey',
     'hair thinning',
     'excess facial hair',
   ]) {

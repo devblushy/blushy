@@ -47,7 +47,7 @@ import { db } from '../utils/db.js';
 const PARTNER_CONTRACT_VERSION = 'partner-safe-v1.0.0';
 
 /**
- * The names her own "Symptoms" section offers, and nothing else.
+ * The symptom names a partner may see.
  *
  * Five categories in `symptom_categories.dart` write `symptom_logged`:
  * Symptoms, Intimate health, Vaginal discharge, Hair and skin, and Digestion
@@ -56,12 +56,20 @@ const PARTNER_CONTRACT_VERSION = 'partner-safe-v1.0.0';
  * switch labelled "Symptoms". "Vaginal itching" travelled to him on the same
  * permission as "Cramps".
  *
+ * Two of the five are listed here. Her own Symptoms section, and Digestion,
+ * which is ordinary enough to be worth a partner knowing -- nausea and
+ * bloating are things he can actually do something about, and they are the
+ * kind of thing people say out loud anyway.
+ *
+ * Intimate health, vaginal discharge, and hair and skin stay closed. Those
+ * are not things a general "symptoms" switch should be understood to cover,
+ * and she can still tell him herself in her own words.
+ *
  * An allowlist rather than a blocklist: a new intimate-health option added
  * later must not reach a partner because nobody remembered to exclude it.
- * Anything not named here is simply withheld, and she can still share it
- * herself in her own words.
  */
 const PARTNER_VISIBLE_SYMPTOMS = new Set([
+  // Symptoms.
   'cramps',
   'headache',
   'tender breasts',
@@ -74,6 +82,11 @@ const PARTNER_VISIBLE_SYMPTOMS = new Set([
   'swelling',
   'dry skin',
   'dry eyes',
+  // Digestion and stool.
+  'nausea',
+  'bloating',
+  'constipation',
+  'diarrhea',
 ]);
 const CONNECTIONS = 'partner_connections';
 
