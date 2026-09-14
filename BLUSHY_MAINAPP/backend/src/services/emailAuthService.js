@@ -209,17 +209,48 @@ async function checkPasswordBreached(password) {
   }
 }
 
+/**
+ * Refuses a verification request, and writes down why.
+ *
+ * Every rejection below returns a 4xx and sends no email. None of them used to
+ * log anything, so a user who never received a code looked exactly like one
+ * whose mail failed: "validation passed" was the last line written either way.
+ * Production showed six consecutive refusals for one address with no hint of
+ * the cause, and then a seventh that sent.
+ *
+ * Refusals go through this one helper so that a rejection cannot be added
+ * without a line to go with it. The reason is a short fixed tag, never the
+ * password or anything derived from it -- the address is already logged on the
+ * surrounding lines, and the tag is what was missing.
+ */
+function refuseVerification(email, status, message, reason) {
+  logger.warn(`sendEmailVerification: refused for ${email} (${reason}) -- no email sent`);
+  throw createHttpError(status, message);
+}
+
 export async function sendEmailVerification(payload, context = {}) {
   enforceStringPayload(payload, ['email', 'password', 'role', 'phoneNumber', 'cycleStartDate', 'mode']);
 
   const email = normalizeEmail(payload?.email);
   if (!email) {
+    // Before the first log line below, so without this the request left no
+    // trace at all.
+    logger.warn('sendEmailVerification: refused (email_missing_or_unparseable) -- no email sent');
     throw createHttpError(400, 'Valid email is required.');
   }
 
   // Validate email format and MX records before proceeding
   logger.info(`sendEmailVerification: starting validation for ${email} at ${new Date().toISOString()}`);
-  await validateEmailBeforeSend(email);
+  try {
+    await validateEmailBeforeSend(email);
+  } catch (error) {
+    refuseVerification(
+      email,
+      error?.statusCode ?? 400,
+      error?.message ?? 'Email address could not be verified.',
+      'address_validation_failed',
+    );
+  }
   logger.info(`sendEmailVerification: validation passed for ${email} at ${new Date().toISOString()}`);
 
   const password = typeof payload?.password === 'string' ? payload.password : '';
@@ -229,19 +260,30 @@ export async function sendEmailVerification(payload, context = {}) {
   const mode = payload?.mode === 'signup' ? 'signup' : 'login';
 
   if (mode !== 'signup') {
-    throw createHttpError(400, 'Email verification is only required for signup.');
+    refuseVerification(email, 400, 'Email verification is only required for signup.', 'mode_not_signup');
   }
 
   const existingUser = await userRepository.getUserByEmail(email);
   if (existingUser) {
-    throw createHttpError(409, 'Account already exists for this email. Use login.');
+    refuseVerification(email, 409, 'Account already exists for this email. Use login.', 'account_already_exists');
   }
 
   if (password.trim().length < 8) {
-    throw createHttpError(400, 'Password must be at least 8 characters.');
+    refuseVerification(email, 400, 'Password must be at least 8 characters.', 'password_too_short');
   }
 
-  await checkPasswordBreached(password.trim());
+  try {
+    await checkPasswordBreached(password.trim());
+  } catch (error) {
+    // The breach check fails open on its own for network trouble; a throw here
+    // means the password was actually found in a breach corpus.
+    refuseVerification(
+      email,
+      error?.statusCode ?? 400,
+      error?.message ?? 'Please choose a safer, unique password.',
+      'password_found_in_breach',
+    );
+  }
 
   const emailHash = hashEmail(email);
   const rawCode = generateUnusedCode();

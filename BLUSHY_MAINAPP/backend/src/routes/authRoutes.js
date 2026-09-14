@@ -39,7 +39,7 @@ import {
   withdrawMyConsent,
 } from '../controllers/consentController.js';
 import { optionalAuth } from '../middleware/optionalAuth.js';
-import { requireAuth } from '../middleware/requireAuth.js';
+import { requireAuth, requireRole } from '../middleware/requireAuth.js';
 import { submitFeedback } from '../controllers/feedbackController.js';
 import {
   loginRateLimiter,
@@ -52,7 +52,13 @@ const router = Router();
 
 router.post('/send-email-verification', otpRequestRateLimiter, sendEmailVerification);
 router.post('/verify-email-code', otpConfirmRateLimiter, verifyEmailCode);
-router.post('/admin/test-smtp', adminTestSmtp);
+// An unauthenticated caller could make production send a Blushy-branded
+// verification email to any address they named, from the verified Brevo
+// sender, at the global IP budget of 600 per five minutes. That is a phishing
+// relay wearing our own domain, and it spends the mail quota that real signup
+// codes come out of. It is a diagnostic, so it is behind the same admin guard
+// as every other admin surface, and behind the OTP budget as well.
+router.post('/admin/test-smtp', requireAuth, requireRole('admin'), otpRequestRateLimiter, adminTestSmtp);
 router.post('/complete-email-signup', completeEmailSignup);
 router.post('/login-email', loginRateLimiter, loginWithEmail);
 router.post('/refresh', refreshAuthToken);

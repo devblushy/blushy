@@ -460,15 +460,45 @@ export async function confirmEmailSignup(req, res, next) {
   }
 }
 
+/**
+ * Sends one verification email to prove the transport works.
+ *
+ * The route is admin-only now. The recipient is restricted too: an admin
+ * asking for an arbitrary address is still a relay, just one with a login.
+ * The only addresses allowed are the configured test recipient, the sender
+ * itself, and the calling admin's own -- all of which are already ours.
+ */
 export async function adminTestSmtp(req, res, next) {
   try {
-    const to = typeof req.body?.email === 'string' && req.body.email.trim().length > 0
-      ? req.body.email.trim()
-      : env.smtpTestTo || env.emailFrom;
+    const configured = [env.smtpTestTo, env.emailFrom]
+      .filter((value) => typeof value === 'string' && value.trim().length > 0)
+      .map((value) => value.trim().toLowerCase());
 
-    if (!to) {
+    // Read from the record rather than the token: the token is not guaranteed
+    // to carry an address, and this is the one value that decides the
+    // recipient.
+    const admin = await userRepository.getUserById(req.user?.userId);
+    const adminEmail = typeof admin?.email === 'string' ? admin.email.trim().toLowerCase() : null;
+
+    const allowed = new Set([...configured, ...(adminEmail ? [adminEmail] : [])]);
+
+    const requested = typeof req.body?.email === 'string' && req.body.email.trim().length > 0
+      ? req.body.email.trim()
+      : (env.smtpTestTo || env.emailFrom);
+
+    if (!requested) {
       throw createHttpError(400, 'No test recipient configured. Provide `email` in body or set SMTP_TEST_TO/EMAIL_FROM.');
     }
+
+    if (!allowed.has(requested.toLowerCase())) {
+      logger.warn(`Admin SMTP test refused: ${requested} is not the sender, the configured test recipient, or the caller.`);
+      throw createHttpError(
+        403,
+        'Test email may only be sent to the configured test recipient, the sender address, or your own account address.',
+      );
+    }
+
+    const to = requested;
 
     const verificationLink = `${resolvePublicBaseUrl(req)}/auth/confirm-email?token=test-token`;
 
