@@ -72,6 +72,13 @@ services:
       - key: APP_PUBLIC_URL
         sync: false
 
+      # Where a shareable partner invite link points. Optional: without it
+      # links use the origin that serves the web build today. Set it to the
+      # app's own https origin -- root path only, no trailing slash -- if that
+      # ever moves.
+      - key: PARTNER_INVITE_BASE_URL
+        sync: false
+
       - key: GOOGLE_CLIENT_ID_ANDROID
         sync: false
       - key: GOOGLE_CLIENT_ID_WEB

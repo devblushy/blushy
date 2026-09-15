@@ -71,6 +71,10 @@ export const env = {
   reacherApiUrl: process.env.REACHER_API_URL ?? 'https://api.reacher.email',
   reacherApiKey: process.env.REACHER_API_KEY ?? '',
   appPublicUrl: process.env.APP_PUBLIC_URL ?? '',
+  // Where a shareable partner invite link points. Separate from
+  // APP_PUBLIC_URL, which addresses this API (email verification lands on a
+  // route served here); an invite has to open the *app*.
+  partnerInviteBaseUrl: process.env.PARTNER_INVITE_BASE_URL ?? '',
   mobileAppDeepLinkBase: process.env.MOBILE_APP_DEEP_LINK_BASE ?? 'blushy://auth/email-verified',
   // Chat and speech-to-text are separate providers on purpose.
   //

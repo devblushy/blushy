@@ -5,6 +5,7 @@ import { createHttpError } from '../utils/httpError.js';
 import { publishToUsers } from '../utils/realtimeHub.js';
 import { emailService } from '../services/emailService.js';
 import { logger } from '../utils/logger.js';
+import { buildInviteUrl } from '../utils/inviteUrl.js';
 
 /// Returns the full user record, so unlike the other controllers' helpers this
 /// cannot be skipped when the middleware has already verified the request --
@@ -64,7 +65,7 @@ export async function createPartnerInviteLink(req, res, next) {
     res.status(201).json({
       message: 'Invite link generated successfully.',
       inviteCode: token,
-      inviteUrl: `https://blushy.life/partner/claim#code=${token}`,
+      inviteUrl: buildInviteUrl(token),
       expiresAt: expiresAt.toISOString(),
       invitationId: invitation.invitationId,
     });

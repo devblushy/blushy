@@ -1596,6 +1596,14 @@ test('invite: an invite link can be claimed and connects the pair', async () => 
   const code = link.body.code ?? link.body.inviteCode ?? link.body.invite?.code;
   assert.ok(code, 'a link invite needs a code to share');
 
+  // The link has to open something. It used to name a path that answered 404
+  // on the host it pointed at, so the invite could be generated, shared and
+  // opened and still reach no app at all.
+  const url = new URL(link.body.inviteUrl);
+  assert.equal(url.protocol, 'https:', 'an invite is opened on another device');
+  assert.equal(url.pathname, '/', 'only the root is safe on a host without a SPA rewrite');
+  assert.equal(url.hash, `#code=${code}`, 'the token travels in the fragment, not the query');
+
   const claimed = await api('POST', '/partner/invite/claim', {
     token: man.token,
     body: { code },
